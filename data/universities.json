@@ -1,0 +1,163 @@
+[
+  {
+    "id": "metu",
+    "name": { "tk": "Orta Gündogar Tehniki Uniwersiteti", "ru": "Ближневосточный технический университет", "en": "Middle East Technical University" },
+    "country": "Turkey",
+    "city": "Ankara",
+    "tuition_usd": 600,
+    "moe_approved": true,
+    "ranking_qs": 601,
+    "languages": ["tr", "en"],
+    "majors": ["Engineering", "Computer Science", "Architecture", "Economics"],
+    "official_website": "https://www.metu.edu.tr",
+    "application_portal_url": "https://oidb.metu.edu.tr",
+    "entrance_requirements": {
+      "turkey": {
+        "yos": true,
+        "quota": true,
+        "notes": "YÖS exam required. Fixed quota for international students."
+      }
+    }
+  },
+  {
+    "id": "hacettepe",
+    "name": { "tk": "Hasettepe Uniwersiteti", "ru": "Университет Хаджеттепе", "en": "Hacettepe University" },
+    "country": "Turkey",
+    "city": "Ankara",
+    "tuition_usd": 500,
+    "moe_approved": true,
+    "ranking_qs": 751,
+    "languages": ["tr"],
+    "majors": ["Medicine", "Pharmacy", "Engineering", "Education"],
+    "official_website": "https://www.hacettepe.edu.tr",
+    "application_portal_url": "https://international.hacettepe.edu.tr",
+    "entrance_requirements": {
+      "turkey": {
+        "yos": true,
+        "quota": true,
+        "notes": "YÖS required. Apply through university portal in March–May."
+      }
+    }
+  },
+  {
+    "id": "mgu",
+    "name": { "tk": "Moskwa Döwlet Uniwersiteti", "ru": "Московский государственный университет", "en": "Lomonosov Moscow State University" },
+    "country": "Russia",
+    "city": "Moscow",
+    "tuition_usd": 4500,
+    "moe_approved": true,
+    "ranking_qs": 87,
+    "languages": ["ru"],
+    "majors": ["Physics", "Mathematics", "Chemistry", "Law", "Economics", "Biology"],
+    "official_website": "https://www.msu.ru",
+    "application_portal_url": "https://international.msu.ru",
+    "entrance_requirements": {
+      "russia": {
+        "ege": true,
+        "quota": true,
+        "notes": "EGE required. Government quota places available for Turkmen citizens through MoE."
+      }
+    }
+  },
+  {
+    "id": "spbgu",
+    "name": { "tk": "Sankt-Peterburg Döwlet Uniwersiteti", "ru": "Санкт-Петербургский государственный университет", "en": "Saint Petersburg State University" },
+    "country": "Russia",
+    "city": "Saint Petersburg",
+    "tuition_usd": 3800,
+    "moe_approved": true,
+    "ranking_qs": 242,
+    "languages": ["ru"],
+    "majors": ["Law", "Economics", "History", "International Relations", "Physics"],
+    "official_website": "https://spbu.ru",
+    "application_portal_url": "https://spbu.ru/international",
+    "entrance_requirements": {
+      "russia": {
+        "ege": true,
+        "quota": true,
+        "notes": "EGE or internal entrance exams. Quota available through Turkmenistan MoE."
+      }
+    }
+  },
+  {
+    "id": "ucl",
+    "name": { "tk": "Londonyň Uniwersitet Kolleji", "ru": "Университетский колледж Лондона", "en": "University College London" },
+    "country": "United Kingdom",
+    "city": "London",
+    "tuition_usd": 28000,
+    "moe_approved": false,
+    "ranking_qs": 9,
+    "languages": ["en"],
+    "majors": ["Medicine", "Law", "Engineering", "Arts", "Sciences"],
+    "official_website": "https://www.ucl.ac.uk",
+    "application_portal_url": "https://www.ucas.com",
+    "entrance_requirements": {
+      "uk": {
+        "ucas": true,
+        "sat": "optional",
+        "notes": "Apply via UCAS. A-levels or equivalent required. Highly competitive."
+      }
+    }
+  },
+  {
+    "id": "istanbul",
+    "name": { "tk": "Stambul Uniwersiteti", "ru": "Стамбульский университет", "en": "Istanbul University" },
+    "country": "Turkey",
+    "city": "Istanbul",
+    "tuition_usd": 400,
+    "moe_approved": true,
+    "ranking_qs": null,
+    "languages": ["tr"],
+    "majors": ["Medicine", "Law", "Economics", "Engineering", "Literature"],
+    "official_website": "https://www.istanbul.edu.tr",
+    "application_portal_url": "https://ubs.istanbul.edu.tr",
+    "entrance_requirements": {
+      "turkey": {
+        "yos": true,
+        "quota": true,
+        "notes": "YÖS required. One of the largest universities in Turkey."
+      }
+    }
+  },
+  {
+    "id": "kazan",
+    "name": { "tk": "Kazan Federal Uniwersiteti", "ru": "Казанский федеральный университет", "en": "Kazan Federal University" },
+    "country": "Russia",
+    "city": "Kazan",
+    "tuition_usd": 2800,
+    "moe_approved": true,
+    "ranking_qs": 601,
+    "languages": ["ru", "tt"],
+    "majors": ["Medicine", "Law", "Engineering", "Chemistry", "IT"],
+    "official_website": "https://kpfu.ru",
+    "application_portal_url": "https://kpfu.ru/international",
+    "entrance_requirements": {
+      "russia": {
+        "ege": true,
+        "quota": true,
+        "notes": "EGE or university entrance exam. Quota for international students."
+      }
+    }
+  },
+  {
+    "id": "mit",
+    "name": { "tk": "Massaçusets Tehnologiýa Instituty", "ru": "Массачусетский технологический институт", "en": "Massachusetts Institute of Technology" },
+    "country": "USA",
+    "city": "Cambridge, MA",
+    "tuition_usd": 59750,
+    "moe_approved": false,
+    "ranking_qs": 1,
+    "languages": ["en"],
+    "majors": ["Engineering", "Computer Science", "Physics", "Mathematics", "Management"],
+    "official_website": "https://www.mit.edu",
+    "application_portal_url": "https://apply.mit.edu",
+    "entrance_requirements": {
+      "usa": {
+        "common_app": false,
+        "sat": "required",
+        "act": "optional",
+        "notes": "MIT Application (not Common App). SAT/ACT required. Extremely competitive."
+      }
+    }
+  }
+]

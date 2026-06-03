@@ -1,0 +1,10 @@
+.agents/
+.claude/
+AGENTS.md
+CLAUDE.md
+skills-lock.json
+
+.next/
+node_modules/
+dist/
+
