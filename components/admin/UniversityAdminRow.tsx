@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
+import Link from 'next/link';
 import { formatDate } from '@/lib/format';
 import {
   deleteUniversityAction,
@@ -55,14 +56,23 @@ export function UniversityAdminRow({ university: u }: { university: RowData }) {
         {formatDate(new Date(u.created_at))}
       </td>
       <td className="px-4 py-3 text-right">
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          aria-label={`Delete ${u.name_en}`}
-          className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
-        >
-          Delete
-        </button>
+        <div className="flex items-center justify-end gap-3">
+          <Link
+            href={`/admin/universities/${u.id}/edit`}
+            aria-label={`Edit ${u.name_en}`}
+            className="text-xs text-primary hover:underline"
+          >
+            Edit
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            aria-label={`Delete ${u.name_en}`}
+            className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
+          >
+            Delete
+          </button>
+        </div>
       </td>
     </tr>
   );
