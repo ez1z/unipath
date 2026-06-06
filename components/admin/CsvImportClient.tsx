@@ -69,16 +69,23 @@ export function CsvImportClient({ existingData }: Props) {
       header: true,
       skipEmptyLines: true,
       complete(results) {
+        const seenNames = new Map<string, number>();
         const parsed: ParsedRow[] = results.data.map((raw, index) => {
           const result = CsvRowSchema.safeParse(raw);
-          return {
-            raw,
-            index,
-            errors: result.success
-              ? []
-              : result.error.issues.map((i) => `${String(i.path[0])}: ${i.message}`),
-            valid: result.success,
-          };
+          const errors = result.success
+            ? []
+            : result.error.issues.map((i) => `${String(i.path[0])}: ${i.message}`);
+
+          const nameEn = raw.name_en?.trim();
+          if (nameEn) {
+            if (seenNames.has(nameEn)) {
+              errors.push(`name_en: Duplicate — same as row ${seenNames.get(nameEn)! + 1}`);
+            } else {
+              seenNames.set(nameEn, index);
+            }
+          }
+
+          return { raw, index, errors, valid: result.success && errors.length === 0 };
         });
         setRows(parsed);
       },

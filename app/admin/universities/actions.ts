@@ -52,6 +52,13 @@ async function requireAdmin() {
   return supabase;
 }
 
+function friendlyDbError(error: { code?: string; message: string }): string {
+  if (error.code === '23505') {
+    return 'A university with this English name already exists.';
+  }
+  return error.message;
+}
+
 function revalidateUniversityPaths() {
   for (const locale of SUPPORTED_LOCALES) {
     revalidatePath(`/${locale}/universities`);
@@ -91,7 +98,7 @@ export async function importUniversitiesAction(
     .from('universities')
     .upsert(rows, { onConflict: 'name_en', ignoreDuplicates: false });
 
-  if (error) return { success: false, error: error.message };
+  if (error) return { success: false, error: friendlyDbError(error) };
 
   revalidateUniversityPaths();
   return { success: true, count: rows.length };
@@ -134,7 +141,7 @@ export async function createUniversityAction(
   }
 
   const { error } = await supabase.from('universities').insert(parsed.data);
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyDbError(error) };
 
   revalidateUniversityPaths();
   redirect('/admin/universities');
@@ -154,7 +161,7 @@ export async function updateUniversityAction(
   }
 
   const { error } = await supabase.from('universities').update(parsed.data).eq('id', id);
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyDbError(error) };
 
   revalidateUniversityPaths();
   redirect('/admin/universities');
