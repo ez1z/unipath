@@ -1,92 +1,47 @@
-import { z } from 'zod';
-import rawData from '@/data/universities.json';
+import { createClient } from '@/lib/supabase/server';
+import type { UniversityDbRow } from './university-types';
+import { dbRowToUniversity } from './university-types';
 
-const EntranceRequirementsSchema = z.record(z.string(), z.unknown());
+export type { University } from './university-types';
+export type { FilterParams } from './university-types';
 
-const UniversitySchema = z.object({
-  id: z.string(),
-  name: z.object({ tk: z.string(), ru: z.string(), en: z.string() }),
-  country: z.string(),
-  city: z.string(),
-  tuition_usd: z.number().nonnegative(),
-  moe_approved: z.boolean(),
-  ranking_qs: z.number().int().positive().nullable().optional(),
-  languages: z.array(z.string()),
-  majors: z.array(z.string()),
-  official_website: z.string().url(),
-  application_portal_url: z.string().url(),
-  entrance_requirements: EntranceRequirementsSchema,
-});
-
-export type University = z.infer<typeof UniversitySchema>;
-
-const parsed = z.array(UniversitySchema).safeParse(rawData);
-if (!parsed.success) {
-  throw new Error(`Invalid universities.json:\n${parsed.error.toString()}`);
+async function queryAll() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('universities')
+    .select('*')
+    .order('name_en', { ascending: true });
+  if (error) throw new Error(`Failed to fetch universities: ${error.message}`);
+  return (data as UniversityDbRow[]).map(dbRowToUniversity);
 }
 
-const universities: University[] = parsed.data;
-
-export function getAll(): University[] {
-  return universities;
+export async function getAll() {
+  return queryAll();
 }
 
-export function getById(id: string): University | undefined {
-  return universities.find((u) => u.id === id);
+export async function getById(id: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('universities')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw new Error(`Failed to fetch university: ${error.message}`);
+  if (!data) return undefined;
+  return dbRowToUniversity(data as UniversityDbRow);
 }
 
-export function getAllIds(): string[] {
-  return universities.map((u) => u.id);
+export async function getUniqueCountries(): Promise<string[]> {
+  const all = await queryAll();
+  return [...new Set(all.map((u) => u.country))].sort();
 }
 
-export type FilterParams = {
-  query?: string;
-  country?: string;
-  language?: string;
-  major?: string;
-  moeOnly?: boolean;
-};
-
-export function filterUniversities(params: FilterParams): University[] {
-  let result = universities;
-
-  if (params.moeOnly) {
-    result = result.filter((u) => u.moe_approved);
-  }
-  if (params.country) {
-    result = result.filter((u) => u.country === params.country);
-  }
-  if (params.language) {
-    result = result.filter((u) => u.languages.includes(params.language!));
-  }
-  if (params.major) {
-    result = result.filter((u) =>
-      u.majors.some((m) => m.toLowerCase().includes(params.major!.toLowerCase()))
-    );
-  }
-  if (params.query) {
-    const q = params.query.toLowerCase();
-    result = result.filter(
-      (u) =>
-        u.name.en.toLowerCase().includes(q) ||
-        u.name.ru.toLowerCase().includes(q) ||
-        u.name.tk.toLowerCase().includes(q) ||
-        u.city.toLowerCase().includes(q) ||
-        u.country.toLowerCase().includes(q)
-    );
-  }
-
-  return result;
+export async function getUniqueLanguages(): Promise<string[]> {
+  const all = await queryAll();
+  return [...new Set(all.flatMap((u) => u.languages))].sort();
 }
 
-export function getUniqueCountries(): string[] {
-  return [...new Set(universities.map((u) => u.country))].sort();
-}
-
-export function getUniqueLanguages(): string[] {
-  return [...new Set(universities.flatMap((u) => u.languages))].sort();
-}
-
-export function getUniqueMajors(): string[] {
-  return [...new Set(universities.flatMap((u) => u.majors))].sort();
+export async function getUniqueMajors(): Promise<string[]> {
+  const all = await queryAll();
+  return [...new Set(all.flatMap((u) => u.majors))].sort();
 }

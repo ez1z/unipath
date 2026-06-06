@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getById, getAllIds } from '@/lib/data/universities';
+import { getById } from '@/lib/data/universities';
 import { formatTuition } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
@@ -10,15 +10,13 @@ import type { Locale } from '@/lib/constants';
 
 type Props = { params: { locale: Locale; id: string } };
 
-export function generateStaticParams() {
-  return getAllIds().map((id) => ({ id }));
-}
+export const dynamic = 'force-dynamic';
 
-export default function UniversityDetailPage({ params: { locale, id } }: Props) {
-  const university = getById(id);
+export default async function UniversityDetailPage({ params: { locale, id } }: Props) {
+  const university = await getById(id);
   if (!university) notFound();
 
-  const t = useTranslations('university');
+  const t = await getTranslations('university');
   const name = university.name[locale] ?? university.name.en;
 
   return (

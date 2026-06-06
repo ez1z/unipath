@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
-import { filterUniversities } from '@/lib/data/universities';
+import { filterUniversities } from '@/lib/data/filter-universities';
 import { UniversityCard } from './UniversityCard';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
@@ -26,14 +26,14 @@ export function UniversityListClient({ universities, locale, countries, language
 
   const filtered = useMemo(
     () =>
-      filterUniversities({
+      filterUniversities(universities, {
         query: query || undefined,
         country: country || undefined,
         language: language || undefined,
         major: major || undefined,
         moeOnly,
       }),
-    [query, country, language, major, moeOnly]
+    [universities, query, country, language, major, moeOnly]
   );
 
   function clearFilters() {

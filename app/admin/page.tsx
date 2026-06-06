@@ -49,10 +49,25 @@ export default async function AdminPage() {
           <p className="text-muted-foreground text-sm mt-1">Signed in as {user.email}</p>
         </div>
 
-        {/* Placeholder content card */}
-        <div className="bg-card rounded-xl border border-border shadow-card border-t-4 border-t-gold p-12 text-center">
-          <GulPattern size={48} className="text-gold/30 mx-auto mb-4" />
-          <p className="text-muted-foreground text-sm">Admin features coming soon.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <a
+            href="/admin/universities"
+            className="bg-card rounded-xl border border-border border-t-4 border-t-primary p-6 hover:shadow-card transition-shadow group"
+          >
+            <div className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+              Universities
+            </div>
+            <p className="text-sm text-muted-foreground">View, manage, and delete university records.</p>
+          </a>
+          <a
+            href="/admin/universities/import"
+            className="bg-card rounded-xl border border-border border-t-4 border-t-gold p-6 hover:shadow-card transition-shadow group"
+          >
+            <div className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+              Import CSV
+            </div>
+            <p className="text-sm text-muted-foreground">Bulk-upload universities from a CSV file.</p>
+          </a>
         </div>
       </main>
     </div>

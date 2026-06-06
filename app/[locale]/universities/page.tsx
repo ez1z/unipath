@@ -1,17 +1,21 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { getAll, getUniqueCountries, getUniqueLanguages, getUniqueMajors } from '@/lib/data/universities';
 import { UniversityListClient } from '@/components/university/UniversityListClient';
 import { GulPattern } from '@/components/ui/GulPattern';
 import type { Locale } from '@/lib/constants';
 
+export const dynamic = 'force-dynamic';
+
 type Props = { params: { locale: Locale } };
 
-export default function UniversitiesPage({ params: { locale } }: Props) {
-  const t = useTranslations('universities');
-  const universities = getAll();
-  const countries = getUniqueCountries();
-  const languages = getUniqueLanguages();
-  const majors = getUniqueMajors();
+export default async function UniversitiesPage({ params: { locale } }: Props) {
+  const t = await getTranslations('universities');
+  const [universities, countries, languages, majors] = await Promise.all([
+    getAll(),
+    getUniqueCountries(),
+    getUniqueLanguages(),
+    getUniqueMajors(),
+  ]);
 
   return (
     <>

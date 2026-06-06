@@ -1,14 +1,16 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { getAll } from "@/lib/data/universities";
 import type { Locale } from "@/lib/constants";
 import { GulPattern } from "@/components/ui/GulPattern";
 
+export const dynamic = 'force-dynamic';
+
 type Props = { params: { locale: Locale } };
 
-export default function HomePage({ params: { locale } }: Props) {
-  const t = useTranslations("home");
-  const universities = getAll();
+export default async function HomePage({ params: { locale } }: Props) {
+  const t = await getTranslations("home");
+  const universities = await getAll();
   const moeCount = universities.filter((u) => u.moe_approved).length;
   const countryCount = new Set(universities.map((u) => u.country)).size;
 

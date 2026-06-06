@@ -1,14 +1,16 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { getAll } from '@/lib/data/universities';
 import { CompareClient } from '@/components/university/CompareClient';
 import { GulPattern } from '@/components/ui/GulPattern';
 import type { Locale } from '@/lib/constants';
 
+export const dynamic = 'force-dynamic';
+
 type Props = { params: { locale: Locale } };
 
-export default function ComparePage({ params: { locale } }: Props) {
-  const t = useTranslations('compare');
-  const universities = getAll();
+export default async function ComparePage({ params: { locale } }: Props) {
+  const t = await getTranslations('compare');
+  const universities = await getAll();
 
   return (
     <>
