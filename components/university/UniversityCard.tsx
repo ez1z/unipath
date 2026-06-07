@@ -15,7 +15,7 @@ export function UniversityCard({ university, locale }: Props) {
   const name = university.name[locale] ?? university.name.en;
 
   return (
-    <div className="bg-card rounded-xl border border-border border-l-[3px] border-l-primary shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-4 p-5">
+    <div data-testid="university-card" className="bg-card rounded-xl border border-border border-l-[3px] border-l-primary shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-4 p-5">
       <div>
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-heading font-semibold text-base leading-snug text-foreground">{name}</h3>

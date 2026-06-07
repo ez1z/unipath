@@ -64,21 +64,28 @@ export const CsvRowSchema = z.object({
   name_tk: z.string().min(1, 'name_tk is required'),
   country: z.string().min(1, 'country is required'),
   city: z.string().min(1, 'city is required'),
-  tuition_usd: z.string().transform((v) => {
+  tuition_usd: z.string().transform((v, ctx) => {
     const n = Number(v);
-    if (isNaN(n) || n < 0) throw new Error('must be a non-negative number');
+    if (isNaN(n) || n < 0) {
+      ctx.addIssue({ code: 'custom', message: 'must be a non-negative number' });
+      return z.NEVER;
+    }
     return n;
   }),
-  moe_approved: z.string().transform((v) => {
+  moe_approved: z.string().transform((v, ctx) => {
     const lower = v.toLowerCase().trim();
     if (lower === 'true') return true;
     if (lower === 'false') return false;
-    throw new Error('must be "true" or "false"');
+    ctx.addIssue({ code: 'custom', message: 'must be "true" or "false"' });
+    return z.NEVER;
   }),
-  ranking_qs: z.string().optional().transform((v) => {
+  ranking_qs: z.string().optional().transform((v, ctx) => {
     if (!v || v.trim() === '') return null;
     const n = parseInt(v, 10);
-    if (isNaN(n) || n <= 0) throw new Error('must be a positive integer or blank');
+    if (isNaN(n) || n <= 0) {
+      ctx.addIssue({ code: 'custom', message: 'must be a positive integer or blank' });
+      return z.NEVER;
+    }
     return n;
   }),
   languages: z.string().transform((v) =>
@@ -89,12 +96,13 @@ export const CsvRowSchema = z.object({
   ),
   official_website: z.string().url('must be a valid URL'),
   application_portal_url: z.string().url('must be a valid URL'),
-  entrance_requirements: z.string().optional().transform((v) => {
+  entrance_requirements: z.string().optional().transform((v, ctx) => {
     if (!v || v.trim() === '') return {};
     try {
       return JSON.parse(v) as Record<string, unknown>;
     } catch {
-      throw new Error('must be valid JSON or blank');
+      ctx.addIssue({ code: 'custom', message: 'must be valid JSON or blank' });
+      return z.NEVER;
     }
   }),
 });
