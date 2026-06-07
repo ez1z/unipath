@@ -18,10 +18,6 @@ export async function signInAction(formData: FormData): Promise<{ error: string 
     return { error: parsed.error.issues[0].message };
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return { error: 'Invalid email or password.' };
-  }
-
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithPassword({

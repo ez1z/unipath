@@ -40,10 +40,9 @@ jobs:
 
       - name: Export Supabase credentials
         run: |
-          SUPABASE_URL=$(npx supabase status | grep 'API URL' | awk '{print $NF}')
-          SUPABASE_ANON_KEY=$(npx supabase status | grep 'anon key' | awk '{print $NF}')
-          echo "NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" >> $GITHUB_ENV
+          STATUS=$(npx supabase status --output json)
+          echo "NEXT_PUBLIC_SUPABASE_URL=$(echo "$STATUS" | jq -r '.api_url')" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$(echo "$STATUS" | jq -r '.anon_key')" >> $GITHUB_ENV
           echo "TEST_ADMIN_EMAIL=admin@test.local" >> $GITHUB_ENV
           echo "TEST_ADMIN_PASSWORD=TestPassword123!" >> $GITHUB_ENV
 
