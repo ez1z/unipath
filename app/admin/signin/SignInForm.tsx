@@ -17,7 +17,7 @@ export function SignInForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
           Email address

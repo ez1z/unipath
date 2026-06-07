@@ -6,9 +6,11 @@ import { SignInForm } from './SignInForm';
 export const metadata = { title: 'Admin Sign In — UniPath' };
 
 export default async function SignInPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) redirect('/admin');
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) redirect('/admin');
+  }
 
   return (
     <main className="min-h-screen flex flex-col">
