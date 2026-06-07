@@ -21,10 +21,10 @@ begin
   ) on conflict (id) do nothing;
 
   insert into auth.identities (
-    id, user_id, identity_data, provider,
+    provider_id, user_id, identity_data, provider,
     last_sign_in_at, created_at, updated_at
   ) values (
-    v_admin_id,
+    'admin@test.local',
     v_admin_id,
     format('{"sub":"%s","email":"admin@test.local"}', v_admin_id)::jsonb,
     'email',
