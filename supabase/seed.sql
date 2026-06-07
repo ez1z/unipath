@@ -24,7 +24,7 @@ begin
     id, user_id, identity_data, provider,
     last_sign_in_at, created_at, updated_at
   ) values (
-    v_admin_id::text,
+    v_admin_id,
     v_admin_id,
     format('{"sub":"%s","email":"admin@test.local"}', v_admin_id)::jsonb,
     'email',
