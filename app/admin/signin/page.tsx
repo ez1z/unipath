@@ -6,10 +6,14 @@ import { SignInForm } from './SignInForm';
 export const metadata = { title: 'Admin Sign In — UniPath' };
 
 export default async function SignInPage() {
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) redirect('/admin');
+  try {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) redirect('/admin');
+    }
+  } catch {
+    // Supabase unreachable — render sign-in form
   }
 
   return (

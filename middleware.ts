@@ -42,7 +42,13 @@ export async function middleware(request: NextRequest) {
       }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    let user = null;
+    try {
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    } catch {
+      // Supabase unreachable — treat as unauthenticated
+    }
 
     if (!user) {
       return NextResponse.redirect(new URL('/admin/signin', request.url));
