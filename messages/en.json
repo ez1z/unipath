@@ -174,7 +174,8 @@
     "error_retry": "Try again",
     "not_found": "Page not found",
     "back_home": "Back to home",
-    "open_new_tab": "Opens in new tab"
+    "open_new_tab": "Opens in new tab",
+    "data_disclaimer": "University data may be incomplete or outdated. Always verify tuition, requirements, and deadlines on the university's official website before applying."
   },
   "auth": {
     "signin_title": "Sign in",

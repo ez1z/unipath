@@ -38,6 +38,7 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
     : [];
 
   const t = await getTranslations('university');
+  const tCommon = await getTranslations('common');
   const name = university.name[locale] ?? university.name.en;
 
   return (
@@ -151,6 +152,16 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
           country={university.country}
           locale={locale}
         />
+
+        {/* Data accuracy notice */}
+        <div className="flex gap-2.5 items-start rounded-lg border border-gold/30 bg-gold/5 px-4 py-3 mb-4 text-sm text-foreground/70">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5 text-gold" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p>{tCommon('data_disclaimer')}</p>
+        </div>
 
         {/* Action links */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">

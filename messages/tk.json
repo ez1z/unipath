@@ -174,7 +174,8 @@
     "error_retry": "Täzeden synanyşyň",
     "not_found": "Sahypa tapylmady",
     "back_home": "Baş sahypa dolan",
-    "open_new_tab": "Täze goýmada açylýar"
+    "open_new_tab": "Täze goýmada açylýar",
+    "data_disclaimer": "Uniwersitetler baradaky maglumatlar doly ýa-da täze bolmadyk bolup biler. Ýüz tutmazdan ozal töleg, talaplar we möhletleri uniwersitetiň resmi saýtynda barlaň."
   },
   "auth": {
     "signin_title": "Giriş",
