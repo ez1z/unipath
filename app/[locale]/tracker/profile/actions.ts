@@ -36,7 +36,7 @@ export async function updateProfileAction(
     gmat_total: emptyToNull(formData.get('gmat_total')),
     duolingo_score: emptyToNull(formData.get('duolingo_score')),
     gpa: emptyToNull(formData.get('gpa')),
-    gpa_scale: formData.get('gpa_scale') ?? '4.0',
+    gpa_scale: '5.0',
     desired_countries: formData.getAll('desired_countries'),
     desired_majors: formData.getAll('desired_majors'),
     dream_university_ids: formData.getAll('dream_university_ids'),

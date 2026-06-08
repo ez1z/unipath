@@ -19,12 +19,10 @@ export default async function SignInPage({ params }: Props) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) redirect(`/${locale}`);
+    if (user) redirect(`/${locale}/tracker/profile`);
   } catch {
     // Supabase unreachable — render form
   }
-
-  const oauthError = null; // passed via URL in real use; SignInForm reads searchParams
 
   return (
     <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16 bg-background relative overflow-hidden">

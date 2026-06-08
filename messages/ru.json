@@ -153,8 +153,6 @@
     "password_label": "Пароль",
     "name_label": "Полное имя",
     "name_placeholder": "Ваше имя",
-    "continue_with_google": "Войти через Google",
-    "or": "или",
     "signin_button": "Войти",
     "signup_button": "Зарегистрироваться",
     "signing_in": "Вход…",
@@ -165,7 +163,6 @@
     "signin_link": "Войти",
     "signout_button": "Выйти",
     "tracker_nav": "Мой трекер",
-    "error_oauth": "Вход через Google не удался. Попробуйте снова.",
     "age_label": "Возраст",
     "age_placeholder": "Ваш возраст",
     "error_age_invalid": "Введите корректный возраст (14–100)",
@@ -176,9 +173,6 @@
     "error_email_in_use": "Аккаунт с таким адресом уже существует",
     "error_invalid_credentials": "Неверный email или пароль",
     "error_generic": "Что-то пошло не так. Попробуйте снова.",
-    "confirm_email_title": "Проверьте почту",
-    "confirm_email_desc": "Мы отправили ссылку для подтверждения на {email}. Перейдите по ней, чтобы активировать аккаунт.",
-    "confirm_email_spam": "Не получили письмо? Проверьте папку «Спам».",
     "profile_link": "Мой профиль"
   },
   "profile": {
@@ -214,6 +208,15 @@
     "no_scores_yet": "Баллы ещё не добавлены",
     "gpa_scale_4": "Шкала 4.0",
     "gpa_scale_5": "Шкала 5.0",
-    "gpa_scale_100": "100-балльная шкала"
+    "gpa_scale_100": "100-балльная шкала",
+    "toefl_scale_label": "Шкала",
+    "toefl_scale_120": "0–120",
+    "toefl_scale_6": "0–6",
+    "toefl_converted": "Эквивалент",
+    "gpa_hint": "Туркменская шкала 5.0 (2.0–5.0)",
+    "gpa_4_equiv": "Эквивалент по шкале 4.0",
+    "gpa_100_equiv": "Эквивалент (100 баллов)",
+    "country_search_placeholder": "Поиск стран…",
+    "gpa_error_range": "GPA должен быть от 2.0 до 5.0"
   }
 }

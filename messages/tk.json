@@ -153,8 +153,6 @@
     "password_label": "Parol",
     "name_label": "Doly adyňyz",
     "name_placeholder": "Adyňyz",
-    "continue_with_google": "Google bilen dowam ediň",
-    "or": "ýa-da",
     "signin_button": "Giriş",
     "signup_button": "Hasap aç",
     "signing_in": "Girýär…",
@@ -165,7 +163,6 @@
     "signin_link": "Giriş",
     "signout_button": "Çyk",
     "tracker_nav": "Yzarlaýjy",
-    "error_oauth": "Google bilen giriş başartmady. Täzeden synanyşyň.",
     "age_label": "Ýaş",
     "age_placeholder": "Ýaşyňyz",
     "error_age_invalid": "Dogry ýaş giriziň (14–100)",
@@ -176,9 +173,6 @@
     "error_email_in_use": "Bu e-poçta bilen hasap eýýäm bar",
     "error_invalid_credentials": "Nädogry e-poçta ýa-da parol",
     "error_generic": "Bir zat ýalňyş gitdi. Täzeden synanyşyň.",
-    "confirm_email_title": "E-poçtaňyzy barlaň",
-    "confirm_email_desc": "{email} adresine tassyklama salgysy iberildi. Hasabyňyzy işjeňleşdirmek üçin ony basyň.",
-    "confirm_email_spam": "Hat gelmedimi? Spam bukjasyny barlaň.",
     "profile_link": "Meniň profilim"
   },
   "profile": {
@@ -214,6 +208,15 @@
     "no_scores_yet": "Heniz bal girizilmedi",
     "gpa_scale_4": "4.0 ölçegi",
     "gpa_scale_5": "5.0 ölçegi",
-    "gpa_scale_100": "100 ballyk ölçeg"
+    "gpa_scale_100": "100 ballyk ölçeg",
+    "toefl_scale_label": "Ölçeg",
+    "toefl_scale_120": "0–120",
+    "toefl_scale_6": "0–6",
+    "toefl_converted": "Deňligi",
+    "gpa_hint": "Türkmen 5.0 ölçegi (2.0–5.0)",
+    "gpa_4_equiv": "4.0 ölçegiň deňligi",
+    "gpa_100_equiv": "100 ballyk deňligi",
+    "country_search_placeholder": "Ýurt gözläň…",
+    "gpa_error_range": "OGB 2.0 bilen 5.0 aralygynda bolmaly"
   }
 }

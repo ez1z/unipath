@@ -37,6 +37,12 @@ export default async function ProfilePage({ params }: Props) {
   const profile = profileResult.data ?? null;
   const t = await getTranslations({ locale, namespace: 'profile' });
 
+  const defaultDisplayName =
+    (profile?.display_name as string | null) ??
+    (user.user_metadata?.full_name as string | undefined) ??
+    (user.user_metadata?.name as string | undefined) ??
+    '';
+
   return (
     <>
       <div className="bg-primary">
@@ -61,6 +67,7 @@ export default async function ProfilePage({ params }: Props) {
           profile={profile}
           universities={universities}
           majors={majors}
+          defaultDisplayName={defaultDisplayName}
         />
       </div>
     </>

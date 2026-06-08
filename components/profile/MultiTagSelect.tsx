@@ -70,7 +70,7 @@ export function MultiTagSelect({ displayOptions, selected, onChange, placeholder
   });
 
   return (
-    <div ref={containerRef} className="space-y-2">
+    <div ref={containerRef} className={`space-y-2${open && filtered.length > 0 ? ' relative z-[100]' : ''}`}>
       <div className="relative">
         <input
           ref={inputRef}
@@ -84,14 +84,14 @@ export function MultiTagSelect({ displayOptions, selected, onChange, placeholder
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-secondary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           aria-autocomplete="list"
           aria-expanded={open && filtered.length > 0}
         />
         {open && filtered.length > 0 && (
           <ul
             role="listbox"
-            className="absolute z-20 left-0 right-0 top-full mt-1 bg-popover border border-border rounded-lg shadow-card-hover max-h-52 overflow-y-auto"
+            className="absolute z-20 left-0 right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-card-hover max-h-52 overflow-y-auto"
           >
             {filtered.map((opt, i) => (
               <li

@@ -3,7 +3,6 @@
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
 import { signInWithEmailAction } from '../actions';
 import type { Locale } from '@/lib/constants';
 
@@ -11,9 +10,7 @@ type Props = { locale: Locale };
 
 export function SignInForm({ locale }: Props) {
   const t = useTranslations('auth');
-  const searchParams = useSearchParams();
-  const oauthError = searchParams.get('error') === 'oauth_failed';
-  const [error, setError] = useState<string | null>(oauthError ? t('error_oauth') : null);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
