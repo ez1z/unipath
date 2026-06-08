@@ -62,6 +62,12 @@ export async function NavBar({ locale }: Props) {
             >
               {t('scholarships')}
             </Link>
+            <Link
+              href={`/${locale}/support`}
+              className="text-primary-foreground/80 hover:text-gold transition-colors"
+            >
+              {t('support')}
+            </Link>
           </div>
         </div>
         <div className="flex items-center gap-1">

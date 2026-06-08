@@ -87,6 +87,13 @@ export function MobileMenu({ locale, user }: Props) {
           >
             {t('scholarships')}
           </Link>
+          <Link
+            href={`/${locale}/support`}
+            onClick={() => setOpen(false)}
+            className="block px-4 py-3 text-sm text-primary-foreground/80 hover:text-gold hover:bg-white/5 transition-colors border-t border-white/5"
+          >
+            {t('support')}
+          </Link>
 
           <div className="border-t border-white/10 mt-1 pt-1">
             {user && (
