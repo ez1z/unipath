@@ -19,13 +19,35 @@ create table if not exists public.scholarships (
 
 alter table public.scholarships enable row level security;
 
-create policy "public_read_scholarships"
-  on public.scholarships for select
-  to anon, authenticated
-  using (is_active = true);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'scholarships'
+      and policyname = 'public_read_scholarships'
+  ) then
+    execute $p$
+      create policy "public_read_scholarships"
+        on public.scholarships for select
+        to anon, authenticated
+        using (is_active = true)
+    $p$;
+  end if;
 
-create policy "admin_write_scholarships"
-  on public.scholarships for all
-  to authenticated
-  using  (exists (select 1 from public.admins where user_id = auth.uid()))
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'scholarships'
+      and policyname = 'admin_write_scholarships'
+  ) then
+    execute $p$
+      create policy "admin_write_scholarships"
+        on public.scholarships for all
+        to authenticated
+        using  (exists (select 1 from public.admins where user_id = auth.uid()))
+        with check (exists (select 1 from public.admins where user_id = auth.uid()))
+    $p$;
+  end if;
+end
+$$;
