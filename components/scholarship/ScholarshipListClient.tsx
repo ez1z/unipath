@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { Scholarship } from '@/lib/data/scholarships';
 import { filterScholarships } from '@/lib/data/filter-scholarships';
 import { ScholarshipCard } from './ScholarshipCard';
+import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
 
@@ -13,11 +14,12 @@ type Props = {
   locale: Locale;
   countries: string[];
   types: string[];
+  savedScholarshipIds: string[];
 };
 
 const COVERAGE_FILTER_OPTIONS = ['tuition', 'accommodation', 'flights', 'stipend', 'health'];
 
-export function ScholarshipListClient({ scholarships, locale, countries, types }: Props) {
+export function ScholarshipListClient({ scholarships, locale, countries, types, savedScholarshipIds }: Props) {
   const t = useTranslations('scholarships');
   const [query, setQuery] = useState('');
   const [country, setCountry] = useState('');
@@ -171,7 +173,20 @@ export function ScholarshipListClient({ scholarships, locale, countries, types }
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((s) => (
-            <ScholarshipCard key={s.id} scholarship={s} locale={locale} />
+            <ScholarshipCard
+              key={s.id}
+              scholarship={s}
+              locale={locale}
+              bookmarkSlot={
+                <BookmarkButton
+                  type="scholarship"
+                  id={s.id}
+                  initialSaved={savedScholarshipIds.includes(s.id)}
+                  locale={locale}
+                  size="card"
+                />
+              }
+            />
           ))}
         </div>
       )}

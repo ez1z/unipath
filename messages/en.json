@@ -31,6 +31,10 @@
     "no_results": "No universities match your filters.",
     "clear_filters": "Clear filters",
     "view_details": "View details",
+    "bookmark_add": "Save",
+    "bookmark_saved": "Saved",
+    "bookmark_add_label": "Save to Dream Universities",
+    "bookmark_remove_label": "Remove from Dream Universities",
     "add_to_compare": "Compare",
     "ranking": "QS Ranking",
     "ranking_value": "#{rank}",
@@ -136,7 +140,11 @@
     "all_universities_in": "All universities in {country}",
     "section_title": "Available Scholarships",
     "view_all": "View all scholarships for {country}",
-    "none_listed": "No scholarships listed yet."
+    "none_listed": "No scholarships listed yet.",
+    "bookmark_add": "Save",
+    "bookmark_saved": "Saved",
+    "bookmark_add_label": "Save to Interested Scholarships",
+    "bookmark_remove_label": "Remove from Interested Scholarships"
   },
   "common": {
     "loading": "Loading...",
@@ -205,6 +213,8 @@
     "error_save_failed": "Failed to save. Please try again.",
     "majors_placeholder": "Search majors…",
     "unis_placeholder": "Search universities…",
+    "scholarships_placeholder": "Search scholarships…",
+    "interested_scholarships_label": "Interested Scholarships",
     "no_scores_yet": "No scores added yet",
     "gpa_scale_4": "4.0 scale",
     "gpa_scale_5": "5.0 scale",

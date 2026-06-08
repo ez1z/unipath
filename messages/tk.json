@@ -31,6 +31,10 @@
     "no_results": "Filtrlere laýyk uniwersitet tapylmady.",
     "clear_filters": "Filtrleri arassala",
     "view_details": "Giňişleýin",
+    "bookmark_add": "Sakla",
+    "bookmark_saved": "Saklanan",
+    "bookmark_add_label": "Arzuw uniwersitetlerine goş",
+    "bookmark_remove_label": "Arzuw uniwersitetlerinden aýyr",
     "add_to_compare": "Deňeşdir",
     "ranking": "QS Reýting",
     "ranking_value": "#{rank}",
@@ -136,7 +140,11 @@
     "all_universities_in": "{country} ähli uniwersitetleri",
     "section_title": "Elýeterli stipendiýalar",
     "view_all": "{country} üçin ähli stipendiýalar",
-    "none_listed": "Häzirlikçe stipendiýa görkezilmedi."
+    "none_listed": "Häzirlikçe stipendiýa görkezilmedi.",
+    "bookmark_add": "Sakla",
+    "bookmark_saved": "Saklanan",
+    "bookmark_add_label": "Gyzyklanýan stipendiýalara goş",
+    "bookmark_remove_label": "Gyzyklanýan stipendiýalardan aýyr"
   },
   "common": {
     "loading": "Ýüklenýär...",
@@ -205,6 +213,8 @@
     "error_save_failed": "Saklamak başartmady. Täzeden synanyşyň.",
     "majors_placeholder": "Hünär gözläň…",
     "unis_placeholder": "Uniwersitet gözläň…",
+    "scholarships_placeholder": "Stipendiýa gözläň…",
+    "interested_scholarships_label": "Gyzyklanýan stipendiýalar",
     "no_scores_yet": "Heniz bal girizilmedi",
     "gpa_scale_4": "4.0 ölçegi",
     "gpa_scale_5": "5.0 ölçegi",

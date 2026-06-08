@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { getAll, getUniqueCountries, getUniqueLanguages, getUniqueMajors } from '@/lib/data/universities';
 import { UniversityListClient } from '@/components/university/UniversityListClient';
 import { GulPattern } from '@/components/ui/GulPattern';
+import { createClient } from '@/lib/supabase/server';
 import type { Locale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
@@ -10,12 +11,20 @@ type Props = { params: { locale: Locale } };
 
 export default async function UniversitiesPage({ params: { locale } }: Props) {
   const t = await getTranslations('universities');
-  const [universities, countries, languages, majors] = await Promise.all([
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const [universities, countries, languages, majors, profileResult] = await Promise.all([
     getAll(),
     getUniqueCountries(),
     getUniqueLanguages(),
     getUniqueMajors(),
+    user
+      ? supabase.from('profiles').select('dream_university_ids').eq('id', user.id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
+
+  const savedUniversityIds: string[] = profileResult.data?.dream_university_ids ?? [];
 
   return (
     <>
@@ -39,6 +48,7 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
           countries={countries}
           languages={languages}
           majors={majors}
+          savedUniversityIds={savedUniversityIds}
         />
       </div>
     </>

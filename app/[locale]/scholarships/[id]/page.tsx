@@ -5,6 +5,8 @@ import { getBySlug } from '@/lib/data/scholarships';
 import { getById as getUniversityById } from '@/lib/data/universities';
 import { TMT_PER_USD } from '@/lib/constants';
 import { GulPattern } from '@/components/ui/GulPattern';
+import { BookmarkButton } from '@/components/profile/BookmarkButton';
+import { createClient } from '@/lib/supabase/server';
 import type { Locale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +42,18 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
     stipend: t('coverage_stipend'),
     health: t('coverage_health'),
   };
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let isSaved = false;
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('interested_scholarship_ids')
+      .eq('id', user.id)
+      .maybeSingle();
+    isSaved = (data?.interested_scholarship_ids ?? []).includes(scholarship.id);
+  }
 
   const university = scholarship.university_id
     ? await getUniversityById(scholarship.university_id)
@@ -155,9 +169,16 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
           </section>
         )}
 
-        {/* Apply button */}
-        {scholarship.application_url && (
-          <div className="pt-4 border-t border-border">
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+          <BookmarkButton
+            type="scholarship"
+            id={scholarship.id}
+            initialSaved={isSaved}
+            locale={locale}
+            size="detail"
+          />
+          {scholarship.application_url && (
             <a
               href={scholarship.application_url}
               target="_blank"
@@ -167,8 +188,8 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
             >
               {t('apply')} ↗
             </a>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

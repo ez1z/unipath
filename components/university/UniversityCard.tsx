@@ -8,9 +8,10 @@ import type { Locale } from '@/lib/constants';
 type Props = {
   university: University;
   locale: Locale;
+  bookmarkSlot?: React.ReactNode;
 };
 
-export function UniversityCard({ university, locale }: Props) {
+export function UniversityCard({ university, locale, bookmarkSlot }: Props) {
   const t = useTranslations('universities');
   const name = university.name[locale] ?? university.name.en;
 
@@ -24,7 +25,10 @@ export function UniversityCard({ university, locale }: Props) {
       <div>
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-heading font-semibold text-base leading-snug text-foreground">{name}</h3>
-          {university.moe_approved && <MoeBadge />}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {university.moe_approved && <MoeBadge />}
+            {bookmarkSlot}
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">
           {university.city}, {university.country}

@@ -32,15 +32,18 @@ type ProfileRow = {
   desired_countries: string[];
   desired_majors: string[];
   dream_university_ids: string[];
+  interested_scholarship_ids: string[];
   budget_usd: number | null;
 };
 
 type UniOption = { id: string; name: { en: string } };
+type ScholarshipOption = { id: string; name: { en: string } };
 
 type Props = {
   locale: Locale;
   profile: ProfileRow | null;
   universities: UniOption[];
+  scholarships: ScholarshipOption[];
   majors: string[];
   defaultDisplayName: string;
 };
@@ -123,6 +126,7 @@ export function ProfileForm({
   locale,
   profile,
   universities,
+  scholarships,
   majors,
   defaultDisplayName,
 }: Props) {
@@ -189,10 +193,14 @@ export function ProfileForm({
   const [dreamUniIds, setDreamUniIds] = useState<string[]>(
     profile?.dream_university_ids ?? [],
   );
+  const [interestedScholarshipIds, setInterestedScholarshipIds] = useState<string[]>(
+    profile?.interested_scholarship_ids ?? [],
+  );
   const [budgetUsd, setBudgetUsd] = useState<string>(numStr(profile?.budget_usd));
 
   const majorOptions = majors.map((m) => ({ value: m, label: m }));
   const uniOptions = universities.map((u) => ({ value: u.id, label: u.name.en }));
+  const scholarshipOptions = scholarships.map((s) => ({ value: s.id, label: s.name.en }));
 
   const tmtEquiv =
     budgetUsd && !isNaN(Number(budgetUsd)) && Number(budgetUsd) > 0
@@ -210,6 +218,7 @@ export function ProfileForm({
     desiredCountries.forEach((c) => formData.append('desired_countries', c));
     desiredMajors.forEach((m) => formData.append('desired_majors', m));
     dreamUniIds.forEach((id) => formData.append('dream_university_ids', id));
+    interestedScholarshipIds.forEach((id) => formData.append('interested_scholarship_ids', id));
     setResult(null);
     startTransition(async () => {
       const r = await updateProfileAction(locale, formData);
@@ -417,6 +426,18 @@ export function ProfileForm({
               selected={dreamUniIds}
               onChange={setDreamUniIds}
               placeholder={t('unis_placeholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              {t('interested_scholarships_label')}
+            </label>
+            <MultiTagSelect
+              displayOptions={scholarshipOptions}
+              selected={interestedScholarshipIds}
+              onChange={setInterestedScholarshipIds}
+              placeholder={t('scholarships_placeholder')}
             />
           </div>
         </div>

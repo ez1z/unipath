@@ -23,6 +23,7 @@ export const ProfileSchema = z.object({
   desired_countries: z.array(z.string()).default([]),
   desired_majors: z.array(z.string()).default([]),
   dream_university_ids: z.array(z.string().uuid()).default([]),
+  interested_scholarship_ids: z.array(z.string().uuid()).default([]),
 
   budget_usd: z.coerce.number().min(0).optional().nullable(),
 });

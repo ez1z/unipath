@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
 import { filterUniversities } from '@/lib/data/filter-universities';
 import { UniversityCard } from './UniversityCard';
+import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
 
@@ -14,9 +15,10 @@ type Props = {
   countries: string[];
   languages: string[];
   majors: string[];
+  savedUniversityIds: string[];
 };
 
-export function UniversityListClient({ universities, locale, countries, languages, majors }: Props) {
+export function UniversityListClient({ universities, locale, countries, languages, majors, savedUniversityIds }: Props) {
   const t = useTranslations('universities');
   const [query, setQuery] = useState('');
   const [country, setCountry] = useState('');
@@ -160,7 +162,20 @@ export function UniversityListClient({ universities, locale, countries, language
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((u) => (
-            <UniversityCard key={u.id} university={u} locale={locale} />
+            <UniversityCard
+              key={u.id}
+              university={u}
+              locale={locale}
+              bookmarkSlot={
+                <BookmarkButton
+                  type="university"
+                  id={u.id}
+                  initialSaved={savedUniversityIds.includes(u.id)}
+                  locale={locale}
+                  size="card"
+                />
+              }
+            />
           ))}
         </div>
       )}

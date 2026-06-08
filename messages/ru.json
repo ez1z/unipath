@@ -31,6 +31,10 @@
     "no_results": "Ни один университет не соответствует фильтрам.",
     "clear_filters": "Сбросить фильтры",
     "view_details": "Подробнее",
+    "bookmark_add": "Сохранить",
+    "bookmark_saved": "Сохранено",
+    "bookmark_add_label": "Добавить в желаемые университеты",
+    "bookmark_remove_label": "Удалить из желаемых университетов",
     "add_to_compare": "Сравнить",
     "ranking": "Рейтинг QS",
     "ranking_value": "#{rank}",
@@ -136,7 +140,11 @@
     "all_universities_in": "Все университеты в {country}",
     "section_title": "Доступные стипендии",
     "view_all": "Все стипендии для {country}",
-    "none_listed": "Стипендии пока не указаны."
+    "none_listed": "Стипендии пока не указаны.",
+    "bookmark_add": "Сохранить",
+    "bookmark_saved": "Сохранено",
+    "bookmark_add_label": "Добавить в интересующие стипендии",
+    "bookmark_remove_label": "Удалить из интересующих стипендий"
   },
   "common": {
     "loading": "Загрузка...",
@@ -205,6 +213,8 @@
     "error_save_failed": "Не удалось сохранить. Попробуйте снова.",
     "majors_placeholder": "Поиск специальностей…",
     "unis_placeholder": "Поиск университетов…",
+    "scholarships_placeholder": "Поиск стипендий…",
+    "interested_scholarships_label": "Интересующие стипендии",
     "no_scores_yet": "Баллы ещё не добавлены",
     "gpa_scale_4": "Шкала 4.0",
     "gpa_scale_5": "Шкала 5.0",

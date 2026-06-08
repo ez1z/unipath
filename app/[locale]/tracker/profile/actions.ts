@@ -40,6 +40,7 @@ export async function updateProfileAction(
     desired_countries: formData.getAll('desired_countries'),
     desired_majors: formData.getAll('desired_majors'),
     dream_university_ids: formData.getAll('dream_university_ids'),
+    interested_scholarship_ids: formData.getAll('interested_scholarship_ids'),
     budget_usd: emptyToNull(formData.get('budget_usd')),
   };
 

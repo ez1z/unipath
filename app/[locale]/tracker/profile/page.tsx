@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import type { Locale } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 import { getAll, getUniqueMajors } from '@/lib/data/universities';
+import { getAll as getAllScholarships } from '@/lib/data/scholarships';
 import { ProfileForm } from './ProfileForm';
 
 export const dynamic = 'force-dynamic';
@@ -28,10 +29,11 @@ export default async function ProfilePage({ params }: Props) {
     redirect(`/${locale}/auth/signin?next=/${locale}/tracker/profile`);
   }
 
-  const [profileResult, universities, majors] = await Promise.all([
+  const [profileResult, universities, majors, scholarships] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     getAll(),
     getUniqueMajors(),
+    getAllScholarships(),
   ]);
 
   const profile = profileResult.data ?? null;
@@ -67,6 +69,7 @@ export default async function ProfilePage({ params }: Props) {
           profile={profile}
           universities={universities}
           majors={majors}
+          scholarships={scholarships}
           defaultDisplayName={defaultDisplayName}
         />
       </div>
