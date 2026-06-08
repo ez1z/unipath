@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseSemestersJson } from '@/lib/types/semester';
 
 export const FormSchema = z.object({
   name_en: z.string().min(1, 'English name is required'),
@@ -29,5 +30,9 @@ export const FormSchema = z.object({
       ctx.addIssue({ code: 'custom', message: 'Entrance requirements must be valid JSON' });
       return z.NEVER;
     }
+  }),
+  semesters: z.string().optional().transform((v) => {
+    if (!v?.trim()) return [];
+    try { return parseSemestersJson(JSON.parse(v)); } catch { return []; }
   }),
 });

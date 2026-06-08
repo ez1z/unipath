@@ -52,6 +52,7 @@ export async function importUniversitiesAction(
     official_website: r.official_website,
     application_portal_url: r.application_portal_url,
     entrance_requirements: r.entrance_requirements,
+    semesters: r.semesters ?? [],
   }));
 
   const { error } = await supabase
@@ -125,6 +126,7 @@ export async function createUniversityAction(
   const { error } = await supabase.from('universities').insert({
     ...parsed.data,
     slug: slugify(parsed.data.name_en),
+    semesters: parsed.data.semesters ?? [],
   });
   if (error) return { error: friendlyDbError(error) };
 
@@ -154,7 +156,7 @@ export async function updateUniversityAction(
 
   const { error } = await supabase
     .from('universities')
-    .update({ ...parsed.data, slug: slugify(parsed.data.name_en) })
+    .update({ ...parsed.data, slug: slugify(parsed.data.name_en), semesters: parsed.data.semesters ?? [] })
     .eq('id', id);
   if (error) return { error: friendlyDbError(error) };
 

@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import type { Semester } from '@/lib/types/semester';
+import { parseSemestersJson, parseSemestersCsv } from '@/lib/types/semester';
+export type { Semester };
 
 export type ScholarshipType = 'government' | 'merit' | 'need-based' | 'partial';
 export type CoverageItem = 'tuition' | 'accommodation' | 'flights' | 'stipend' | 'health';
@@ -17,6 +20,7 @@ export type ScholarshipDbRow = {
   coverage: string[];
   amount_usd: string | number | null;
   deadline_text: string | null;
+  semesters: unknown;
   description_en: string;
   description_ru: string;
   description_tk: string;
@@ -35,6 +39,7 @@ export type Scholarship = {
   coverage: string[];
   amount_usd: number | null;
   deadline_text: string | null;
+  semesters: Semester[];
   description: { tk: string; ru: string; en: string };
   application_url: string;
 };
@@ -50,6 +55,7 @@ export function dbRowToScholarship(row: ScholarshipDbRow): Scholarship {
     coverage: row.coverage,
     amount_usd: row.amount_usd !== null ? Number(row.amount_usd) : null,
     deadline_text: row.deadline_text,
+    semesters: parseSemestersJson(row.semesters),
     description: { en: row.description_en, ru: row.description_ru, tk: row.description_tk },
     application_url: row.application_url,
   };
@@ -84,6 +90,9 @@ export const ScholarshipCsvRowSchema = z.object({
     return n;
   }),
   deadline_text: z.string().optional().transform((v) => v?.trim() || null),
+  semesters: z.string().optional().transform((v) =>
+    v ? parseSemestersCsv(v) : []
+  ),
   description_en: z.string().default(''),
   description_ru: z.string().default(''),
   description_tk: z.string().default(''),
@@ -103,6 +112,7 @@ export type ScholarshipInsert = {
   coverage: string[];
   amount_usd: number | null;
   deadline_text: string | null;
+  semesters: Semester[];
   description_en: string;
   description_ru: string;
   description_tk: string;

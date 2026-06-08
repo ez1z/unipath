@@ -67,7 +67,14 @@
     "quota_available": "Quota available",
     "sat_required": "SAT required",
     "sat_optional": "SAT optional",
-    "notes": "Notes"
+    "notes": "Notes",
+    "semesters_title": "Semesters",
+    "semester_starts": "Course starts",
+    "semester_deadline": "Apply by",
+    "semester_no_deadline": "No deadline",
+    "deadline_days_left": "{days} days left",
+    "deadline_today": "Closes today",
+    "deadline_passed": "Passed"
   },
   "compare": {
     "title": "Compare Universities",
@@ -147,7 +154,14 @@
     "bookmark_saved": "Saved",
     "bookmark_add_label": "Save to Interested Scholarships",
     "bookmark_remove_label": "Remove from Interested Scholarships",
-    "filter_my_preferences": "My preferences"
+    "filter_my_preferences": "My preferences",
+    "semesters_title": "Intake dates",
+    "semester_starts": "Course starts",
+    "semester_deadline": "Apply by",
+    "semester_no_deadline": "No deadline",
+    "deadline_days_left": "{days} days left",
+    "deadline_today": "Closes today",
+    "deadline_passed": "Passed"
   },
   "checklist": {
     "title": "Document Checklist",

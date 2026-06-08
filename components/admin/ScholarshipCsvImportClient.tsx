@@ -7,7 +7,7 @@ import { importScholarshipsAction } from '@/app/admin/scholarships/actions';
 
 const CSV_HEADERS = [
   'name_en', 'name_ru', 'name_tk', 'country', 'university_name_en',
-  'type', 'coverage', 'amount_usd', 'deadline_text',
+  'type', 'coverage', 'amount_usd', 'deadline_text', 'semesters',
   'description_en', 'description_ru', 'description_tk', 'application_url',
 ];
 
@@ -21,6 +21,7 @@ const CSV_EXAMPLE_ROW: Record<string, string> = {
   coverage: 'tuition|accommodation|stipend|flights|health',
   amount_usd: '8000',
   deadline_text: 'February 20',
+  semesters: 'Fall 2026:2026-09-01:2026-02-20|Spring 2027:2027-02-01:2026-11-15',
   description_en: 'Full scholarship for international students.',
   description_ru: 'Полная стипендия для иностранных студентов.',
   description_tk: 'Daşary ýurt talyplary üçin doly stipendiýa.',

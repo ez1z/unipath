@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import type { Semester } from '@/lib/types/semester';
+import { parseSemestersJson, parseSemestersCsv } from '@/lib/types/semester';
+export type { Semester };
 
 export type UniversityDbRow = {
   id: string;
@@ -16,6 +19,7 @@ export type UniversityDbRow = {
   official_website: string;
   application_portal_url: string;
   entrance_requirements: Record<string, unknown>;
+  semesters: unknown;
   created_at: string;
 };
 
@@ -33,6 +37,7 @@ export type University = {
   official_website: string;
   application_portal_url: string;
   entrance_requirements: Record<string, unknown>;
+  semesters: Semester[];
 };
 
 export function dbRowToUniversity(row: UniversityDbRow): University {
@@ -50,6 +55,7 @@ export function dbRowToUniversity(row: UniversityDbRow): University {
     official_website: row.official_website,
     application_portal_url: row.application_portal_url,
     entrance_requirements: row.entrance_requirements ?? {},
+    semesters: parseSemestersJson(row.semesters),
   };
 }
 
@@ -108,6 +114,9 @@ export const CsvRowSchema = z.object({
       return z.NEVER;
     }
   }),
+  semesters: z.string().default('').transform((v) =>
+    v ? parseSemestersCsv(v) : []
+  ),
 });
 
 export type CsvRow = z.infer<typeof CsvRowSchema>;
@@ -127,4 +136,5 @@ export type UniversityInsert = {
   official_website: string;
   application_portal_url: string;
   entrance_requirements: Record<string, unknown>;
+  semesters: Semester[];
 };

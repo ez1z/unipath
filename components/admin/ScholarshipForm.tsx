@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { COVERAGE_ITEMS } from '@/lib/data/scholarship-types';
+import { SemesterEditor } from '@/components/admin/SemesterEditor';
+import type { Semester } from '@/lib/types/semester';
 
 type UniversityOption = { id: string; name_en: string; country: string };
 
@@ -15,6 +17,7 @@ export type ScholarshipFormDefaults = {
   coverage?: string[];
   amount_usd?: string;
   deadline_text?: string;
+  semesters?: Semester[];
   description_en?: string;
   description_ru?: string;
   description_tk?: string;
@@ -206,6 +209,15 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
             />
           </div>
         </div>
+      </div>
+
+      {/* Semesters */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">Semesters</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Each semester has a name (Fall/Spring/custom), a course start date, and an optional application deadline.
+        </p>
+        <SemesterEditor defaultValue={d.semesters ?? []} />
       </div>
 
       {/* Descriptions */}

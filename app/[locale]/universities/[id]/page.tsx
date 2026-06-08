@@ -12,6 +12,7 @@ import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
 import { getOrInitChecklist } from '@/lib/data/checklist';
 import type { Locale } from '@/lib/constants';
+import type { Semester } from '@/lib/types/semester';
 
 type Props = { params: { locale: Locale; id: string } };
 
@@ -39,6 +40,36 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
 
   const t = await getTranslations('university');
   const tCommon = await getTranslations('common');
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  function daysUntil(iso: string) {
+    const d = new Date(iso);
+    d.setHours(0, 0, 0, 0);
+    return Math.ceil((d.getTime() - today.getTime()) / 86_400_000);
+  }
+
+  function deadlineBadge(days: number) {
+    if (days < 0) return { text: t('deadline_passed'), cls: 'bg-muted text-muted-foreground' };
+    if (days === 0) return { text: t('deadline_today'), cls: 'bg-red-50 text-red-600' };
+    if (days <= 14) return { text: t('deadline_days_left', { days }), cls: 'bg-red-50 text-red-600' };
+    if (days <= 30) return { text: t('deadline_days_left', { days }), cls: 'bg-orange-50 text-orange-600' };
+    if (days <= 60) return { text: t('deadline_days_left', { days }), cls: 'bg-yellow-50 text-yellow-700' };
+    return { text: t('deadline_days_left', { days }), cls: 'bg-green-50 text-green-700' };
+  }
+
+  function deadlineLeftBorder(days: number) {
+    if (days < 0) return 'border-l-muted-foreground/30';
+    if (days <= 14) return 'border-l-red-500';
+    if (days <= 30) return 'border-l-orange-400';
+    if (days <= 60) return 'border-l-yellow-500';
+    return 'border-l-green-500';
+  }
+
+  function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
   const name = university.name[locale] ?? university.name.en;
 
   return (
@@ -135,6 +166,52 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
           </h2>
           <EntranceRequirements requirements={university.entrance_requirements} />
         </section>
+
+        {/* Semesters */}
+        {university.semesters.length > 0 && (
+          <section className="mb-8">
+            <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">
+              {t('semesters_title')}
+            </h2>
+            <div className="space-y-3">
+              {university.semesters.map((sem: Semester, i: number) => {
+                const deadlineDays = sem.deadline ? daysUntil(sem.deadline) : null;
+                const badge = deadlineDays !== null ? deadlineBadge(deadlineDays) : null;
+                const leftBorder = deadlineDays !== null ? deadlineLeftBorder(deadlineDays) : 'border-l-border';
+                return (
+                  <div key={i} className={`bg-card border border-border border-l-4 ${leftBorder} rounded-xl px-5 py-4`}>
+                    <p className="font-semibold text-foreground text-sm mb-2">{sem.name}</p>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
+                      <div className="flex items-center gap-1.5">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-muted-foreground">
+                          <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        <span className="text-xs text-muted-foreground">{t('semester_starts')}:</span>
+                        <span className="font-medium text-foreground">{formatDate(sem.start_date)}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-muted-foreground">
+                          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span className="text-xs text-muted-foreground">{t('semester_deadline')}:</span>
+                        {sem.deadline ? (
+                          <span className="font-medium text-foreground">{formatDate(sem.deadline)}</span>
+                        ) : (
+                          <span className="text-muted-foreground italic">{t('semester_no_deadline')}</span>
+                        )}
+                        {badge && (
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.cls}`}>
+                            {badge.text}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Document checklist (auth'd users only) */}
         {user && (

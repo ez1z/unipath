@@ -29,6 +29,8 @@ export default async function EditScholarshipPage({ params: { id } }: Props) {
   type UniversityOption = Pick<UniversityDbRow, 'id' | 'name_en' | 'country'>;
   const universities = universitiesData as UniversityOption[];
 
+  const { parseSemestersJson } = await import('@/lib/types/semester');
+
   const defaultValues: ScholarshipFormDefaults = {
     name_en: s.name_en,
     name_ru: s.name_ru,
@@ -39,6 +41,7 @@ export default async function EditScholarshipPage({ params: { id } }: Props) {
     coverage: s.coverage,
     amount_usd: s.amount_usd != null ? String(Number(s.amount_usd)) : '',
     deadline_text: s.deadline_text ?? '',
+    semesters: parseSemestersJson(s.semesters),
     description_en: s.description_en,
     description_ru: s.description_ru,
     description_tk: s.description_tk,

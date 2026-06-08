@@ -25,6 +25,8 @@ export default async function EditUniversityPage({ params: { id } }: Props) {
   if (!data) notFound();
   const u = data as UniversityDbRow;
 
+  const { parseSemestersJson } = await import('@/lib/types/semester');
+
   const defaultValues: UniversityFormDefaults = {
     name_en: u.name_en,
     name_ru: u.name_ru,
@@ -42,6 +44,7 @@ export default async function EditUniversityPage({ params: { id } }: Props) {
       u.entrance_requirements && Object.keys(u.entrance_requirements).length > 0
         ? JSON.stringify(u.entrance_requirements, null, 2)
         : '',
+    semesters: parseSemestersJson(u.semesters),
   };
 
   const boundAction = updateUniversityAction.bind(null, id);

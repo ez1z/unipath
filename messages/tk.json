@@ -67,7 +67,14 @@
     "quota_available": "Kwota bar",
     "sat_required": "SAT hökman",
     "sat_optional": "SAT hökmany däl",
-    "notes": "Bellikler"
+    "notes": "Bellikler",
+    "semesters_title": "Semestrler",
+    "semester_starts": "Okuw başlaýar",
+    "semester_deadline": "Ýüz tutmak möhleti",
+    "semester_no_deadline": "Möhlet ýok",
+    "deadline_days_left": "{days} gün galdy",
+    "deadline_today": "Şu gün ýapylýar",
+    "deadline_passed": "Geçdi"
   },
   "compare": {
     "title": "Uniwersitetleri deňeşdir",
@@ -147,7 +154,14 @@
     "bookmark_saved": "Saklanan",
     "bookmark_add_label": "Gyzyklanýan stipendiýalara goş",
     "bookmark_remove_label": "Gyzyklanýan stipendiýalardan aýyr",
-    "filter_my_preferences": "Meniň isleglerim"
+    "filter_my_preferences": "Meniň isleglerim",
+    "semesters_title": "Kabul seneleri",
+    "semester_starts": "Okuw başlaýar",
+    "semester_deadline": "Ýüz tutmak möhleti",
+    "semester_no_deadline": "Möhlet ýok",
+    "deadline_days_left": "{days} gün galdy",
+    "deadline_today": "Şu gün ýapylýar",
+    "deadline_passed": "Geçdi"
   },
   "checklist": {
     "title": "Resminama sanawy",

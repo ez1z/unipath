@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { SemesterEditor } from '@/components/admin/SemesterEditor';
+import type { Semester } from '@/lib/types/semester';
 
 export type UniversityFormDefaults = {
   name_en?: string;
@@ -16,6 +18,7 @@ export type UniversityFormDefaults = {
   official_website?: string;
   application_portal_url?: string;
   entrance_requirements?: string;
+  semesters?: Semester[];
 };
 
 type Props = {
@@ -248,6 +251,15 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
           aria-label="Entrance requirements as JSON"
           className={`${inputClass} resize-y font-mono text-xs`}
         />
+      </div>
+
+      {/* Semesters */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">Semesters</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Each semester has a name (Fall/Spring/custom), a course start date, and an optional application deadline.
+        </p>
+        <SemesterEditor defaultValue={d.semesters ?? []} />
       </div>
 
       {/* Actions */}

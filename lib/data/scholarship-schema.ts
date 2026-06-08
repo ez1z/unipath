@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseSemestersJson } from '@/lib/types/semester';
 
 export const ScholarshipFormSchema = z.object({
   name_en: z.string().min(1, 'English name is required'),
@@ -18,6 +19,10 @@ export const ScholarshipFormSchema = z.object({
     return isNaN(n) || n <= 0 ? null : n;
   }),
   deadline_text: z.string().optional().transform((v) => v?.trim() || null),
+  semesters: z.string().optional().transform((v) => {
+    if (!v?.trim()) return [];
+    try { return parseSemestersJson(JSON.parse(v)); } catch { return []; }
+  }),
   description_en: z.string().default(''),
   description_ru: z.string().default(''),
   description_tk: z.string().default(''),

@@ -67,7 +67,14 @@
     "quota_available": "Квоты доступны",
     "sat_required": "SAT обязателен",
     "sat_optional": "SAT необязателен",
-    "notes": "Примечания"
+    "notes": "Примечания",
+    "semesters_title": "Семестры",
+    "semester_starts": "Начало занятий",
+    "semester_deadline": "Срок подачи",
+    "semester_no_deadline": "Без дедлайна",
+    "deadline_days_left": "Осталось {days} дн.",
+    "deadline_today": "Закрывается сегодня",
+    "deadline_passed": "Истёк"
   },
   "compare": {
     "title": "Сравнение университетов",
@@ -147,7 +154,14 @@
     "bookmark_saved": "Сохранено",
     "bookmark_add_label": "Добавить в интересующие стипендии",
     "bookmark_remove_label": "Удалить из интересующих стипендий",
-    "filter_my_preferences": "Мои предпочтения"
+    "filter_my_preferences": "Мои предпочтения",
+    "semesters_title": "Даты набора",
+    "semester_starts": "Начало занятий",
+    "semester_deadline": "Срок подачи",
+    "semester_no_deadline": "Без дедлайна",
+    "deadline_days_left": "Осталось {days} дн.",
+    "deadline_today": "Закрывается сегодня",
+    "deadline_passed": "Истёк"
   },
   "checklist": {
     "title": "Список документов",
