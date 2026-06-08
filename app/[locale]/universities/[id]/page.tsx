@@ -7,6 +7,10 @@ import { MoeBadge } from '@/components/university/MoeBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
 import { ScholarshipSection } from '@/components/scholarship/ScholarshipSection';
 import { GulPattern } from '@/components/ui/GulPattern';
+import { BookmarkButton } from '@/components/profile/BookmarkButton';
+import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
+import { createClient } from '@/lib/supabase/server';
+import { getOrInitChecklist } from '@/lib/data/checklist';
 import type { Locale } from '@/lib/constants';
 
 type Props = { params: { locale: Locale; id: string } };
@@ -16,6 +20,22 @@ export const dynamic = 'force-dynamic';
 export default async function UniversityDetailPage({ params: { locale, id } }: Props) {
   const university = await getBySlug(id);
   if (!university) notFound();
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let isSaved = false;
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('dream_university_ids')
+      .eq('id', user.id)
+      .maybeSingle();
+    isSaved = (data?.dream_university_ids ?? []).includes(university.id);
+  }
+
+  const checklistItems = user
+    ? await getOrInitChecklist(university.id, locale)
+    : [];
 
   const t = await getTranslations('university');
   const name = university.name[locale] ?? university.name.en;
@@ -115,6 +135,16 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
           <EntranceRequirements requirements={university.entrance_requirements} />
         </section>
 
+        {/* Document checklist (auth'd users only) */}
+        {user && (
+          <section className="mb-8">
+            <DocumentChecklist
+              universityId={university.id}
+              initialItems={checklistItems}
+            />
+          </section>
+        )}
+
         {/* Scholarships */}
         <ScholarshipSection
           universityId={university.id}
@@ -124,6 +154,13 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
 
         {/* Action links */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+          <BookmarkButton
+            type="university"
+            id={university.id}
+            initialSaved={isSaved}
+            locale={locale}
+            size="detail"
+          />
           <a
             href={university.official_website}
             target="_blank"

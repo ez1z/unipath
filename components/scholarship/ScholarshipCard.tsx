@@ -9,6 +9,7 @@ type Props = {
   locale: Locale;
   universityName?: string;
   compact?: boolean;
+  bookmarkSlot?: React.ReactNode;
 };
 
 const TYPE_STYLES: Record<string, string> = {
@@ -18,7 +19,7 @@ const TYPE_STYLES: Record<string, string> = {
   partial: 'bg-secondary text-secondary-foreground border-border',
 };
 
-export function ScholarshipCard({ scholarship: s, locale, universityName, compact = false }: Props) {
+export function ScholarshipCard({ scholarship: s, locale, universityName, compact = false, bookmarkSlot }: Props) {
   const t = useTranslations('scholarships');
   const name = s.name[locale] ?? s.name.en;
 
@@ -59,11 +60,14 @@ export function ScholarshipCard({ scholarship: s, locale, universityName, compac
           <h3 className={`font-heading font-semibold leading-snug text-foreground ${compact ? 'text-sm' : 'text-base'}`}>
             {name}
           </h3>
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap flex-shrink-0 ${TYPE_STYLES[s.type] ?? TYPE_STYLES.partial}`}
-          >
-            {typeLabel}
-          </span>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap ${TYPE_STYLES[s.type] ?? TYPE_STYLES.partial}`}
+            >
+              {typeLabel}
+            </span>
+            {bookmarkSlot}
+          </div>
         </div>
         <p className="text-xs text-muted-foreground">{uniLine}</p>
       </div>

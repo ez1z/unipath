@@ -5,8 +5,11 @@ import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
 import { filterUniversities } from '@/lib/data/filter-universities';
 import { UniversityCard } from './UniversityCard';
+import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
+
+type UserPrefs = { countries: string[]; majors: string[] };
 
 type Props = {
   universities: University[];
@@ -14,26 +17,61 @@ type Props = {
   countries: string[];
   languages: string[];
   majors: string[];
+  savedUniversityIds: string[];
+  userPrefs: UserPrefs | null;
 };
 
-export function UniversityListClient({ universities, locale, countries, languages, majors }: Props) {
+export function UniversityListClient({
+  universities,
+  locale,
+  countries,
+  languages,
+  majors,
+  savedUniversityIds,
+  userPrefs,
+}: Props) {
   const t = useTranslations('universities');
   const [query, setQuery] = useState('');
   const [country, setCountry] = useState('');
   const [language, setLanguage] = useState('');
   const [major, setMajor] = useState('');
   const [moeOnly, setMoeOnly] = useState(false);
+  const [prefsActive, setPrefsActive] = useState(false);
+
+  const hasPrefs =
+    userPrefs !== null &&
+    (userPrefs.countries.length > 0 ||
+      userPrefs.majors.length > 0 ||
+      savedUniversityIds.length > 0);
+
+  // When prefs are active, include bookmarked universities OR country+major matches
+  const basePool = useMemo(() => {
+    if (!prefsActive || !userPrefs) return universities;
+    return universities.filter((u) => {
+      if (savedUniversityIds.includes(u.id)) return true;
+      const countryOk =
+        userPrefs.countries.length === 0 || userPrefs.countries.includes(u.country);
+      const majorOk =
+        userPrefs.majors.length === 0 ||
+        u.majors.some((m) =>
+          userPrefs.majors.some((pm) =>
+            m.toLowerCase().includes(pm.toLowerCase()),
+          ),
+        );
+      return countryOk && majorOk;
+    });
+  }, [universities, prefsActive, userPrefs, savedUniversityIds]);
 
   const filtered = useMemo(
     () =>
-      filterUniversities(universities, {
+      filterUniversities(basePool, {
         query: query || undefined,
         country: country || undefined,
         language: language || undefined,
         major: major || undefined,
         moeOnly,
       }),
-    [universities, query, country, language, major, moeOnly]
+    [basePool, query, country, language, major, moeOnly],
   );
 
   function clearFilters() {
@@ -114,20 +152,51 @@ export function UniversityListClient({ universities, locale, countries, language
           />
         </div>
 
-        <div className="flex items-center justify-between mt-3">
-          <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={moeOnly}
-              onChange={(e) => setMoeOnly(e.target.checked)}
-              className="rounded border-input accent-primary"
-              aria-label={t('filter_moe')}
-            />
-            <span className="text-gold-dark font-medium">★ {t('filter_moe')}</span>
-          </label>
-          {hasFilters && (
+        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={moeOnly}
+                onChange={(e) => setMoeOnly(e.target.checked)}
+                className="rounded border-input accent-primary"
+                aria-label={t('filter_moe')}
+              />
+              <span className="text-gold-dark font-medium">★ {t('filter_moe')}</span>
+            </label>
+
+            {hasPrefs && (
+              <button
+                type="button"
+                onClick={() => setPrefsActive((v) => !v)}
+                aria-pressed={prefsActive}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                  prefsActive
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
+                }`}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill={prefsActive ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                {t('filter_my_preferences')}
+              </button>
+            )}
+          </div>
+
+          {(hasFilters || prefsActive) && (
             <button
-              onClick={clearFilters}
+              onClick={() => { clearFilters(); setPrefsActive(false); }}
               className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
             >
               {t('clear_filters')}
@@ -160,7 +229,20 @@ export function UniversityListClient({ universities, locale, countries, language
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((u) => (
-            <UniversityCard key={u.id} university={u} locale={locale} />
+            <UniversityCard
+              key={u.id}
+              university={u}
+              locale={locale}
+              bookmarkSlot={
+                <BookmarkButton
+                  type="university"
+                  id={u.id}
+                  initialSaved={savedUniversityIds.includes(u.id)}
+                  locale={locale}
+                  size="card"
+                />
+              }
+            />
           ))}
         </div>
       )}

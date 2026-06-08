@@ -64,7 +64,7 @@ export async function signInWithEmailAction(
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { error: mapSupabaseSignInError(error.message, t) };
 
-  redirect(`/${locale}`);
+  redirect(`/${locale}/tracker/profile`);
 }
 
 export async function signUpWithEmailAction(
@@ -91,7 +91,7 @@ export async function signUpWithEmailAction(
   });
   if (error) return { error: mapSupabaseSignUpError(error.message, t) };
 
-  redirect(`/${locale}`);
+  redirect(`/${locale}/tracker/profile`);
 }
 
 export async function signOutAction(locale: string): Promise<never> {

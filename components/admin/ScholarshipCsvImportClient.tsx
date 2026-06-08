@@ -2,29 +2,29 @@
 
 import { useState, useTransition } from 'react';
 import Papa from 'papaparse';
-import { CsvRowSchema } from '@/lib/data/university-types';
-import { importUniversitiesAction } from '@/app/admin/universities/actions';
+import { ScholarshipCsvRowSchema } from '@/lib/data/scholarship-types';
+import { importScholarshipsAction } from '@/app/admin/scholarships/actions';
 
 const CSV_HEADERS = [
-  'name_en', 'name_ru', 'name_tk', 'country', 'city', 'tuition_usd',
-  'moe_approved', 'ranking_qs', 'languages', 'majors',
-  'official_website', 'application_portal_url', 'entrance_requirements',
+  'name_en', 'name_ru', 'name_tk', 'country', 'university_name_en',
+  'type', 'coverage', 'amount_usd', 'deadline_text',
+  'description_en', 'description_ru', 'description_tk', 'application_url',
 ];
 
 const CSV_EXAMPLE_ROW: Record<string, string> = {
-  name_en: 'Middle East Technical University',
-  name_ru: 'METU',
-  name_tk: 'ODTU',
+  name_en: 'Türkiye Scholarships',
+  name_ru: 'Стипендии Турции',
+  name_tk: 'Türkiye Stipendiýalary',
   country: 'Turkey',
-  city: 'Ankara',
-  tuition_usd: '600',
-  moe_approved: 'true',
-  ranking_qs: '601',
-  languages: 'English|Turkish',
-  majors: 'Engineering|Computer Science|Architecture',
-  official_website: 'https://metu.edu.tr',
-  application_portal_url: 'https://oidb.metu.edu.tr',
-  entrance_requirements: '{"turkey":{"yos":true},"document_requirements":["Passport","Transcript","YÖS Score","Visa Documents"]}',
+  university_name_en: '',
+  type: 'government',
+  coverage: 'tuition|accommodation|stipend|flights|health',
+  amount_usd: '8000',
+  deadline_text: 'February 20',
+  description_en: 'Full scholarship for international students.',
+  description_ru: 'Полная стипендия для иностранных студентов.',
+  description_tk: 'Daşary ýurt talyplary üçin doly stipendiýa.',
+  application_url: 'https://turkiyeburslari.gov.tr',
 };
 
 type ParsedRow = {
@@ -36,11 +36,10 @@ type ParsedRow = {
 
 function buildCsv(dataRows: Record<string, string>[]) {
   const rows = dataRows.length > 0 ? dataRows : [CSV_EXAMPLE_ROW];
-  const csv = Papa.unparse({
+  return Papa.unparse({
     fields: CSV_HEADERS,
     data: rows.map((r) => CSV_HEADERS.map((h) => r[h] ?? '')),
   });
-  return csv;
 }
 
 function triggerDownload(content: string, filename: string) {
@@ -55,7 +54,7 @@ function triggerDownload(content: string, filename: string) {
 
 type Props = { existingData: Record<string, string>[] };
 
-export function CsvImportClient({ existingData }: Props) {
+export function ScholarshipCsvImportClient({ existingData }: Props) {
   const [rows, setRows] = useState<ParsedRow[]>([]);
   const [isPending, startTransition] = useTransition();
   const [importResult, setImportResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -69,22 +68,11 @@ export function CsvImportClient({ existingData }: Props) {
       header: true,
       skipEmptyLines: true,
       complete(results) {
-        const seenNames = new Map<string, number>();
         const parsed: ParsedRow[] = results.data.map((raw, index) => {
-          const result = CsvRowSchema.safeParse(raw);
+          const result = ScholarshipCsvRowSchema.safeParse(raw);
           const errors = result.success
             ? []
             : result.error.issues.map((i) => `${String(i.path[0])}: ${i.message}`);
-
-          const nameEn = raw.name_en?.trim();
-          if (nameEn) {
-            if (seenNames.has(nameEn)) {
-              errors.push(`name_en: Duplicate — same as row ${seenNames.get(nameEn)! + 1}`);
-            } else {
-              seenNames.set(nameEn, index);
-            }
-          }
-
           return { raw, index, errors, valid: result.success && errors.length === 0 };
         });
         setRows(parsed);
@@ -97,9 +85,9 @@ export function CsvImportClient({ existingData }: Props) {
 
   function handleImport() {
     startTransition(async () => {
-      const result = await importUniversitiesAction(rows.map((r) => r.raw));
+      const result = await importScholarshipsAction(rows.map((r) => r.raw));
       if (result.success) {
-        setImportResult({ ok: true, message: `Successfully imported ${result.count} universities.` });
+        setImportResult({ ok: true, message: `Successfully imported ${result.count} scholarships.` });
         setRows([]);
       } else {
         setImportResult({ ok: false, message: `Import failed: ${result.error}` });
@@ -114,20 +102,19 @@ export function CsvImportClient({ existingData }: Props) {
         <h2 className="font-heading font-semibold text-base mb-2">Step 1: Download current data</h2>
         <p className="text-sm text-muted-foreground mb-4">
           {existingData.length > 0
-            ? <>Downloads all <strong>{existingData.length}</strong> existing universities as CSV. Edit the rows, then re-upload — unchanged rows are left as-is.</>
-            : <>No universities in the database yet. Downloads a blank template with one example row.</>
+            ? <><strong>{existingData.length}</strong> existing scholarships as CSV. Edit and re-upload — rows are matched by slug (name_en + country).</>
+            : <>No scholarships yet. Downloads a blank template with one example row.</>
           }
-          {' '}Use <code className="bg-muted px-1 rounded text-xs">|</code> to separate multiple languages or majors.{' '}
-          <code className="bg-muted px-1 rounded text-xs">ranking_qs</code> can be blank.
-          To set the student document checklist, add a <code className="bg-muted px-1 rounded text-xs">document_requirements</code> array inside <code className="bg-muted px-1 rounded text-xs">entrance_requirements</code> JSON.
+          {' '}Use <code className="bg-muted px-1 rounded text-xs">|</code> to separate multiple values (coverage).{' '}
+          Leave <code className="bg-muted px-1 rounded text-xs">university_name_en</code> blank for country-wide scholarships.
         </p>
         <button
-          onClick={() => triggerDownload(buildCsv(existingData), 'universities.csv')}
-          aria-label="Download universities as CSV"
+          onClick={() => triggerDownload(buildCsv(existingData), 'scholarships.csv')}
+          aria-label="Download scholarships as CSV"
           className="px-4 py-2 border border-primary text-primary rounded-lg text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           {existingData.length > 0
-            ? `Download data (${existingData.length} universities)`
+            ? `Download data (${existingData.length} scholarships)`
             : 'Download blank template'}
         </button>
       </div>
@@ -157,10 +144,10 @@ export function CsvImportClient({ existingData }: Props) {
             <button
               onClick={handleImport}
               disabled={!canImport}
-              aria-label={`Import ${rows.length} universities`}
+              aria-label={`Import ${rows.length} scholarships`}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isPending ? 'Importing…' : `Import ${rows.length} universities`}
+              {isPending ? 'Importing…' : `Import ${rows.length} scholarships`}
             </button>
           </div>
 
@@ -171,8 +158,8 @@ export function CsvImportClient({ existingData }: Props) {
                   <th className="text-left px-3 py-2 font-medium">#</th>
                   <th className="text-left px-3 py-2 font-medium">name_en</th>
                   <th className="text-left px-3 py-2 font-medium">country</th>
-                  <th className="text-left px-3 py-2 font-medium">tuition_usd</th>
-                  <th className="text-left px-3 py-2 font-medium">moe_approved</th>
+                  <th className="text-left px-3 py-2 font-medium">type</th>
+                  <th className="text-left px-3 py-2 font-medium">coverage</th>
                   <th className="text-left px-3 py-2 font-medium">Issues</th>
                 </tr>
               </thead>
@@ -185,8 +172,8 @@ export function CsvImportClient({ existingData }: Props) {
                     <td className="px-3 py-2 text-muted-foreground">{row.index + 1}</td>
                     <td className="px-3 py-2">{row.raw.name_en}</td>
                     <td className="px-3 py-2">{row.raw.country}</td>
-                    <td className="px-3 py-2">{row.raw.tuition_usd}</td>
-                    <td className="px-3 py-2">{row.raw.moe_approved}</td>
+                    <td className="px-3 py-2">{row.raw.type}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{row.raw.coverage || '—'}</td>
                     <td className="px-3 py-2 text-red-600">{row.errors.join('; ')}</td>
                   </tr>
                 ))}
