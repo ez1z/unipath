@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { signOutAction } from '@/app/admin/actions';
 
-type Props = { email: string };
+type Props = { email: string; role?: 'admin' | 'superuser' };
 
-export function AdminHeader({ email }: Props) {
+export function AdminHeader({ email, role }: Props) {
   return (
     <header className="bg-primary shadow-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -16,6 +16,22 @@ export function AdminHeader({ email }: Props) {
           <span className="text-primary-foreground/40 text-sm font-medium ml-1">Admin</span>
         </div>
         <div className="flex items-center gap-4">
+          {role === 'superuser' && (
+            <nav className="hidden sm:flex items-center gap-1" aria-label="Superuser navigation">
+              <Link
+                href="/admin/admins"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-primary-foreground/70 hover:text-gold hover:bg-white/5 transition-colors"
+              >
+                Admins
+              </Link>
+              <Link
+                href="/admin/logs"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-primary-foreground/70 hover:text-gold hover:bg-white/5 transition-colors"
+              >
+                Logs
+              </Link>
+            </nav>
+          )}
           <span className="text-primary-foreground/60 text-sm hidden sm:block">{email}</span>
           <form action={signOutAction}>
             <button

@@ -4,24 +4,12 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin, logAction } from '@/lib/admin/auth';
 import { CsvRowSchema } from '@/lib/data/university-types';
 import type { UniversityInsert } from '@/lib/data/university-types';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { FormSchema } from '@/lib/data/university-schema';
 import { slugify } from '@/lib/utils/slugify';
-
-async function requireAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
-  const { data: adminRow } = await supabase
-    .from('admins')
-    .select('user_id')
-    .eq('user_id', user.id)
-    .single();
-  if (!adminRow) redirect('/admin/signin');
-  return supabase;
-}
 
 function friendlyDbError(error: { code?: string; message: string }): string {
   if (error.code === '23505') {
@@ -40,7 +28,7 @@ function revalidateUniversityPaths() {
 export async function importUniversitiesAction(
   rawRows: Record<string, string>[]
 ): Promise<{ success: boolean; count?: number; error?: string }> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
 
   const parsed = z.array(CsvRowSchema).safeParse(rawRows);
   if (!parsed.success) {
@@ -73,16 +61,30 @@ export async function importUniversitiesAction(
   if (error) return { success: false, error: friendlyDbError(error) };
 
   revalidateUniversityPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'import_universities',
+    entityType: 'university',
+    details: { count: rows.length },
+  });
   return { success: true, count: rows.length };
 }
 
 export async function deleteUniversityAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
   const { error } = await supabase.from('universities').delete().eq('id', id);
   if (error) return { success: false, error: error.message };
   revalidateUniversityPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'delete_university',
+    entityType: 'university',
+    entityId: id,
+  });
   return { success: true };
 }
 
@@ -90,20 +92,28 @@ export async function toggleMoeApprovedAction(
   id: string,
   currentValue: boolean
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
   const { error } = await supabase
     .from('universities')
     .update({ moe_approved: !currentValue })
     .eq('id', id);
   if (error) return { success: false, error: error.message };
   revalidateUniversityPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'toggle_moe_approved',
+    entityType: 'university',
+    entityId: id,
+    details: { moe_approved: !currentValue },
+  });
   return { success: true };
 }
 
 export async function createUniversityAction(
   formData: FormData
 ): Promise<{ error: string } | never> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
 
   const raw = Object.fromEntries(formData.entries()) as Record<string, string>;
   const parsed = FormSchema.safeParse(raw);
@@ -119,6 +129,13 @@ export async function createUniversityAction(
   if (error) return { error: friendlyDbError(error) };
 
   revalidateUniversityPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'create_university',
+    entityType: 'university',
+    entityName: parsed.data.name_en,
+  });
   redirect('/admin/universities');
 }
 
@@ -126,7 +143,7 @@ export async function updateUniversityAction(
   id: string,
   formData: FormData
 ): Promise<{ error: string } | never> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
 
   const raw = Object.fromEntries(formData.entries()) as Record<string, string>;
   const parsed = FormSchema.safeParse(raw);
@@ -142,5 +159,13 @@ export async function updateUniversityAction(
   if (error) return { error: friendlyDbError(error) };
 
   revalidateUniversityPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'update_university',
+    entityType: 'university',
+    entityId: id,
+    entityName: parsed.data.name_en,
+  });
   redirect('/admin/universities');
 }

@@ -2,14 +2,15 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdmin, logAction } from '@/lib/admin/auth';
 import { COVERAGE_ITEMS } from '@/lib/data/scholarship-types';
 import { ScholarshipFormSchema } from '@/lib/data/scholarship-schema';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { slugify } from '@/lib/utils/slugify';
+type SupabaseClient = Awaited<ReturnType<typeof requireAdmin>>['supabase'];
 
 async function generateScholarshipSlug(
-  supabase: Awaited<ReturnType<typeof import('@/lib/supabase/server').createClient>>,
+  supabase: SupabaseClient,
   nameEn: string,
   country: string,
   excludeId?: string
@@ -27,19 +28,6 @@ async function generateScholarshipSlug(
   }
 }
 
-async function requireAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
-  const { data: adminRow } = await supabase
-    .from('admins')
-    .select('user_id')
-    .eq('user_id', user.id)
-    .single();
-  if (!adminRow) redirect('/admin/signin');
-  return supabase;
-}
-
 function revalidateScholarshipPaths() {
   for (const locale of SUPPORTED_LOCALES) {
     revalidatePath(`/${locale}/scholarships`);
@@ -49,13 +37,12 @@ function revalidateScholarshipPaths() {
 export async function createScholarshipAction(
   formData: FormData
 ): Promise<{ error: string } | never> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
 
   const raw: Record<string, string> = Object.fromEntries(
     [...formData.entries()].map(([k, v]) => [k, String(v)])
   );
 
-  // Collect coverage checkboxes into comma-separated string for the schema
   const selectedCoverage = COVERAGE_ITEMS.filter((item) => formData.get(`coverage_${item}`) === 'on');
   raw.coverage = selectedCoverage.join(',');
 
@@ -87,6 +74,13 @@ export async function createScholarshipAction(
   if (error) return { error: error.message };
 
   revalidateScholarshipPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'create_scholarship',
+    entityType: 'scholarship',
+    entityName: parsed.data.name_en,
+  });
   redirect('/admin/scholarships');
 }
 
@@ -94,7 +88,7 @@ export async function updateScholarshipAction(
   id: string,
   formData: FormData
 ): Promise<{ error: string } | never> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
 
   const raw: Record<string, string> = Object.fromEntries(
     [...formData.entries()].map(([k, v]) => [k, String(v)])
@@ -134,15 +128,30 @@ export async function updateScholarshipAction(
   if (error) return { error: error.message };
 
   revalidateScholarshipPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'update_scholarship',
+    entityType: 'scholarship',
+    entityId: id,
+    entityName: parsed.data.name_en,
+  });
   redirect('/admin/scholarships');
 }
 
 export async function deleteScholarshipAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
   const { error } = await supabase.from('scholarships').delete().eq('id', id);
   if (error) return { success: false, error: error.message };
   revalidateScholarshipPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'delete_scholarship',
+    entityType: 'scholarship',
+    entityId: id,
+  });
   return { success: true };
 }
