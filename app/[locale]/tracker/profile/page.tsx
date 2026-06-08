@@ -5,7 +5,9 @@ import type { Locale } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 import { getAll, getUniqueMajors } from '@/lib/data/universities';
 import { getAll as getAllScholarships } from '@/lib/data/scholarships';
+import { getChecklistProgress } from '@/lib/data/checklist';
 import { ProfileForm } from './ProfileForm';
+import { ProfileChecklistSummary } from '@/components/checklist/ProfileChecklistSummary';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,6 +39,11 @@ export default async function ProfilePage({ params }: Props) {
   ]);
 
   const profile = profileResult.data ?? null;
+
+  const dreamUniIds = (profile?.dream_university_ids as string[] | null) ?? [];
+  const dreamUniversities = universities.filter((u) => dreamUniIds.includes(u.id));
+  const checklistProgress = await getChecklistProgress(dreamUniIds);
+
   const t = await getTranslations({ locale, namespace: 'profile' });
 
   const defaultDisplayName =
@@ -71,6 +78,11 @@ export default async function ProfilePage({ params }: Props) {
           majors={majors}
           scholarships={scholarships}
           defaultDisplayName={defaultDisplayName}
+        />
+        <ProfileChecklistSummary
+          dreamUniversities={dreamUniversities}
+          checklistProgress={checklistProgress}
+          locale={locale}
         />
       </div>
     </>

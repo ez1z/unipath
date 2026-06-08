@@ -8,7 +8,9 @@ import { EntranceRequirements } from '@/components/university/EntranceRequiremen
 import { ScholarshipSection } from '@/components/scholarship/ScholarshipSection';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
+import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
+import { getOrInitChecklist } from '@/lib/data/checklist';
 import type { Locale } from '@/lib/constants';
 
 type Props = { params: { locale: Locale; id: string } };
@@ -30,6 +32,10 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
       .maybeSingle();
     isSaved = (data?.dream_university_ids ?? []).includes(university.id);
   }
+
+  const checklistItems = user
+    ? await getOrInitChecklist(university.id, locale)
+    : [];
 
   const t = await getTranslations('university');
   const name = university.name[locale] ?? university.name.en;
@@ -128,6 +134,16 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
           </h2>
           <EntranceRequirements requirements={university.entrance_requirements} />
         </section>
+
+        {/* Document checklist (auth'd users only) */}
+        {user && (
+          <section className="mb-8">
+            <DocumentChecklist
+              universityId={university.id}
+              initialItems={checklistItems}
+            />
+          </section>
+        )}
 
         {/* Scholarships */}
         <ScholarshipSection

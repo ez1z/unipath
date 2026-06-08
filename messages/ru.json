@@ -146,6 +146,25 @@
     "bookmark_add_label": "Добавить в интересующие стипендии",
     "bookmark_remove_label": "Удалить из интересующих стипендий"
   },
+  "checklist": {
+    "title": "Список документов",
+    "progress": "{checked} из {total} готово",
+    "add_item": "Добавить документ",
+    "add_placeholder": "Название документа...",
+    "add_button": "Добавить",
+    "delete_item": "Удалить",
+    "cancel": "Отмена",
+    "default_passport": "Паспорт",
+    "default_transcript": "Академическая справка",
+    "default_recommendation_letters": "Рекомендательные письма",
+    "default_toefl": "Результат TOEFL",
+    "default_sat": "Результат SAT",
+    "default_visa_documents": "Визовые документы",
+    "profile_section_title": "Список документов",
+    "profile_section_subtitle": "Отслеживайте документы для каждого желаемого университета",
+    "view_checklist": "Просмотреть и изменить",
+    "no_items_hint": "Сохраните университеты и зайдите на их страницы, чтобы начать отслеживать документы"
+  },
   "common": {
     "loading": "Загрузка...",
     "error_title": "Что-то пошло не так",

@@ -146,6 +146,25 @@
     "bookmark_add_label": "Save to Interested Scholarships",
     "bookmark_remove_label": "Remove from Interested Scholarships"
   },
+  "checklist": {
+    "title": "Document Checklist",
+    "progress": "{checked} of {total} done",
+    "add_item": "Add document",
+    "add_placeholder": "Document name...",
+    "add_button": "Add",
+    "delete_item": "Remove item",
+    "cancel": "Cancel",
+    "default_passport": "Passport",
+    "default_transcript": "Transcript",
+    "default_recommendation_letters": "Recommendation Letters",
+    "default_toefl": "TOEFL Score",
+    "default_sat": "SAT Score",
+    "default_visa_documents": "Visa Documents",
+    "profile_section_title": "Document Checklists",
+    "profile_section_subtitle": "Track your application documents for each dream university",
+    "view_checklist": "View & edit",
+    "no_items_hint": "Bookmark universities and visit their pages to start tracking documents"
+  },
   "common": {
     "loading": "Loading...",
     "error_title": "Something went wrong",

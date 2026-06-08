@@ -146,6 +146,25 @@
     "bookmark_add_label": "Gyzyklanýan stipendiýalara goş",
     "bookmark_remove_label": "Gyzyklanýan stipendiýalardan aýyr"
   },
+  "checklist": {
+    "title": "Resminama sanawy",
+    "progress": "{checked}/{total} taýyn",
+    "add_item": "Resminama goş",
+    "add_placeholder": "Resminamanyň ady...",
+    "add_button": "Goş",
+    "delete_item": "Aýyr",
+    "cancel": "Ýatyr",
+    "default_passport": "Pasport",
+    "default_transcript": "Okuw şahadatnamasy",
+    "default_recommendation_letters": "Maslahat hatlary",
+    "default_toefl": "TOEFL netijesji",
+    "default_sat": "SAT netijesji",
+    "default_visa_documents": "Wiza resminamalary",
+    "profile_section_title": "Resminama sanawy",
+    "profile_section_subtitle": "Arzuw edýän uniwersitetleriňiz üçin ýüz tutmak resminamalaryňyzy yzarlaň",
+    "view_checklist": "Gör we düzet",
+    "no_items_hint": "Uniwersitetlere bellik goýuň we resminama yzarlamagy başlamak üçin sahypalaryna baryň"
+  },
   "common": {
     "loading": "Ýüklenýär...",
     "error_title": "Bir zat ýalňyş gitdi",
