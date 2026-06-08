@@ -31,7 +31,10 @@ function mapSupabaseSignUpError(message: string, t: (key: string) => string): st
   if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('user already')) {
     return t('error_email_in_use');
   }
-  return t('error_generic') + (process.env.NODE_ENV === 'development' ? ` [${message}]` : '');
+  if (lower.includes('rate limit')) {
+    return t('error_rate_limit');
+  }
+  return t('error_generic');
 }
 
 function mapSupabaseSignInError(message: string, t: (key: string) => string): string {

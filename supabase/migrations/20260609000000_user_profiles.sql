@@ -1,7 +1,6 @@
 create table if not exists public.profiles (
   id           uuid primary key references auth.users(id) on delete cascade,
   display_name text,
-  avatar_url   text,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
 );
@@ -30,15 +29,14 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, display_name, avatar_url)
+  insert into public.profiles (id, display_name)
   values (
     new.id,
     coalesce(
       new.raw_user_meta_data->>'full_name',
       new.raw_user_meta_data->>'name',
       split_part(new.email, '@', 1)
-    ),
-    new.raw_user_meta_data->>'avatar_url'
+    )
   )
   on conflict (id) do nothing;
   return new;

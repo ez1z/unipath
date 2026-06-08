@@ -38,7 +38,6 @@ export function NavBarAuthButtons({ locale, user }: Props) {
     user.email?.split('@')[0] ??
     '?';
   const initial = displayName[0].toUpperCase();
-  const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
 
   function handleSignOut() {
     startTransition(async () => {
@@ -49,16 +48,11 @@ export function NavBarAuthButtons({ locale, user }: Props) {
   return (
     <div className="hidden sm:flex items-center gap-2 ml-1">
       <div
-        className="w-7 h-7 rounded-full bg-gold flex items-center justify-center text-white text-xs font-bold overflow-hidden flex-shrink-0"
+        className="w-7 h-7 rounded-full bg-gold flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
         title={displayName}
         aria-label={displayName}
       >
-        {avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
-        ) : (
-          initial
-        )}
+        {initial}
       </div>
       <button
         onClick={handleSignOut}
