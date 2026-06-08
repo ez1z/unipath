@@ -7,6 +7,7 @@ import { signOutAction } from '@/app/[locale]/auth/actions';
 import type { Locale } from '@/lib/constants';
 import type { User } from '@supabase/supabase-js';
 
+
 type Props = { locale: Locale; user: User | null };
 
 export function NavBarAuthButtons({ locale, user }: Props) {
@@ -47,13 +48,14 @@ export function NavBarAuthButtons({ locale, user }: Props) {
 
   return (
     <div className="hidden sm:flex items-center gap-2 ml-1">
-      <div
-        className="w-7 h-7 rounded-full bg-gold flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+      <Link
+        href={`/${locale}/tracker/profile`}
+        className="w-7 h-7 rounded-full bg-gold flex items-center justify-center text-white text-xs font-bold flex-shrink-0 hover:opacity-80 transition-opacity"
         title={displayName}
-        aria-label={displayName}
+        aria-label={t('profile_link')}
       >
         {initial}
-      </div>
+      </Link>
       <button
         onClick={handleSignOut}
         disabled={isPending}

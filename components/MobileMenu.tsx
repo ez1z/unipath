@@ -89,11 +89,20 @@ export function MobileMenu({ locale, user }: Props) {
           </Link>
 
           <div className="border-t border-white/10 mt-1 pt-1">
+            {user && (
+              <Link
+                href={`/${locale}/tracker/profile`}
+                onClick={() => setOpen(false)}
+                className="block px-4 py-3 text-sm text-primary-foreground/80 hover:text-gold hover:bg-white/5 transition-colors"
+              >
+                {tAuth('tracker_nav')}
+              </Link>
+            )}
             {user ? (
               <button
                 onClick={handleSignOut}
                 disabled={isPending}
-                className="w-full text-left px-4 py-3 text-sm text-primary-foreground/60 hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-50"
+                className="w-full text-left px-4 py-3 text-sm text-primary-foreground/60 hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-50 border-t border-white/5"
               >
                 {isPending ? '…' : tAuth('signout_button')}
               </button>
