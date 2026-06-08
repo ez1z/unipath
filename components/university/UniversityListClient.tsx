@@ -40,12 +40,15 @@ export function UniversityListClient({
 
   const hasPrefs =
     userPrefs !== null &&
-    (userPrefs.countries.length > 0 || userPrefs.majors.length > 0);
+    (userPrefs.countries.length > 0 ||
+      userPrefs.majors.length > 0 ||
+      savedUniversityIds.length > 0);
 
-  // When prefs are active, narrow the pool by multi-value country + major matching
+  // When prefs are active, include bookmarked universities OR country+major matches
   const basePool = useMemo(() => {
     if (!prefsActive || !userPrefs) return universities;
     return universities.filter((u) => {
+      if (savedUniversityIds.includes(u.id)) return true;
       const countryOk =
         userPrefs.countries.length === 0 || userPrefs.countries.includes(u.country);
       const majorOk =
@@ -57,7 +60,7 @@ export function UniversityListClient({
         );
       return countryOk && majorOk;
     });
-  }, [universities, prefsActive, userPrefs]);
+  }, [universities, prefsActive, userPrefs, savedUniversityIds]);
 
   const filtered = useMemo(
     () =>
