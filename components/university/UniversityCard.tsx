@@ -17,7 +17,7 @@ export function UniversityCard({ university, locale }: Props) {
   return (
     <div data-testid="university-card" className="relative bg-card rounded-xl border border-border border-l-[3px] border-l-primary shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-4 p-5">
       <Link
-        href={`/${locale}/universities/${university.id}`}
+        href={`/${locale}/universities/${university.slug}`}
         className="absolute inset-0 rounded-xl z-0"
         aria-label={`${t('view_details')}: ${name}`}
       />

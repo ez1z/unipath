@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getById } from '@/lib/data/scholarships';
+import { getBySlug } from '@/lib/data/scholarships';
 import { getById as getUniversityById } from '@/lib/data/universities';
 import { TMT_PER_USD } from '@/lib/constants';
 import { GulPattern } from '@/components/ui/GulPattern';
@@ -19,7 +19,7 @@ const TYPE_STYLES: Record<string, string> = {
 };
 
 export default async function ScholarshipDetailPage({ params: { locale, id } }: Props) {
-  const scholarship = await getById(id);
+  const scholarship = await getBySlug(id);
   if (!scholarship) notFound();
 
   const t = await getTranslations('scholarships');
@@ -139,7 +139,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
               University
             </h2>
             <Link
-              href={`/${locale}/universities/${university.id}`}
+              href={`/${locale}/universities/${university.slug}`}
               className="inline-flex items-center gap-2 bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-card transition-shadow"
             >
               <div>

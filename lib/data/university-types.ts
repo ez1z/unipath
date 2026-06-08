@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export type UniversityDbRow = {
   id: string;
+  slug: string;
   name_en: string;
   name_ru: string;
   name_tk: string;
@@ -20,6 +21,7 @@ export type UniversityDbRow = {
 
 export type University = {
   id: string;
+  slug: string;
   name: { tk: string; ru: string; en: string };
   country: string;
   city: string;
@@ -36,6 +38,7 @@ export type University = {
 export function dbRowToUniversity(row: UniversityDbRow): University {
   return {
     id: row.id,
+    slug: row.slug,
     name: { en: row.name_en, ru: row.name_ru, tk: row.name_tk },
     country: row.country,
     city: row.city,
@@ -113,6 +116,7 @@ export type UniversityInsert = {
   name_en: string;
   name_ru: string;
   name_tk: string;
+  slug: string;
   country: string;
   city: string;
   tuition_usd: number;

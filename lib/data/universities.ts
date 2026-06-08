@@ -31,6 +31,18 @@ export async function getById(id: string) {
   return dbRowToUniversity(data as UniversityDbRow);
 }
 
+export async function getBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('universities')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle();
+  if (error) throw new Error(`Failed to fetch university: ${error.message}`);
+  if (!data) return undefined;
+  return dbRowToUniversity(data as UniversityDbRow);
+}
+
 export async function getUniqueCountries(): Promise<string[]> {
   const all = await queryAll();
   return [...new Set(all.map((u) => u.country))].sort();

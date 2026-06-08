@@ -49,7 +49,7 @@ export function ScholarshipCard({ scholarship: s, locale, universityName, compac
       className="relative bg-card rounded-xl border border-border border-l-[3px] border-l-tk-green shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-3 p-5"
     >
       <Link
-        href={`/${locale}/scholarships/${s.id}`}
+        href={`/${locale}/scholarships/${s.slug}`}
         className="absolute inset-0 rounded-xl z-0"
         aria-label={name}
       />
