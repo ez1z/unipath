@@ -28,10 +28,10 @@ function mapZodSignUpError(issue: z.ZodIssue, t: (key: string) => string): strin
 
 function mapSupabaseSignUpError(message: string, t: (key: string) => string): string {
   const lower = message.toLowerCase();
-  if (lower.includes('already registered') || lower.includes('already exists')) {
+  if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('user already')) {
     return t('error_email_in_use');
   }
-  return t('error_generic');
+  return t('error_generic') + (process.env.NODE_ENV === 'development' ? ` [${message}]` : '');
 }
 
 function mapSupabaseSignInError(message: string, t: (key: string) => string): string {
