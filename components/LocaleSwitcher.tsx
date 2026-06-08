@@ -13,6 +13,7 @@ export function LocaleSwitcher({ currentLocale }: Props) {
   const router = useRouter();
 
   function switchLocale(next: Locale) {
+    document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; SameSite=Lax`;
     const segments = pathname.split('/');
     segments[1] = next;
     router.push(segments.join('/'));

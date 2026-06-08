@@ -145,5 +145,26 @@
     "not_found": "Sahypa tapylmady",
     "back_home": "Baş sahypa dolan",
     "open_new_tab": "Täze goýmada açylýar"
+  },
+  "auth": {
+    "signin_title": "Giriş",
+    "signup_title": "Hasap açmak",
+    "email_label": "E-poçta",
+    "password_label": "Parol",
+    "name_label": "Doly adyňyz",
+    "name_placeholder": "Adyňyz",
+    "continue_with_google": "Google bilen dowam ediň",
+    "or": "ýa-da",
+    "signin_button": "Giriş",
+    "signup_button": "Hasap aç",
+    "signing_in": "Girýär…",
+    "signing_up": "Hasap açylýar…",
+    "no_account": "Hasabyňyz ýokmy?",
+    "signup_link": "Hasap aç",
+    "have_account": "Hasabyňyz barmy?",
+    "signin_link": "Giriş",
+    "signout_button": "Çyk",
+    "tracker_nav": "Yzarlaýjy",
+    "error_oauth": "Google bilen giriş başartmady. Täzeden synanyşyň."
   }
 }

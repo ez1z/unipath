@@ -1,15 +1,19 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { Locale } from '@/lib/constants';
+import type { User } from '@supabase/supabase-js';
+import { signOutAction } from '@/app/[locale]/auth/actions';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; user: User | null };
 
-export function MobileMenu({ locale }: Props) {
+export function MobileMenu({ locale, user }: Props) {
   const t = useTranslations('nav');
+  const tAuth = useTranslations('auth');
   const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,6 +26,13 @@ export function MobileMenu({ locale }: Props) {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
+
+  function handleSignOut() {
+    setOpen(false);
+    startTransition(async () => {
+      await signOutAction(locale);
+    });
+  }
 
   return (
     <div ref={ref} className="relative sm:hidden">
@@ -76,6 +87,35 @@ export function MobileMenu({ locale }: Props) {
           >
             {t('scholarships')}
           </Link>
+
+          <div className="border-t border-white/10 mt-1 pt-1">
+            {user ? (
+              <button
+                onClick={handleSignOut}
+                disabled={isPending}
+                className="w-full text-left px-4 py-3 text-sm text-primary-foreground/60 hover:text-gold hover:bg-white/5 transition-colors disabled:opacity-50"
+              >
+                {isPending ? '…' : tAuth('signout_button')}
+              </button>
+            ) : (
+              <>
+                <Link
+                  href={`/${locale}/auth/signin`}
+                  onClick={() => setOpen(false)}
+                  className="block px-4 py-3 text-sm text-primary-foreground/80 hover:text-gold hover:bg-white/5 transition-colors"
+                >
+                  {tAuth('signin_button')}
+                </Link>
+                <Link
+                  href={`/${locale}/auth/signup`}
+                  onClick={() => setOpen(false)}
+                  className="block px-4 py-3 text-sm font-semibold text-gold hover:bg-white/5 transition-colors border-t border-white/5"
+                >
+                  {tAuth('signup_button')}
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>

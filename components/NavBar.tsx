@@ -1,14 +1,27 @@
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import type { Locale } from '@/lib/constants';
+import { createClient } from '@/lib/supabase/server';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { MobileMenu } from '@/components/MobileMenu';
+import { NavBarAuthButtons } from '@/components/NavBarAuthButtons';
+import type { User } from '@supabase/supabase-js';
 
 type Props = { locale: Locale };
 
-export function NavBar({ locale }: Props) {
-  const t = useTranslations('nav');
+export async function NavBar({ locale }: Props) {
+  const t = await getTranslations({ locale, namespace: 'nav' });
+
+  let user: User | null = null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Supabase unreachable — render unauthenticated state
+  }
+
   return (
     <nav
       className="bg-primary sticky top-0 z-40 shadow-md"
@@ -52,8 +65,9 @@ export function NavBar({ locale }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <MobileMenu locale={locale} />
+          <MobileMenu locale={locale} user={user} />
           <LocaleSwitcher currentLocale={locale} />
+          <NavBarAuthButtons locale={locale} user={user} />
         </div>
       </div>
     </nav>

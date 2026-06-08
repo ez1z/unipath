@@ -145,5 +145,26 @@
     "not_found": "Page not found",
     "back_home": "Back to home",
     "open_new_tab": "Opens in new tab"
+  },
+  "auth": {
+    "signin_title": "Sign in",
+    "signup_title": "Create an account",
+    "email_label": "Email address",
+    "password_label": "Password",
+    "name_label": "Full name",
+    "name_placeholder": "Your name",
+    "continue_with_google": "Continue with Google",
+    "or": "or",
+    "signin_button": "Sign in",
+    "signup_button": "Sign up",
+    "signing_in": "Signing in…",
+    "signing_up": "Creating account…",
+    "no_account": "Don't have an account?",
+    "signup_link": "Sign up",
+    "have_account": "Already have an account?",
+    "signin_link": "Sign in",
+    "signout_button": "Sign out",
+    "tracker_nav": "My Tracker",
+    "error_oauth": "Google sign-in failed. Please try again."
   }
 }

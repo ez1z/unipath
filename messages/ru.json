@@ -145,5 +145,26 @@
     "not_found": "Страница не найдена",
     "back_home": "На главную",
     "open_new_tab": "Открывается в новой вкладке"
+  },
+  "auth": {
+    "signin_title": "Войти",
+    "signup_title": "Создать аккаунт",
+    "email_label": "Электронная почта",
+    "password_label": "Пароль",
+    "name_label": "Полное имя",
+    "name_placeholder": "Ваше имя",
+    "continue_with_google": "Войти через Google",
+    "or": "или",
+    "signin_button": "Войти",
+    "signup_button": "Зарегистрироваться",
+    "signing_in": "Вход…",
+    "signing_up": "Создание аккаунта…",
+    "no_account": "Нет аккаунта?",
+    "signup_link": "Зарегистрироваться",
+    "have_account": "Уже есть аккаунт?",
+    "signin_link": "Войти",
+    "signout_button": "Выйти",
+    "tracker_nav": "Мой трекер",
+    "error_oauth": "Вход через Google не удался. Попробуйте снова."
   }
 }
