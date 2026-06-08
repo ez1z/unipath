@@ -36,6 +36,7 @@
     "bookmark_add_label": "Добавить в желаемые университеты",
     "bookmark_remove_label": "Удалить из желаемых университетов",
     "add_to_compare": "Сравнить",
+    "filter_my_preferences": "Мои предпочтения",
     "ranking": "Рейтинг QS",
     "ranking_value": "#{rank}",
     "ranking_unranked": "Не ранжирован",
@@ -144,7 +145,8 @@
     "bookmark_add": "Сохранить",
     "bookmark_saved": "Сохранено",
     "bookmark_add_label": "Добавить в интересующие стипендии",
-    "bookmark_remove_label": "Удалить из интересующих стипендий"
+    "bookmark_remove_label": "Удалить из интересующих стипендий",
+    "filter_my_preferences": "Мои предпочтения"
   },
   "checklist": {
     "title": "Список документов",

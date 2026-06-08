@@ -36,6 +36,7 @@
     "bookmark_add_label": "Arzuw uniwersitetlerine goş",
     "bookmark_remove_label": "Arzuw uniwersitetlerinden aýyr",
     "add_to_compare": "Deňeşdir",
+    "filter_my_preferences": "Meniň isleglerim",
     "ranking": "QS Reýting",
     "ranking_value": "#{rank}",
     "ranking_unranked": "Reýting ýok",
@@ -144,7 +145,8 @@
     "bookmark_add": "Sakla",
     "bookmark_saved": "Saklanan",
     "bookmark_add_label": "Gyzyklanýan stipendiýalara goş",
-    "bookmark_remove_label": "Gyzyklanýan stipendiýalardan aýyr"
+    "bookmark_remove_label": "Gyzyklanýan stipendiýalardan aýyr",
+    "filter_my_preferences": "Meniň isleglerim"
   },
   "checklist": {
     "title": "Resminama sanawy",

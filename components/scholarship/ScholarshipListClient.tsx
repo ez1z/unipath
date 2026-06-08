@@ -9,32 +9,53 @@ import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
 
+type UserPrefs = { countries: string[] };
+
 type Props = {
   scholarships: Scholarship[];
   locale: Locale;
   countries: string[];
   types: string[];
   savedScholarshipIds: string[];
+  userPrefs: UserPrefs | null;
 };
 
 const COVERAGE_FILTER_OPTIONS = ['tuition', 'accommodation', 'flights', 'stipend', 'health'];
 
-export function ScholarshipListClient({ scholarships, locale, countries, types, savedScholarshipIds }: Props) {
+export function ScholarshipListClient({
+  scholarships,
+  locale,
+  countries,
+  types,
+  savedScholarshipIds,
+  userPrefs,
+}: Props) {
   const t = useTranslations('scholarships');
   const [query, setQuery] = useState('');
   const [country, setCountry] = useState('');
   const [type, setType] = useState('');
   const [coverage, setCoverage] = useState('');
+  const [prefsActive, setPrefsActive] = useState(false);
+
+  const hasPrefs = userPrefs !== null && userPrefs.countries.length > 0;
+
+  // When prefs are active, narrow the pool by the user's desired countries
+  const basePool = useMemo(() => {
+    if (!prefsActive || !userPrefs) return scholarships;
+    return scholarships.filter((s) =>
+      userPrefs.countries.length === 0 || userPrefs.countries.includes(s.country),
+    );
+  }, [scholarships, prefsActive, userPrefs]);
 
   const filtered = useMemo(
     () =>
-      filterScholarships(scholarships, {
+      filterScholarships(basePool, {
         query: query || undefined,
         country: country || undefined,
         type: type || undefined,
         coverage: coverage || undefined,
       }),
-    [scholarships, query, country, type, coverage]
+    [basePool, query, country, type, coverage],
   );
 
   function clearFilters() {
@@ -137,16 +158,46 @@ export function ScholarshipListClient({ scholarships, locale, countries, types, 
           />
         </div>
 
-        {hasFilters && (
-          <div className="flex justify-end mt-3">
+        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+          <div>
+            {hasPrefs && (
+              <button
+                type="button"
+                onClick={() => setPrefsActive((v) => !v)}
+                aria-pressed={prefsActive}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                  prefsActive
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
+                }`}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill={prefsActive ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                {t('filter_my_preferences')}
+              </button>
+            )}
+          </div>
+
+          {(hasFilters || prefsActive) && (
             <button
-              onClick={clearFilters}
+              onClick={() => { clearFilters(); setPrefsActive(false); }}
               className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
             >
               {t('clear_filters')}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="flex items-center mb-4 text-sm text-muted-foreground">

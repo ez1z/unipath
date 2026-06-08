@@ -20,11 +20,21 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
     getUniqueLanguages(),
     getUniqueMajors(),
     user
-      ? supabase.from('profiles').select('dream_university_ids').eq('id', user.id).maybeSingle()
+      ? supabase
+          .from('profiles')
+          .select('dream_university_ids, desired_countries, desired_majors')
+          .eq('id', user.id)
+          .maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
   const savedUniversityIds: string[] = profileResult.data?.dream_university_ids ?? [];
+  const userPrefs = user
+    ? {
+        countries: (profileResult.data?.desired_countries as string[] | null) ?? [],
+        majors: (profileResult.data?.desired_majors as string[] | null) ?? [],
+      }
+    : null;
 
   return (
     <>
@@ -49,6 +59,7 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
           languages={languages}
           majors={majors}
           savedUniversityIds={savedUniversityIds}
+          userPrefs={userPrefs}
         />
       </div>
     </>

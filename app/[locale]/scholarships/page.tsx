@@ -19,11 +19,18 @@ export default async function ScholarshipsPage({ params: { locale } }: Props) {
     getUniqueCountries(),
     getUniqueTypes(),
     user
-      ? supabase.from('profiles').select('interested_scholarship_ids').eq('id', user.id).maybeSingle()
+      ? supabase
+          .from('profiles')
+          .select('interested_scholarship_ids, desired_countries')
+          .eq('id', user.id)
+          .maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
   const savedScholarshipIds: string[] = profileResult.data?.interested_scholarship_ids ?? [];
+  const userPrefs = user
+    ? { countries: (profileResult.data?.desired_countries as string[] | null) ?? [] }
+    : null;
 
   return (
     <>
@@ -49,6 +56,7 @@ export default async function ScholarshipsPage({ params: { locale } }: Props) {
           countries={countries}
           types={types}
           savedScholarshipIds={savedScholarshipIds}
+          userPrefs={userPrefs}
         />
       </div>
     </>

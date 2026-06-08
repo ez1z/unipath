@@ -36,6 +36,7 @@
     "bookmark_add_label": "Save to Dream Universities",
     "bookmark_remove_label": "Remove from Dream Universities",
     "add_to_compare": "Compare",
+    "filter_my_preferences": "My preferences",
     "ranking": "QS Ranking",
     "ranking_value": "#{rank}",
     "ranking_unranked": "Unranked",
@@ -144,7 +145,8 @@
     "bookmark_add": "Save",
     "bookmark_saved": "Saved",
     "bookmark_add_label": "Save to Interested Scholarships",
-    "bookmark_remove_label": "Remove from Interested Scholarships"
+    "bookmark_remove_label": "Remove from Interested Scholarships",
+    "filter_my_preferences": "My preferences"
   },
   "checklist": {
     "title": "Document Checklist",
