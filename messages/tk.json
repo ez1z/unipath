@@ -164,6 +164,7 @@
     "deadline_passed": "Geçdi"
   },
   "checklist": {
+    "next_deadline": "Indiki möhlet",
     "title": "Resminama sanawy",
     "progress": "{checked}/{total} taýyn",
     "add_item": "Resminama goş",

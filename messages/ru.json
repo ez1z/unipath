@@ -164,6 +164,7 @@
     "deadline_passed": "Истёк"
   },
   "checklist": {
+    "next_deadline": "Следующий дедлайн",
     "title": "Список документов",
     "progress": "{checked} из {total} готово",
     "add_item": "Добавить документ",

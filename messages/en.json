@@ -164,6 +164,7 @@
     "deadline_passed": "Passed"
   },
   "checklist": {
+    "next_deadline": "Next deadline",
     "title": "Document Checklist",
     "progress": "{checked} of {total} done",
     "add_item": "Add document",

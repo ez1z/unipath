@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import type { University } from '@/lib/data/university-types';
 import type { Locale } from '@/lib/constants';
+import type { Semester } from '@/lib/types/semester';
 
 type Props = {
   dreamUniversities: University[];
@@ -9,12 +10,48 @@ type Props = {
   locale: Locale;
 };
 
+function getNearestDeadline(semesters: Semester[]): { semester: Semester; days: number } | null {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const withDeadlines = semesters
+    .filter((s) => s.deadline)
+    .map((s) => {
+      const d = new Date(s.deadline!);
+      d.setHours(0, 0, 0, 0);
+      return { semester: s, days: Math.ceil((d.getTime() - today.getTime()) / 86_400_000) };
+    });
+
+  if (withDeadlines.length === 0) return null;
+
+  const upcoming = withDeadlines.filter((x) => x.days >= 0).sort((a, b) => a.days - b.days);
+  if (upcoming.length > 0) return upcoming[0];
+
+  return withDeadlines.sort((a, b) => b.days - a.days)[0];
+}
+
+function deadlineBadgeCls(days: number): string {
+  if (days < 0) return 'bg-muted text-muted-foreground';
+  if (days <= 14) return 'bg-red-50 text-red-600';
+  if (days <= 30) return 'bg-orange-50 text-orange-600';
+  if (days <= 60) return 'bg-yellow-50 text-yellow-700';
+  return 'bg-green-50 text-green-700';
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}.${mm}.${d.getFullYear()}`;
+}
+
 export async function ProfileChecklistSummary({
   dreamUniversities,
   checklistProgress,
   locale,
 }: Props) {
   const t = await getTranslations({ locale, namespace: 'checklist' });
+  const tUni = await getTranslations({ locale, namespace: 'university' });
 
   return (
     <section className="mt-8 border-t border-border pt-8">
@@ -35,6 +72,7 @@ export async function ProfileChecklistSummary({
             const total = progress?.total ?? 0;
             const checked = progress?.checked ?? 0;
             const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+            const nearest = getNearestDeadline(uni.semesters);
 
             return (
               <li
@@ -57,6 +95,7 @@ export async function ProfileChecklistSummary({
                     {t('view_checklist')} →
                   </Link>
                 </div>
+
                 <div className="flex items-center gap-3">
                   <div
                     className="flex-1 bg-secondary rounded-full h-1.5"
@@ -76,6 +115,23 @@ export async function ProfileChecklistSummary({
                     {total > 0 ? t('progress', { checked, total }) : '—'}
                   </span>
                 </div>
+
+                {nearest && (
+                  <div className="mt-2.5 flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground truncate">
+                      {t('next_deadline')}: {nearest.semester.name} · {formatDate(nearest.semester.deadline!)}
+                    </span>
+                    <span
+                      className={`flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${deadlineBadgeCls(nearest.days)}`}
+                    >
+                      {nearest.days < 0
+                        ? tUni('deadline_passed')
+                        : nearest.days === 0
+                          ? tUni('deadline_today')
+                          : tUni('deadline_days_left', { days: nearest.days })}
+                    </span>
+                  </div>
+                )}
               </li>
             );
           })}
