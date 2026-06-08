@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
@@ -15,18 +14,15 @@ const SignUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   name: z.string().min(1).max(80),
+  age: z.coerce.number().int().min(14).max(100),
 });
 
-function mapZodSignUpError(
-  issue: z.ZodIssue,
-  t: (key: string) => string
-): string {
+function mapZodSignUpError(issue: z.ZodIssue, t: (key: string) => string): string {
   const field = issue.path[0] as string;
-  if (field === 'name') {
-    return issue.code === 'too_big' ? t('error_name_too_long') : t('error_name_required');
-  }
+  if (field === 'name') return issue.code === 'too_big' ? t('error_name_too_long') : t('error_name_required');
   if (field === 'email') return t('error_email_invalid');
   if (field === 'password') return t('error_password_short');
+  if (field === 'age') return t('error_age_invalid');
   return t('error_generic');
 }
 
@@ -58,8 +54,7 @@ export async function signInWithEmailAction(
   });
   if (!parsed.success) {
     const field = parsed.error.issues[0].path[0] as string;
-    const msg = field === 'email' ? t('error_email_invalid') : t('error_generic');
-    return { error: msg };
+    return { error: field === 'email' ? t('error_email_invalid') : t('error_generic') };
   }
 
   const supabase = await createClient();
@@ -72,54 +67,28 @@ export async function signInWithEmailAction(
 export async function signUpWithEmailAction(
   locale: string,
   formData: FormData
-): Promise<{ error: string } | { confirmEmail: string }> {
+): Promise<{ error: string }> {
   const t = await getTranslations({ locale, namespace: 'auth' });
 
   const parsed = SignUpSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
     name: formData.get('name'),
+    age: formData.get('age'),
   });
   if (!parsed.success) {
     return { error: mapZodSignUpError(parsed.error.issues[0], t) };
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    options: { data: { full_name: parsed.data.name } },
+    options: { data: { full_name: parsed.data.name, age: parsed.data.age } },
   });
   if (error) return { error: mapSupabaseSignUpError(error.message, t) };
 
-  // session is null when Supabase requires email confirmation
-  if (!data.session) {
-    return { confirmEmail: parsed.data.email };
-  }
-
   redirect(`/${locale}`);
-}
-
-export async function signInWithOAuthAction(
-  locale: string,
-  next?: string
-): Promise<{ error: string }> {
-  const headersList = await headers();
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    headersList.get('origin') ??
-    'http://localhost:3000';
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${origin}/auth/callback?next=/${locale}${next ?? ''}`,
-    },
-  });
-  if (error || !data.url) return { error: error?.message ?? 'OAuth failed' };
-
-  redirect(data.url);
 }
 
 export async function signOutAction(locale: string): Promise<never> {
