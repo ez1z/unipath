@@ -165,6 +165,16 @@
     "signin_link": "Sign in",
     "signout_button": "Sign out",
     "tracker_nav": "My Tracker",
-    "error_oauth": "Google sign-in failed. Please try again."
+    "error_oauth": "Google sign-in failed. Please try again.",
+    "error_name_required": "Full name is required",
+    "error_name_too_long": "Name must be 80 characters or less",
+    "error_email_invalid": "Please enter a valid email address",
+    "error_password_short": "Password must be at least 8 characters",
+    "error_email_in_use": "An account with this email already exists",
+    "error_invalid_credentials": "Invalid email or password",
+    "error_generic": "Something went wrong. Please try again.",
+    "confirm_email_title": "Check your email",
+    "confirm_email_desc": "We sent a confirmation link to {email}. Click it to activate your account.",
+    "confirm_email_spam": "Didn't receive it? Check your spam folder."
   }
 }

@@ -165,6 +165,16 @@
     "signin_link": "Giriş",
     "signout_button": "Çyk",
     "tracker_nav": "Yzarlaýjy",
-    "error_oauth": "Google bilen giriş başartmady. Täzeden synanyşyň."
+    "error_oauth": "Google bilen giriş başartmady. Täzeden synanyşyň.",
+    "error_name_required": "Doly adyňyzy giriziň",
+    "error_name_too_long": "At 80 nyşandan köp bolmaly däldir",
+    "error_email_invalid": "Dogry e-poçta adresini giriziň",
+    "error_password_short": "Parol azyndan 8 nyşandan ybarat bolmaly",
+    "error_email_in_use": "Bu e-poçta bilen hasap eýýäm bar",
+    "error_invalid_credentials": "Nädogry e-poçta ýa-da parol",
+    "error_generic": "Bir zat ýalňyş gitdi. Täzeden synanyşyň.",
+    "confirm_email_title": "E-poçtaňyzy barlaň",
+    "confirm_email_desc": "{email} adresine tassyklama salgysy iberildi. Hasabyňyzy işjeňleşdirmek üçin ony basyň.",
+    "confirm_email_spam": "Hat gelmedimi? Spam bukjasyny barlaň."
   }
 }

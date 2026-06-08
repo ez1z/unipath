@@ -20,6 +20,7 @@ type Props = { locale: Locale };
 export function SignUpForm({ locale }: Props) {
   const t = useTranslations('auth');
   const [error, setError] = useState<string | null>(null);
+  const [confirmedEmail, setConfirmedEmail] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -28,7 +29,11 @@ export function SignUpForm({ locale }: Props) {
     setError(null);
     startTransition(async () => {
       const result = await signUpWithEmailAction(locale, formData);
-      if (result?.error) setError(result.error);
+      if ('error' in result) {
+        setError(result.error);
+      } else if ('confirmEmail' in result) {
+        setConfirmedEmail(result.confirmEmail);
+      }
     });
   }
 
@@ -38,6 +43,30 @@ export function SignUpForm({ locale }: Props) {
       const result = await signInWithOAuthAction(locale);
       if (result?.error) setError(result.error);
     });
+  }
+
+  if (confirmedEmail) {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="w-14 h-14 rounded-full bg-tk-green-light flex items-center justify-center mx-auto">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-tk-green" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+        </div>
+        <h2 className="font-heading text-xl font-bold text-foreground">{t('confirm_email_title')}</h2>
+        <p className="text-sm text-muted-foreground">
+          {t('confirm_email_desc', { email: confirmedEmail })}
+        </p>
+        <p className="text-xs text-muted-foreground">{t('confirm_email_spam')}</p>
+        <Link
+          href={`/${locale}/auth/signin`}
+          className="inline-block mt-2 text-sm text-primary font-medium hover:underline"
+        >
+          {t('signin_link')}
+        </Link>
+      </div>
+    );
   }
 
   return (
