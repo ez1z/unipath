@@ -8,14 +8,14 @@
   },
   "home": {
     "hero_title": "Daşary ýurtdaky uniwersitediňizi tapyň",
-    "hero_subtitle": "MHM tarapyndan tassyklanan uniwersitetleri açyň, mümkinçilikleri deňeşdiriň we resmi töleg geçiriş prosesini öwreniň.",
+    "hero_subtitle": "Bilim ministrligi tarapyndan tassyklanan uniwersitetleri açyň, mümkinçilikleri deňeşdiriň we resmi töleg geçiriş prosesini öwreniň.",
     "search_placeholder": "Uniwersitetleri gözläň...",
     "search_button": "Gözle",
     "browse_all": "Ähli uniwersitetler",
     "transfer_guide": "Geçiriş gollanmasy we kalkulýator",
     "stats_universities": "Uniwersitet",
     "stats_countries": "Ýurt",
-    "stats_moe_approved": "MHM tassyklady"
+    "stats_moe_approved": "Oblono tassyklady"
   },
   "universities": {
     "title": "Uniwersitetler",
@@ -38,7 +38,7 @@
     "tuition_label": "Töleg / ýyl"
   },
   "university": {
-    "moe_badge": "MHM Tassyklady",
+    "moe_badge": "Oblono Tassyklady",
     "moe_badge_title": "Bu uniwersitet Türkmenistanyň Milli Bilim Ministrligi tarapyndan resmi töleg geçirişleri üçin tassyklandy",
     "website": "Resmi saýt",
     "apply": "Tabşyrmak",
