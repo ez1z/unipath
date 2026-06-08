@@ -37,12 +37,20 @@ export default async function AdminScholarshipsPage() {
             <h1 className="font-heading text-2xl font-bold text-foreground mt-2">Scholarships</h1>
             <p className="text-muted-foreground text-sm mt-1">{scholarships.length} total</p>
           </div>
-          <Link
-            href="/admin/scholarships/new"
-            className="px-4 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
-          >
-            + Add scholarship
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/admin/scholarships/import"
+              className="px-4 py-2 border border-primary text-primary rounded-lg text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              Import CSV
+            </Link>
+            <Link
+              href="/admin/scholarships/new"
+              className="px-4 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              + Add scholarship
+            </Link>
+          </div>
         </div>
 
         {scholarships.length === 0 ? (

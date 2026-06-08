@@ -32,11 +32,30 @@ export async function getOrInitChecklist(
     return existing as ChecklistItem[];
   }
 
-  const t = await getTranslations({ locale, namespace: 'checklist' });
-  const defaults = DEFAULT_ITEM_KEYS.map((key, i) => ({
+  // Read template from entrance_requirements.document_requirements
+  const { data: uni } = await supabase
+    .from('universities')
+    .select('entrance_requirements')
+    .eq('id', universityId)
+    .maybeSingle();
+
+  const er = uni?.entrance_requirements as Record<string, unknown> | null;
+  const template = Array.isArray(er?.document_requirements)
+    ? (er!.document_requirements as unknown[]).filter((v): v is string => typeof v === 'string')
+    : [];
+
+  let names: string[];
+  if (template.length > 0) {
+    names = template;
+  } else {
+    const t = await getTranslations({ locale, namespace: 'checklist' });
+    names = DEFAULT_ITEM_KEYS.map((key) => t(key));
+  }
+
+  const defaults = names.map((name, i) => ({
     user_id: user.id,
     university_id: universityId,
-    name: t(key),
+    name,
     is_checked: false,
     sort_order: i,
   }));

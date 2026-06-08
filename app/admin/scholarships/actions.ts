@@ -2,8 +2,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
 import { requireAdmin, logAction } from '@/lib/admin/auth';
-import { COVERAGE_ITEMS } from '@/lib/data/scholarship-types';
+import { COVERAGE_ITEMS, ScholarshipCsvRowSchema } from '@/lib/data/scholarship-types';
+import type { ScholarshipInsert } from '@/lib/data/scholarship-types';
 import { ScholarshipFormSchema } from '@/lib/data/scholarship-schema';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { slugify } from '@/lib/utils/slugify';
@@ -154,4 +156,71 @@ export async function deleteScholarshipAction(
     entityId: id,
   });
   return { success: true };
+}
+
+export async function importScholarshipsAction(
+  rawRows: Record<string, string>[],
+): Promise<{ success: boolean; count?: number; error?: string }> {
+  const { supabase, user } = await requireAdmin();
+
+  const parsed = z.array(ScholarshipCsvRowSchema).safeParse(rawRows);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    const rowIdx = typeof issue.path[0] === 'number' ? issue.path[0] + 1 : '?';
+    return { success: false, error: `Row ${rowIdx}, ${String(issue.path[1] ?? '')}: ${issue.message}` };
+  }
+
+  // Resolve university_name_en → university_id in a single query
+  const universityNames = [
+    ...new Set(
+      parsed.data
+        .map((r) => r.university_name_en?.trim())
+        .filter((n): n is string => Boolean(n)),
+    ),
+  ];
+  const universityMap = new Map<string, string>();
+  if (universityNames.length > 0) {
+    const { data: unis } = await supabase
+      .from('universities')
+      .select('id, name_en')
+      .in('name_en', universityNames);
+    for (const u of unis ?? []) {
+      universityMap.set(u.name_en as string, u.id as string);
+    }
+  }
+
+  const rows: ScholarshipInsert[] = parsed.data.map((r) => ({
+    slug: slugify(`${r.name_en}-${r.country}`),
+    university_id: r.university_name_en?.trim()
+      ? (universityMap.get(r.university_name_en.trim()) ?? null)
+      : null,
+    country: r.country,
+    name_en: r.name_en,
+    name_ru: r.name_ru,
+    name_tk: r.name_tk,
+    type: r.type,
+    coverage: r.coverage,
+    amount_usd: r.amount_usd,
+    deadline_text: r.deadline_text,
+    description_en: r.description_en,
+    description_ru: r.description_ru,
+    description_tk: r.description_tk,
+    application_url: r.application_url ?? '',
+  }));
+
+  const { error } = await supabase
+    .from('scholarships')
+    .upsert(rows, { onConflict: 'slug', ignoreDuplicates: false });
+
+  if (error) return { success: false, error: error.message };
+
+  revalidateScholarshipPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'import_scholarships',
+    entityType: 'scholarship',
+    details: { count: rows.length },
+  });
+  return { success: true, count: rows.length };
 }
