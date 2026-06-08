@@ -33,6 +33,19 @@ export async function getById(id: string) {
   return dbRowToScholarship(data as ScholarshipDbRow);
 }
 
+export async function getBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('scholarships')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .maybeSingle();
+  if (error) throw new Error(`Failed to fetch scholarship: ${error.message}`);
+  if (!data) return undefined;
+  return dbRowToScholarship(data as ScholarshipDbRow);
+}
+
 export async function getByUniversity(universityId: string, country: string) {
   const supabase = await createClient();
   const [uniResult, countryResult] = await Promise.all([

@@ -8,6 +8,7 @@ import { CsvRowSchema } from '@/lib/data/university-types';
 import type { UniversityInsert } from '@/lib/data/university-types';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { FormSchema } from '@/lib/data/university-schema';
+import { slugify } from '@/lib/utils/slugify';
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -52,6 +53,7 @@ export async function importUniversitiesAction(
     name_en: r.name_en,
     name_ru: r.name_ru,
     name_tk: r.name_tk,
+    slug: slugify(r.name_en),
     country: r.country,
     city: r.city,
     tuition_usd: r.tuition_usd,
@@ -110,7 +112,10 @@ export async function createUniversityAction(
     return { error: `${String(issue.path[0])}: ${issue.message}` };
   }
 
-  const { error } = await supabase.from('universities').insert(parsed.data);
+  const { error } = await supabase.from('universities').insert({
+    ...parsed.data,
+    slug: slugify(parsed.data.name_en),
+  });
   if (error) return { error: friendlyDbError(error) };
 
   revalidateUniversityPaths();
@@ -130,7 +135,10 @@ export async function updateUniversityAction(
     return { error: `${String(issue.path[0])}: ${issue.message}` };
   }
 
-  const { error } = await supabase.from('universities').update(parsed.data).eq('id', id);
+  const { error } = await supabase
+    .from('universities')
+    .update({ ...parsed.data, slug: slugify(parsed.data.name_en) })
+    .eq('id', id);
   if (error) return { error: friendlyDbError(error) };
 
   revalidateUniversityPaths();

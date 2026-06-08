@@ -5,6 +5,7 @@ import type { University } from '@/lib/data/university-types';
 function makeUni(overrides: Partial<University> = {}): University {
   return {
     id: '1',
+    slug: 'default-university',
     name: { en: 'Default University', ru: 'Университет', tk: 'Uniwersitet' },
     country: 'Turkey',
     city: 'Ankara',

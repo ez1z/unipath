@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getById } from '@/lib/data/universities';
+import { getBySlug } from '@/lib/data/universities';
 import { formatTuition } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
@@ -14,7 +14,7 @@ type Props = { params: { locale: Locale; id: string } };
 export const dynamic = 'force-dynamic';
 
 export default async function UniversityDetailPage({ params: { locale, id } }: Props) {
-  const university = await getById(id);
+  const university = await getBySlug(id);
   if (!university) notFound();
 
   const t = await getTranslations('university');

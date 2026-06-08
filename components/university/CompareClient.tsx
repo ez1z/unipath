@@ -131,7 +131,7 @@ export function CompareClient({ universities, locale }: Props) {
                   <th key={u.id} className="text-left py-4 px-4 border-l border-white/10 align-top">
                     <div className="flex items-start justify-between gap-2">
                       <Link
-                        href={`/${locale}/universities/${u.id}`}
+                        href={`/${locale}/universities/${u.slug}`}
                         className="font-heading font-semibold text-primary-foreground hover:text-gold transition-colors"
                       >
                         {u.name[locale] ?? u.name.en}

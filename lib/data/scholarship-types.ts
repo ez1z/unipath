@@ -5,6 +5,7 @@ export const COVERAGE_ITEMS: CoverageItem[] = ['tuition', 'accommodation', 'flig
 
 export type ScholarshipDbRow = {
   id: string;
+  slug: string;
   university_id: string | null;
   country: string;
   name_en: string;
@@ -24,6 +25,7 @@ export type ScholarshipDbRow = {
 
 export type Scholarship = {
   id: string;
+  slug: string;
   university_id: string | null;
   country: string;
   name: { tk: string; ru: string; en: string };
@@ -38,6 +40,7 @@ export type Scholarship = {
 export function dbRowToScholarship(row: ScholarshipDbRow): Scholarship {
   return {
     id: row.id,
+    slug: row.slug,
     university_id: row.university_id,
     country: row.country,
     name: { en: row.name_en, ru: row.name_ru, tk: row.name_tk },

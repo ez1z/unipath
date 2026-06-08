@@ -4,6 +4,7 @@ import type { UniversityDbRow } from '@/lib/data/university-types';
 
 const baseRow: UniversityDbRow = {
   id: 'abc-123',
+  slug: 'test-university',
   name_en: 'Test University',
   name_ru: 'Тест Университет',
   name_tk: 'Test Uni',

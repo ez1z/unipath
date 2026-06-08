@@ -6,6 +6,26 @@ import { createClient } from '@/lib/supabase/server';
 import { COVERAGE_ITEMS } from '@/lib/data/scholarship-types';
 import { ScholarshipFormSchema } from '@/lib/data/scholarship-schema';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
+import { slugify } from '@/lib/utils/slugify';
+
+async function generateScholarshipSlug(
+  supabase: Awaited<ReturnType<typeof import('@/lib/supabase/server').createClient>>,
+  nameEn: string,
+  country: string,
+  excludeId?: string
+): Promise<string> {
+  const base = slugify(`${nameEn}-${country}`);
+  let candidate = base;
+  let suffix = 2;
+  while (true) {
+    let query = supabase.from('scholarships').select('id').eq('slug', candidate);
+    if (excludeId) query = query.neq('id', excludeId);
+    const { data } = await query.maybeSingle();
+    if (!data) return candidate;
+    candidate = `${base}-${suffix}`;
+    suffix++;
+  }
+}
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -45,7 +65,10 @@ export async function createScholarshipAction(
     return { error: `${String(issue.path[0])}: ${issue.message}` };
   }
 
+  const slug = await generateScholarshipSlug(supabase, parsed.data.name_en, parsed.data.country);
+
   const { error } = await supabase.from('scholarships').insert({
+    slug,
     university_id: parsed.data.university_id,
     country: parsed.data.country,
     name_en: parsed.data.name_en,
@@ -86,9 +109,12 @@ export async function updateScholarshipAction(
     return { error: `${String(issue.path[0])}: ${issue.message}` };
   }
 
+  const slug = await generateScholarshipSlug(supabase, parsed.data.name_en, parsed.data.country, id);
+
   const { error } = await supabase
     .from('scholarships')
     .update({
+      slug,
       university_id: parsed.data.university_id,
       country: parsed.data.country,
       name_en: parsed.data.name_en,
