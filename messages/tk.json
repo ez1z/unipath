@@ -74,7 +74,18 @@
     "semester_no_deadline": "Möhlet ýok",
     "deadline_days_left": "{days} gün galdy",
     "deadline_today": "Şu gün ýapylýar",
-    "deadline_passed": "Geçdi"
+    "deadline_passed": "Geçdi",
+    "transfer_breakdown": "Tölegiň TMT-däki deňi",
+    "tmt_equivalent": "TMT deňi",
+    "official_portion": "Resmi ($12 000 çäk)",
+    "unofficial_portion": "Galan böleg (bazar kursy)",
+    "transfer_over_cap_note": "Ýyllyk töleg $12 000 MHM çäginden geçýär. Diňe $12 000-y resmi kurs (3,51 TMT/USD) bilen geçirip bolýar. Galan ${overage} bazar kursyny (≈19,6 TMT/USD) talap edýär.",
+    "official_rate_detail": "1 USD = 3,51 TMT (resmi)",
+    "unofficial_rate_detail": "1 USD ≈ 19,6 TMT (bazar)",
+    "billion_word": "milliard",
+    "tmt_total": "Jemi TMT",
+    "million_word": "million",
+    "thousand_word": "müň"
   },
   "compare": {
     "title": "Uniwersitetleri deňeşdir",
@@ -104,6 +115,16 @@
     "amount_placeholder": "USD-daky mukdary giriziň",
     "result_usd": "USD",
     "result_tmt": "TMT deňi",
+    "result_old_manat": "Köne manat",
+    "result_tmt_total": "Jemi TMT",
+    "dual_rate_note": "Bu mukdar ýyllyk $12 000 çäginden geçýär. Diňe $12 000-y Merkezi Bank kursy (1 USD = 3,51 TMT) bilen resmi ýollar arkaly geçirip bolýar. Galan mukdar adatça bazar kursy (takmynan 1 USD = 19,6 TMT) bilen çalşylýar.",
+    "official_portion": "Resmi çäk ($12 000)",
+    "unofficial_portion": "Galan böleg (bazar kursy)",
+    "official_rate_detail": "1 USD = 3,51 TMT (resmi)",
+    "unofficial_rate_detail": "1 USD ≈ 19,6 TMT (bazar)",
+    "billion_word": "milliard",
+    "million_word": "million",
+    "thousand_word": "müň",
     "cap_warning": "Ýyllyk $12,000 çäginden geçýär. Resmi ýollar bilen diňe $12,000 geçirip bolýar.",
     "cap_info": "Ýyllyk geçiriş çägi: $12,000 / {tmt} TMT",
     "rate_info": "Alyş-çalyş kursy: 1 USD = {rate} TMT (Türkmenistanyň Merkezi Banky, kesgitli)",
@@ -190,7 +211,10 @@
     "not_found": "Sahypa tapylmady",
     "back_home": "Baş sahypa dolan",
     "open_new_tab": "Täze goýmada açylýar",
-    "data_disclaimer": "Uniwersitetler baradaky maglumatlar doly ýa-da täze bolmadyk bolup biler. Ýüz tutmazdan ozal töleg, talaplar we möhletleri uniwersitetiň resmi saýtynda barlaň."
+    "data_disclaimer": "Uniwersitetler baradaky maglumatlar doly ýa-da täze bolmadyk bolup biler. Ýüz tutmazdan ozal töleg, talaplar we möhletleri uniwersitetiň resmi saýtynda barlaň.",
+    "old_manat_label": "Köne manat deňi",
+    "million": "million",
+    "thousand": "müň"
   },
   "auth": {
     "signin_title": "Giriş",

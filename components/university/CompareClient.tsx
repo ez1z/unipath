@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { University } from '@/lib/data/universities';
-import { formatTuition } from '@/lib/format';
+import { computeTuitionBreakdown } from '@/lib/format';
 import { MoeBadge } from './MoeBadge';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
@@ -16,6 +16,7 @@ type Props = { universities: University[]; locale: Locale };
 
 export function CompareClient({ universities, locale }: Props) {
   const t = useTranslations('compare');
+  const tUni = useTranslations('university');
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -54,7 +55,33 @@ export function CompareClient({ universities, locale }: Props) {
   ];
 
   const rows: { label: string; key: string; render: (u: University) => React.ReactNode }[] = [
-    { label: t('tuition'), key: 'tuition', render: (u) => formatTuition(u.tuition_usd) },
+    {
+      label: t('tuition'),
+      key: 'tuition',
+      render: (u) => {
+        const bd = computeTuitionBreakdown(u.tuition_usd);
+        const parts: string[] = [];
+        if (bd.billions > 0) parts.push(`${bd.billions} ${tUni('billion_word')}`);
+        if (bd.millions > 0) parts.push(`${bd.millions} ${tUni('million_word')}`);
+        if (bd.thousands > 0) parts.push(`${bd.thousands} ${tUni('thousand_word')}`);
+        const oldManatText = parts.join(' ') || `< 1 ${tUni('thousand_word')}`;
+        return (
+          <div className="space-y-0.5">
+            <div className="font-semibold text-foreground">${u.tuition_usd.toLocaleString('en')}</div>
+            {bd.exceedsCap ? (
+              <div className="text-xs">
+                <span className="text-gold-dark">{bd.officialTmt.toLocaleString('ru')} TMT</span>
+                {' + '}
+                <span className="text-crimson">{bd.unofficialTmt.toLocaleString('ru')} TMT</span>
+              </div>
+            ) : (
+              <div className="text-xs text-muted-foreground">{bd.officialTmt.toLocaleString('ru')} TMT</div>
+            )}
+            <div className="text-xs text-amber-600">{oldManatText}</div>
+          </div>
+        );
+      },
+    },
     {
       label: t('ranking'),
       key: 'ranking',

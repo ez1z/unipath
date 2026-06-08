@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getBySlug } from '@/lib/data/universities';
-import { formatTuition } from '@/lib/format';
+import { formatTuition, computeTuitionBreakdown } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
 import { ScholarshipSection } from '@/components/scholarship/ScholarshipSection';
@@ -11,6 +11,7 @@ import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
 import { getOrInitChecklist } from '@/lib/data/checklist';
+import { TRANSFER_CAP_USD } from '@/lib/constants';
 import type { Locale } from '@/lib/constants';
 import type { Semester } from '@/lib/types/semester';
 
@@ -40,6 +41,13 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
 
   const t = await getTranslations('university');
   const tCommon = await getTranslations('common');
+
+  const bd = computeTuitionBreakdown(university.tuition_usd);
+  const oldManatParts: string[] = [];
+  if (bd.billions > 0) oldManatParts.push(`${bd.billions} ${t('billion_word')}`);
+  if (bd.millions > 0) oldManatParts.push(`${bd.millions} ${t('million_word')}`);
+  if (bd.thousands > 0) oldManatParts.push(`${bd.thousands} ${t('thousand_word')}`);
+  const oldManatText = oldManatParts.join(' ') || `< 1 ${t('thousand_word')}`;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -124,6 +132,55 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
             </div>
           </div>
         </div>
+
+        {/* TMT breakdown */}
+        <section className="mb-8">
+          <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">
+            {t('transfer_breakdown')}
+          </h2>
+
+          {bd.exceedsCap && (
+            <div className="mb-3 flex items-start gap-2.5 rounded-lg border border-crimson/30 bg-crimson-light/30 px-4 py-3 text-sm text-crimson-dark">
+              <span className="font-bold text-base leading-tight shrink-0">!</span>
+              <span>{t('transfer_over_cap_note', { overage: bd.overageUsd.toLocaleString('en') })}</span>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-3">
+            {bd.exceedsCap ? (
+              <>
+                <div className="border-2 border-primary/20 rounded-xl p-4 bg-background flex-1 min-w-[140px]">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('official_portion')}</div>
+                  <div className="font-heading font-bold text-lg text-primary">{bd.officialTmt.toLocaleString('ru')} TMT</div>
+                  <div className="text-xs text-muted-foreground mt-1">{t('official_rate_detail')}</div>
+                </div>
+                <div className="border-2 border-crimson/20 rounded-xl p-4 bg-crimson-light/30 flex-1 min-w-[140px]">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('unofficial_portion')}</div>
+                  <div className="font-heading font-bold text-lg text-crimson">{bd.unofficialTmt.toLocaleString('ru')} TMT</div>
+                  <div className="text-xs text-muted-foreground mt-1">{t('unofficial_rate_detail')}</div>
+                </div>
+              </>
+            ) : (
+              <div className="border-2 border-gold/30 rounded-xl p-4 bg-gold/5 flex-1 min-w-[140px]">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('tmt_equivalent')}</div>
+                <div className="font-heading font-bold text-xl text-gold-dark">{bd.officialTmt.toLocaleString('ru')} TMT</div>
+              </div>
+            )}
+
+            {bd.exceedsCap && (
+              <div className="border-2 border-gold/30 rounded-xl p-4 bg-gold/5 flex-1 min-w-[140px]">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('tmt_total')}</div>
+                <div className="font-heading font-bold text-xl text-gold-dark">{bd.totalTmt.toLocaleString('ru')} TMT</div>
+              </div>
+            )}
+
+            <div className="border-2 border-amber-300/50 rounded-xl p-4 bg-amber-50/40 flex-1 min-w-[140px]">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{tCommon('old_manat_label')}</div>
+              <div className="font-heading font-bold text-lg text-amber-700">{oldManatText}</div>
+              <div className="text-xs text-muted-foreground mt-1">{bd.totalTmt.toLocaleString('ru')} TMT × 5 000</div>
+            </div>
+          </div>
+        </section>
 
         {/* Languages */}
         <section className="mb-6">
