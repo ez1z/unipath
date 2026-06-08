@@ -3,7 +3,8 @@
     "home": "Home",
     "universities": "Universities",
     "compare": "Compare",
-    "transfer": "Transfer Guide"
+    "transfer": "Transfer Guide",
+    "scholarships": "Scholarships"
   },
   "home": {
     "hero_title": "Find Your University Abroad",
@@ -106,6 +107,36 @@
     "step5_desc": "Once approved, the bank executes the transfer at the official Central Bank rate (3.51 TMT = 1 USD).",
     "disclaimer": "UniPath is a guide platform only. We do not process or facilitate payments. Always follow official procedures at a licensed bank.",
     "moe_only_note": "Only MoE-approved universities qualify for official transfers. Use the 'Transfer eligible' filter when searching."
+  },
+  "scholarships": {
+    "title": "Scholarships",
+    "filter_country": "Country",
+    "filter_type": "Type",
+    "filter_coverage": "Covers",
+    "filter_all_countries": "All countries",
+    "filter_all_types": "All types",
+    "filter_all_coverage": "Any coverage",
+    "search_placeholder": "Search scholarships...",
+    "results_count": "{count} scholarships found",
+    "no_results": "No scholarships match your filters.",
+    "clear_filters": "Clear filters",
+    "type_government": "Government",
+    "type_merit": "Merit",
+    "type_need_based": "Need-based",
+    "type_partial": "Partial",
+    "coverage_tuition": "Tuition",
+    "coverage_accommodation": "Accommodation",
+    "coverage_flights": "Flights",
+    "coverage_stipend": "Monthly stipend",
+    "coverage_health": "Health insurance",
+    "amount_label": "Amount / year",
+    "amount_varies": "Varies",
+    "deadline_label": "Deadline",
+    "apply": "Apply",
+    "all_universities_in": "All universities in {country}",
+    "section_title": "Available Scholarships",
+    "view_all": "View all scholarships for {country}",
+    "none_listed": "No scholarships listed yet."
   },
   "common": {
     "loading": "Loading...",

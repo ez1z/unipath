@@ -3,7 +3,8 @@
     "home": "Главная",
     "universities": "Университеты",
     "compare": "Сравнение",
-    "transfer": "Руководство по переводу"
+    "transfer": "Руководство по переводу",
+    "scholarships": "Стипендии"
   },
   "home": {
     "hero_title": "Найдите университет за рубежом",
@@ -106,6 +107,36 @@
     "step5_desc": "После одобрения банк осуществляет перевод по официальному курсу (3,51 TMT = 1 USD).",
     "disclaimer": "UniPath — информационная платформа. Мы не обрабатываем и не выполняем платежи. Всегда следуйте официальным процедурам в лицензированном банке.",
     "moe_only_note": "Только университеты, одобренные МОН, имеют право на официальный перевод. Используйте фильтр «Только с переводом оплаты» при поиске."
+  },
+  "scholarships": {
+    "title": "Стипендии",
+    "filter_country": "Страна",
+    "filter_type": "Тип",
+    "filter_coverage": "Покрытие",
+    "filter_all_countries": "Все страны",
+    "filter_all_types": "Все типы",
+    "filter_all_coverage": "Любое покрытие",
+    "search_placeholder": "Поиск стипендий...",
+    "results_count": "Найдено стипендий: {count}",
+    "no_results": "Ни одна стипендия не соответствует фильтрам.",
+    "clear_filters": "Сбросить фильтры",
+    "type_government": "Государственная",
+    "type_merit": "По заслугам",
+    "type_need_based": "По нуждаемости",
+    "type_partial": "Частичная",
+    "coverage_tuition": "Обучение",
+    "coverage_accommodation": "Проживание",
+    "coverage_flights": "Перелёты",
+    "coverage_stipend": "Ежемесячная стипендия",
+    "coverage_health": "Медицинская страховка",
+    "amount_label": "Сумма / год",
+    "amount_varies": "Варьируется",
+    "deadline_label": "Дедлайн",
+    "apply": "Подать заявку",
+    "all_universities_in": "Все университеты в {country}",
+    "section_title": "Доступные стипендии",
+    "view_all": "Все стипендии для {country}",
+    "none_listed": "Стипендии пока не указаны."
   },
   "common": {
     "loading": "Загрузка...",

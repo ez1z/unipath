@@ -5,6 +5,7 @@ import { getById } from '@/lib/data/universities';
 import { formatTuition } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
+import { ScholarshipSection } from '@/components/scholarship/ScholarshipSection';
 import { GulPattern } from '@/components/ui/GulPattern';
 import type { Locale } from '@/lib/constants';
 
@@ -113,6 +114,13 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
           </h2>
           <EntranceRequirements requirements={university.entrance_requirements} />
         </section>
+
+        {/* Scholarships */}
+        <ScholarshipSection
+          universityId={university.id}
+          country={university.country}
+          locale={locale}
+        />
 
         {/* Action links */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
