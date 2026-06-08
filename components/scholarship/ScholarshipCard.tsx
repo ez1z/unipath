@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { Scholarship } from '@/lib/data/scholarships';
 import { TMT_PER_USD } from '@/lib/constants';
@@ -45,8 +46,13 @@ export function ScholarshipCard({ scholarship: s, locale, universityName, compac
   return (
     <div
       data-testid="scholarship-card"
-      className="bg-card rounded-xl border border-border border-l-[3px] border-l-tk-green shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-3 p-5"
+      className="relative bg-card rounded-xl border border-border border-l-[3px] border-l-tk-green shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-3 p-5"
     >
+      <Link
+        href={`/${locale}/scholarships/${s.id}`}
+        className="absolute inset-0 rounded-xl z-0"
+        aria-label={name}
+      />
       {/* Header */}
       <div>
         <div className="flex items-start justify-between gap-2 mb-1">
@@ -107,13 +113,13 @@ export function ScholarshipCard({ scholarship: s, locale, universityName, compac
         </p>
       )}
 
-      {/* Apply link */}
+      {/* Apply link — z-10 to sit above the card overlay */}
       {s.application_url && (
         <a
           href={s.application_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto text-sm font-semibold text-tk-green hover:text-tk-green/80 transition-colors"
+          className="relative z-10 mt-auto text-sm font-semibold text-tk-green hover:text-tk-green/80 transition-colors self-start"
           aria-label={`${t('apply')}: ${name} (opens in new tab)`}
         >
           {t('apply')} ↗

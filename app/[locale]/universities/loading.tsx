@@ -1,16 +1,49 @@
 export default function Loading() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="h-9 w-48 bg-muted rounded animate-pulse mb-8" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="border rounded-lg p-6 animate-pulse">
-            <div className="h-5 bg-muted rounded mb-3 w-3/4" />
-            <div className="h-4 bg-muted rounded mb-2 w-1/2" />
-            <div className="h-4 bg-muted rounded w-1/3" />
-          </div>
-        ))}
+    <>
+      {/* Hero skeleton */}
+      <div className="bg-primary">
+        <div className="container mx-auto px-4 py-10 flex items-center justify-between">
+          <div className="h-9 w-44 bg-white/10 rounded animate-pulse" />
+          <div className="w-14 h-14 bg-white/10 rounded-full hidden sm:block animate-pulse" />
+        </div>
+        <div className="h-1 flex">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className={`flex-1 ${i % 2 === 0 ? 'bg-gold/60' : 'bg-tk-green/60'}`} />
+          ))}
+        </div>
       </div>
-    </div>
+      <div className="container mx-auto px-4 py-8 animate-pulse">
+        {/* Filter bar skeleton */}
+        <div className="bg-card border border-border rounded-xl p-4 mb-6 shadow-sm flex gap-3 flex-wrap">
+          <div className="h-10 flex-1 min-w-48 bg-muted rounded-lg" />
+          <div className="h-10 w-44 bg-muted rounded-lg" />
+          <div className="h-10 w-40 bg-muted rounded-lg" />
+          <div className="h-10 w-52 bg-muted rounded-lg" />
+        </div>
+        {/* Count */}
+        <div className="h-4 w-36 bg-muted rounded mb-4" />
+        {/* Card grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-card border border-border border-l-[3px] border-l-primary/30 rounded-xl p-5 flex flex-col gap-4">
+              <div>
+                <div className="h-5 bg-muted rounded w-3/4 mb-2" />
+                <div className="h-4 bg-muted rounded w-1/2" />
+              </div>
+              <div className="flex gap-4">
+                <div className="h-10 w-24 bg-muted rounded" />
+                <div className="h-10 w-20 bg-muted rounded" />
+              </div>
+              <div className="flex gap-1.5">
+                <div className="h-5 w-12 bg-muted rounded" />
+                <div className="h-5 w-14 bg-muted rounded" />
+              </div>
+              <div className="h-4 w-20 bg-muted rounded mt-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }

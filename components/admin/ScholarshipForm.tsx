@@ -5,8 +5,25 @@ import { COVERAGE_ITEMS } from '@/lib/data/scholarship-types';
 
 type UniversityOption = { id: string; name_en: string; country: string };
 
+export type ScholarshipFormDefaults = {
+  name_en?: string;
+  name_ru?: string;
+  name_tk?: string;
+  country?: string;
+  university_id?: string | null;
+  type?: string;
+  coverage?: string[];
+  amount_usd?: string;
+  deadline_text?: string;
+  description_en?: string;
+  description_ru?: string;
+  description_tk?: string;
+  application_url?: string;
+};
+
 type Props = {
   universities: UniversityOption[];
+  defaultValues?: ScholarshipFormDefaults;
   action: (formData: FormData) => Promise<{ error: string } | never>;
   submitLabel: string;
   cancelHref: string;
@@ -25,7 +42,7 @@ const COVERAGE_LABELS: Record<string, string> = {
   health: 'Health insurance',
 };
 
-export function ScholarshipForm({ universities, action, submitLabel, cancelHref }: Props) {
+export function ScholarshipForm({ universities, defaultValues: d = {}, action, submitLabel, cancelHref }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -62,6 +79,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
                 type="text"
                 required
                 disabled={isPending}
+                defaultValue={d[`name_${lang}` as 'name_en' | 'name_ru' | 'name_tk']}
                 placeholder={lang === 'en' ? 'Türkiye Bursları' : undefined}
                 aria-label={`Scholarship name in ${lang}`}
                 className={inputClass}
@@ -83,6 +101,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
               type="text"
               required
               disabled={isPending}
+              defaultValue={d.country}
               placeholder="Turkey"
               aria-label="Country"
               className={inputClass}
@@ -95,6 +114,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
               name="type"
               required
               disabled={isPending}
+              defaultValue={d.type ?? ''}
               aria-label="Scholarship type"
               className={inputClass}
             >
@@ -115,6 +135,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
             id="university_id"
             name="university_id"
             disabled={isPending}
+            defaultValue={d.university_id ?? ''}
             aria-label="Linked university (optional)"
             className={inputClass}
           >
@@ -142,6 +163,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
                   name={`coverage_${item}`}
                   value="on"
                   disabled={isPending}
+                  defaultChecked={d.coverage?.includes(item) ?? false}
                   className="rounded border-input accent-primary"
                 />
                 {COVERAGE_LABELS[item]}
@@ -162,6 +184,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
               min="1"
               step="1"
               disabled={isPending}
+              defaultValue={d.amount_usd}
               placeholder="Leave blank if varies"
               aria-label="Annual scholarship amount in USD"
               className={inputClass}
@@ -176,6 +199,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
               name="deadline_text"
               type="text"
               disabled={isPending}
+              defaultValue={d.deadline_text ?? ''}
               placeholder="April 15 / Rolling"
               aria-label="Application deadline"
               className={inputClass}
@@ -199,6 +223,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
               name={`description_${lang}`}
               rows={2}
               disabled={isPending}
+              defaultValue={d[`description_${lang}` as 'description_en' | 'description_ru' | 'description_tk'] ?? ''}
               aria-label={`Scholarship description in ${lang}`}
               className={`${inputClass} resize-y`}
             />
@@ -217,6 +242,7 @@ export function ScholarshipForm({ universities, action, submitLabel, cancelHref 
           name="application_url"
           type="url"
           disabled={isPending}
+          defaultValue={d.application_url ?? ''}
           placeholder="https://turkiyeburslari.gov.tr"
           aria-label="Scholarship application URL"
           className={inputClass}

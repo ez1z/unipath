@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useTransition } from 'react';
 import { deleteScholarshipAction } from '@/app/admin/scholarships/actions';
 
@@ -32,14 +33,23 @@ export function ScholarshipAdminRow({ scholarship: s }: { scholarship: RowData }
         </span>
       </td>
       <td className="px-4 py-3 text-right">
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          aria-label={`Delete ${s.name_en}`}
-          className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
-        >
-          Delete
-        </button>
+        <div className="flex items-center justify-end gap-3">
+          <Link
+            href={`/admin/scholarships/${s.id}/edit`}
+            aria-label={`Edit ${s.name_en}`}
+            className="text-xs text-primary hover:underline"
+          >
+            Edit
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            aria-label={`Delete ${s.name_en}`}
+            className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
+          >
+            Delete
+          </button>
+        </div>
       </td>
     </tr>
   );
