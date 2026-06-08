@@ -43,6 +43,12 @@ export function NavBar({ locale }: Props) {
             >
               {t('transfer')}
             </Link>
+            <Link
+              href={`/${locale}/scholarships`}
+              className="text-primary-foreground/80 hover:text-gold transition-colors"
+            >
+              {t('scholarships')}
+            </Link>
           </div>
         </div>
         <div className="flex items-center gap-1">

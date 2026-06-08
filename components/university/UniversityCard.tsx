@@ -15,7 +15,12 @@ export function UniversityCard({ university, locale }: Props) {
   const name = university.name[locale] ?? university.name.en;
 
   return (
-    <div data-testid="university-card" className="bg-card rounded-xl border border-border border-l-[3px] border-l-primary shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-4 p-5">
+    <div data-testid="university-card" className="relative bg-card rounded-xl border border-border border-l-[3px] border-l-primary shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col gap-4 p-5">
+      <Link
+        href={`/${locale}/universities/${university.id}`}
+        className="absolute inset-0 rounded-xl z-0"
+        aria-label={`${t('view_details')}: ${name}`}
+      />
       <div>
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-heading font-semibold text-base leading-snug text-foreground">{name}</h3>
@@ -56,13 +61,9 @@ export function UniversityCard({ university, locale }: Props) {
         ))}
       </div>
 
-      <Link
-        href={`/${locale}/universities/${university.id}`}
-        className="mt-auto text-sm font-semibold text-primary hover:text-gold transition-colors"
-        aria-label={`${t('view_details')}: ${name}`}
-      >
+      <span className="mt-auto text-sm font-semibold text-primary">
         {t('view_details')} →
-      </Link>
+      </span>
     </div>
   );
 }

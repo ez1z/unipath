@@ -40,6 +40,15 @@ export default async function AdminPage() {
             </div>
             <p className="text-sm text-muted-foreground">Bulk-upload universities from a CSV file.</p>
           </a>
+          <a
+            href="/admin/scholarships"
+            className="bg-card rounded-xl border border-border border-t-4 border-t-tk-green p-6 hover:shadow-card transition-shadow group"
+          >
+            <div className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+              Scholarships
+            </div>
+            <p className="text-sm text-muted-foreground">Manage scholarship listings linked to universities or countries.</p>
+          </a>
         </div>
       </main>
     </div>

@@ -3,7 +3,8 @@
     "home": "Baş sahypa",
     "universities": "Uniwersitetler",
     "compare": "Deňeşdirmek",
-    "transfer": "Geçiriş gollanmasy"
+    "transfer": "Geçiriş gollanmasy",
+    "scholarships": "Stipendiýalar"
   },
   "home": {
     "hero_title": "Daşary ýurtdaky uniwersitediňizi tapyň",
@@ -106,6 +107,36 @@
     "step5_desc": "Tassyklanandan soň, bank resmi kurs boýunça geçirişi ýerine ýetirýär (3,51 TMT = 1 USD).",
     "disclaimer": "UniPath diňe maglumat platformasydyr. Biz tölegleri işlemeýäris ýa-da amala aşyrmaýarys. Islendik ygtyýarly bankda resmi tertibi yzarlaň.",
     "moe_only_note": "Diňe MHM tarapyndan tassyklanan uniwersitetler resmi geçiriş üçin ýaramlydyr. Gözleýän wagtyňyz 'Geçiriş üçin ýaramlylary' filtrini ulanyň."
+  },
+  "scholarships": {
+    "title": "Stipendiýalar",
+    "filter_country": "Ýurt",
+    "filter_type": "Görnüş",
+    "filter_coverage": "Örtýär",
+    "filter_all_countries": "Ähli ýurtlar",
+    "filter_all_types": "Ähli görnüşler",
+    "filter_all_coverage": "Islendik örtük",
+    "search_placeholder": "Stipendiýa gözläň...",
+    "results_count": "{count} stipendiýa tapyldy",
+    "no_results": "Filtrlere laýyk stipendiýa tapylmady.",
+    "clear_filters": "Filtrleri arassala",
+    "type_government": "Döwlet",
+    "type_merit": "Başarnykly",
+    "type_need_based": "Mätäçlige görä",
+    "type_partial": "Bölekleýin",
+    "coverage_tuition": "Okuw tölegi",
+    "coverage_accommodation": "Ýaşaýyş",
+    "coverage_flights": "Uçuş",
+    "coverage_stipend": "Aýlyk stipendiýa",
+    "coverage_health": "Saglyk ätiýaçlandyrma",
+    "amount_label": "Mukdar / ýyl",
+    "amount_varies": "Üýtgeýär",
+    "deadline_label": "Möhlet",
+    "apply": "Tabşyrmak",
+    "all_universities_in": "{country} ähli uniwersitetleri",
+    "section_title": "Elýeterli stipendiýalar",
+    "view_all": "{country} üçin ähli stipendiýalar",
+    "none_listed": "Häzirlikçe stipendiýa görkezilmedi."
   },
   "common": {
     "loading": "Ýüklenýär...",

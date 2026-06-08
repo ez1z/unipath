@@ -69,6 +69,13 @@ export function MobileMenu({ locale }: Props) {
           >
             {t('transfer')}
           </Link>
+          <Link
+            href={`/${locale}/scholarships`}
+            onClick={() => setOpen(false)}
+            className="block px-4 py-3 text-sm text-primary-foreground/80 hover:text-gold hover:bg-white/5 transition-colors border-t border-white/5"
+          >
+            {t('scholarships')}
+          </Link>
         </div>
       )}
     </div>
