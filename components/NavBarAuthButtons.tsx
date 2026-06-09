@@ -7,9 +7,9 @@ import { signOutAction } from '@/app/[locale]/auth/actions';
 import type { Locale } from '@/lib/constants';
 import type { User } from '@supabase/supabase-js';
 
-type Props = { locale: Locale; user: User | null };
+type Props = { locale: Locale; user: User | null; isAdmin?: boolean };
 
-export function NavBarAuthButtons({ locale, user }: Props) {
+export function NavBarAuthButtons({ locale, user, isAdmin = false }: Props) {
   const t = useTranslations('auth');
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
@@ -105,6 +105,22 @@ export function NavBarAuthButtons({ locale, user }: Props) {
             </svg>
             {t('tracker_nav')}
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 px-3 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+              aria-label={t('admin_panel')}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+              {t('admin_panel')}
+            </Link>
+          )}
           <button
             onClick={handleSignOut}
             disabled={isPending}

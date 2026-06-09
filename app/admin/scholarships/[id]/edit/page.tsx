@@ -1,10 +1,10 @@
-import { redirect, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { ScholarshipForm } from '@/components/admin/ScholarshipForm';
 import type { ScholarshipFormDefaults } from '@/components/admin/ScholarshipForm';
 import { updateScholarshipAction } from '@/app/admin/scholarships/actions';
+import { requireAdmin } from '@/lib/admin/auth';
 import type { ScholarshipDbRow } from '@/lib/data/scholarship-types';
 import type { UniversityDbRow } from '@/lib/data/university-types';
 
@@ -13,9 +13,7 @@ export const metadata = { title: 'Edit Scholarship — UniPath Admin' };
 type Props = { params: { id: string } };
 
 export default async function EditScholarshipPage({ params: { id } }: Props) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
+  const { supabase, user } = await requireAdmin();
 
   const [{ data: scholarshipData }, { data: universitiesData, error: uniError }] = await Promise.all([
     supabase.from('scholarships').select('*').eq('id', id).maybeSingle(),

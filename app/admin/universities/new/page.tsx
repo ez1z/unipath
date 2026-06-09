@@ -1,16 +1,13 @@
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { UniversityForm } from '@/components/admin/UniversityForm';
 import { createUniversityAction } from '@/app/admin/universities/actions';
+import { requireAdmin } from '@/lib/admin/auth';
 
 export const metadata = { title: 'Add University — UniPath Admin' };
 
 export default async function NewUniversityPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
+  const { user } = await requireAdmin();
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -13,10 +13,19 @@ export async function NavBar({ locale }: Props) {
   const t = await getTranslations({ locale, namespace: 'nav' });
 
   let user: User | null = null;
+  let isAdmin = false;
   try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     user = data.user;
+    if (user) {
+      const { data: adminRow } = await supabase
+        .from('admins')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      isAdmin = !!adminRow;
+    }
   } catch {
     // Supabase unreachable — render unauthenticated state
   }
@@ -54,9 +63,9 @@ export async function NavBar({ locale }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <MobileMenu locale={locale} user={user} />
+          <MobileMenu locale={locale} user={user} isAdmin={isAdmin} />
           <LocaleSwitcher currentLocale={locale} />
-          <NavBarAuthButtons locale={locale} user={user} />
+          <NavBarAuthButtons locale={locale} user={user} isAdmin={isAdmin} />
         </div>
       </div>
     </nav>

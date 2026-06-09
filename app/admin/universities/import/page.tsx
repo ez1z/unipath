@@ -1,16 +1,13 @@
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { CsvImportClient } from '@/components/admin/CsvImportClient';
+import { requireAdmin } from '@/lib/admin/auth';
 import type { UniversityDbRow } from '@/lib/data/university-types';
 
 export const metadata = { title: 'Import Universities — UniPath Admin' };
 
 export default async function ImportPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
+  const { supabase, user } = await requireAdmin();
 
   const { data } = await supabase
     .from('universities')

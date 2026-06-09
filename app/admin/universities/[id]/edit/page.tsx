@@ -1,10 +1,10 @@
-import { redirect, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { UniversityForm } from '@/components/admin/UniversityForm';
 import type { UniversityFormDefaults } from '@/components/admin/UniversityForm';
 import { updateUniversityAction } from '@/app/admin/universities/actions';
+import { requireAdmin } from '@/lib/admin/auth';
 import type { UniversityDbRow } from '@/lib/data/university-types';
 
 export const metadata = { title: 'Edit University — UniPath Admin' };
@@ -12,9 +12,7 @@ export const metadata = { title: 'Edit University — UniPath Admin' };
 type Props = { params: { id: string } };
 
 export default async function EditUniversityPage({ params: { id } }: Props) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
+  const { supabase, user } = await requireAdmin();
 
   const { data } = await supabase
     .from('universities')

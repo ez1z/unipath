@@ -7,9 +7,9 @@ import type { Locale } from '@/lib/constants';
 import type { User } from '@supabase/supabase-js';
 import { signOutAction } from '@/app/[locale]/auth/actions';
 
-type Props = { locale: Locale; user: User | null };
+type Props = { locale: Locale; user: User | null; isAdmin?: boolean };
 
-export function MobileMenu({ locale, user }: Props) {
+export function MobileMenu({ locale, user, isAdmin = false }: Props) {
   const t = useTranslations('nav');
   const tAuth = useTranslations('auth');
   const [open, setOpen] = useState(false);
@@ -90,6 +90,16 @@ export function MobileMenu({ locale, user }: Props) {
                   className="flex items-center px-4 py-3.5 rounded-lg text-white/65 hover:text-gold hover:bg-white/5 font-medium transition-colors min-h-[44px]"
                 >
                   {tAuth('tracker_nav')}
+                </Link>
+              )}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center px-4 py-3.5 rounded-lg text-white/65 hover:text-gold hover:bg-white/5 font-medium transition-colors min-h-[44px]"
+                  aria-label={t('admin_panel')}
+                >
+                  {t('admin_panel')}
                 </Link>
               )}
               {user ? (

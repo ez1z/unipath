@@ -1,24 +1,10 @@
-import { redirect, notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { GulPattern } from '@/components/ui/GulPattern';
 import { AdminHeader } from '@/components/admin/AdminHeader';
-import type { AdminRole } from '@/lib/admin/auth';
+import { requireAdmin } from '@/lib/admin/auth';
 
 export const metadata = { title: 'Dashboard — UniPath Admin' };
 
 export default async function AdminPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
-
-  const { data: adminRow } = await supabase
-    .from('admins')
-    .select('role')
-    .eq('user_id', user.id)
-    .single();
-
-  if (!adminRow) notFound();
-  const role = adminRow.role as AdminRole;
+  const { user, role } = await requireAdmin();
 
   return (
     <div className="min-h-screen flex flex-col">

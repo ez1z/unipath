@@ -1,17 +1,14 @@
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { ScholarshipAdminRow } from '@/components/admin/ScholarshipAdminRow';
+import { requireAdmin } from '@/lib/admin/auth';
 import type { ScholarshipDbRow } from '@/lib/data/scholarship-types';
 
 export const metadata = { title: 'Scholarships — UniPath Admin' };
 
 export default async function AdminScholarshipsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/signin');
+  const { supabase, user } = await requireAdmin();
 
   const { data, error } = await supabase
     .from('scholarships')
