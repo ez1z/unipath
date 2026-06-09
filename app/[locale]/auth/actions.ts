@@ -94,7 +94,7 @@ export async function signUpWithEmailAction(
     await logError('signUpWithEmailAction', error.message, {
       email: parsed.data.email,
       status: error.status,
-      code: (error as Record<string, unknown>).code,
+      code: (error as unknown as Record<string, unknown>).code,
     });
     return { error: mapSupabaseSignUpError(error.message, t) };
   }
