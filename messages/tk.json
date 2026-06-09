@@ -8,7 +8,12 @@
     "support": "Goldaw",
     "admin_panel": "Admin paneli",
     "footer_tagline": "Daşary ýurtda okaýan türkmen talyplary üçin mugt gollanma platformasy.",
-    "footer_disclaimer": "Töleg gaýtaryjy däl."
+    "footer_disclaimer": "Töleg gaýtaryjy däl.",
+    "menu_open": "Nawigasiýa menyusyny aç",
+    "menu_close": "Menyuny ýap",
+    "main_nav_label": "Esasy nawigasiýa",
+    "home_link_label": "UniPath baş sahypa",
+    "footer_nav_label": "Alt nawigasiýa"
   },
   "home": {
     "hero_title": "Daşary ýurtdaky uniwersitediňizi tapyň",
@@ -192,7 +197,10 @@
     "semester_no_deadline": "Möhlet ýok",
     "deadline_days_left": "{days} gün galdy",
     "deadline_today": "Şu gün ýapylýar",
-    "deadline_passed": "Geçdi"
+    "deadline_passed": "Geçdi",
+    "coverage_section_title": "Näme üpjün edýär",
+    "about_section_title": "Barada",
+    "university_section_title": "Uniwersitet"
   },
   "checklist": {
     "next_deadline": "Indiki möhlet",
@@ -254,7 +262,9 @@
     "error_email_in_use": "Bu e-poçta bilen hasap eýýäm bar",
     "error_invalid_credentials": "Nädogry e-poçta ýa-da parol",
     "error_generic": "Bir zat ýalňyş gitdi. Täzeden synanyşyň.",
-    "profile_link": "Meniň profilim"
+    "profile_link": "Meniň profilim",
+    "show_password": "Paroly görkez",
+    "hide_password": "Paroly gizle"
   },
   "support": {
     "title": "Goldaw we ÝSS",
@@ -283,7 +293,7 @@
     "faq_language_title": "Dili nädip üýtgedip bilerin?",
     "faq_language_body": "Nawigasiýa panelindäki TK / RU / EN düwmelerini ulanyň. UniPath türkmen, rus we iňlis dillerinde elýeterlidir. Dil saýlawyňyz awtomatiki saklanýar.",
     "faq_contact_title": "UniPath bilen nädip habarlaşyp bilerin?",
-    "faq_contact_body": "Soraglar we teklipler üçin ezizagamyradov@gmail.com adresine ýazyň. 2 iş güni içinde jogap bermäge çalyşýarys.",
+    "faq_contact_body": "Soraglar we teklipler üçin unipathtm@gmail.com adresine ýazyň. 2 iş güni içinde jogap bermäge çalyşýarys.",
     "contact_title": "Soraglaryňyz barmy?",
     "contact_desc": "Bize hat ýazyň — kömek etmäge şatdyrys.",
     "contact_email": "Goldawa e-poçta ýaz"

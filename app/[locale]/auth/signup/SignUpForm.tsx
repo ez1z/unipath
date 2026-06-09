@@ -95,7 +95,7 @@ export function SignUpForm({ locale }: Props) {
             <button
               type="button"
               onClick={() => setShowPassword(v => !v)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-label={showPassword ? t('hide_password') : t('show_password')}
               className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}

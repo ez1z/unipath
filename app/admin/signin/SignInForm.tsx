@@ -1,9 +1,11 @@
 'use client';
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { Eye, EyeOff } from 'lucide-react';
 import { signInAction } from './actions';
 
 export function SignInForm() {
+  const t = useTranslations('admin');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +24,7 @@ export function SignInForm() {
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
-          Email address
+          {t('signin_email')}
         </label>
         <input
           id="email"
@@ -38,7 +40,7 @@ export function SignInForm() {
 
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
-          Password
+          {t('signin_password')}
         </label>
         <div className="relative">
           <input
@@ -74,7 +76,7 @@ export function SignInForm() {
         aria-label="Sign in to admin"
         className="w-full rounded-md bg-gold px-4 py-2.5 text-sm font-semibold text-white hover:bg-gold-dark focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-60 transition-colors shadow-sm"
       >
-        {isPending ? 'Signing in…' : 'Sign in'}
+        {isPending ? t('signin_submitting') : t('signin_submit')}
       </button>
     </form>
   );

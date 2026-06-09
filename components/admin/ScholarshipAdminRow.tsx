@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { deleteScholarshipAction } from '@/app/admin/scholarships/actions';
 
 type RowData = {
@@ -13,10 +14,11 @@ type RowData = {
 };
 
 export function ScholarshipAdminRow({ scholarship: s }: { scholarship: RowData }) {
+  const t = useTranslations('admin');
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
-    if (!confirm(`Delete "${s.name_en}"? This cannot be undone.`)) return;
+    if (!confirm(t('scholarships_delete_confirm', { name: s.name_en }))) return;
     startTransition(async () => {
       const result = await deleteScholarshipAction(s.id);
       if (!result.success) alert(`Error: ${result.error}`);
@@ -39,7 +41,7 @@ export function ScholarshipAdminRow({ scholarship: s }: { scholarship: RowData }
             aria-label={`Edit ${s.name_en}`}
             className="text-xs text-primary hover:underline"
           >
-            Edit
+            {t('edit')}
           </Link>
           <button
             onClick={handleDelete}
@@ -47,7 +49,7 @@ export function ScholarshipAdminRow({ scholarship: s }: { scholarship: RowData }
             aria-label={`Delete ${s.name_en}`}
             className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
           >
-            Delete
+            {t('delete')}
           </button>
         </div>
       </td>

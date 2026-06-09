@@ -186,7 +186,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
         {scholarship.coverage.length > 0 && (
           <section className="mb-6">
             <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">
-              What it covers
+              {t('coverage_section_title')}
             </h2>
             <div className="flex gap-2 flex-wrap">
               {scholarship.coverage.map((item) => (
@@ -201,7 +201,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
         {/* Description */}
         {description && (
           <section className="mb-6">
-            <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">About</h2>
+            <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">{t('about_section_title')}</h2>
             <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{description}</p>
           </section>
         )}
@@ -209,7 +209,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
         {/* Linked university */}
         {university && (
           <section className="mb-8">
-            <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">University</h2>
+            <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">{t('university_section_title')}</h2>
             <Link
               href={`/${locale}/universities/${university.slug}`}
               className="inline-flex items-center gap-2 bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-card transition-shadow"

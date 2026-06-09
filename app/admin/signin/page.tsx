@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { SignInForm } from './SignInForm';
 
@@ -15,16 +16,18 @@ export default async function SignInPage() {
     // Supabase unreachable — render sign-in form
   }
 
+  const t = await getTranslations('admin');
+
   return (
     <main className="min-h-screen bg-brand-dark flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-10">
           <span className="font-heading font-bold text-3xl text-gold tracking-wide">UniPath</span>
-          <span className="text-white/35 text-sm mt-1.5">Admin portal</span>
+          <span className="text-white/35 text-sm mt-1.5">{t('signin_subtitle')}</span>
         </div>
 
         <div className="bg-card rounded-2xl border border-border shadow-card p-8">
-          <h1 className="font-heading text-xl font-bold text-foreground mb-6">Sign in</h1>
+          <h1 className="font-heading text-xl font-bold text-foreground mb-6">{t('signin_title')}</h1>
           <SignInForm />
         </div>
       </div>

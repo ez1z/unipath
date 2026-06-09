@@ -1,27 +1,29 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { requireSuperuser } from '@/lib/admin/auth';
 import { createServiceClient } from '@/lib/supabase/service';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 
 export const metadata = { title: 'Audit Logs — UniPath Admin' };
 
-const ACTION_LABELS: Record<string, string> = {
-  create_university: 'Created university',
-  update_university: 'Updated university',
-  delete_university: 'Deleted university',
-  toggle_moe_approved: 'Toggled MoE status',
-  import_universities: 'Imported universities',
-  create_scholarship: 'Created scholarship',
-  update_scholarship: 'Updated scholarship',
-  delete_scholarship: 'Deleted scholarship',
-  add_admin: 'Added admin',
-  remove_admin: 'Removed admin',
-  reset_admin_password: 'Reset admin password',
-};
-
 export default async function LogsPage() {
   const { user } = await requireSuperuser();
   const service = createServiceClient();
+  const t = await getTranslations('admin');
+
+  const ACTION_LABELS: Record<string, string> = {
+    create_university: t('logs_action_create_university'),
+    update_university: t('logs_action_update_university'),
+    delete_university: t('logs_action_delete_university'),
+    toggle_moe_approved: t('logs_action_toggle_moe_approved'),
+    import_universities: t('logs_action_import_universities'),
+    create_scholarship: t('logs_action_create_scholarship'),
+    update_scholarship: t('logs_action_update_scholarship'),
+    delete_scholarship: t('logs_action_delete_scholarship'),
+    add_admin: t('logs_action_add_admin'),
+    remove_admin: t('logs_action_remove_admin'),
+    reset_admin_password: t('logs_action_reset_admin_password'),
+  };
 
   const { data: logs } = await service
     .from('audit_logs')
@@ -36,25 +38,25 @@ export default async function LogsPage() {
       <main className="flex-1 container mx-auto px-4 py-10">
         <div className="mb-8">
           <Link href="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            ← Dashboard
+            {t('back_dashboard')}
           </Link>
-          <h1 className="font-heading text-2xl font-bold text-foreground mt-2">Audit Logs</h1>
-          <p className="text-muted-foreground text-sm mt-1">Last {logs?.length ?? 0} actions</p>
+          <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{t('logs_title')}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t('logs_last_n', { count: logs?.length ?? 0 })}</p>
         </div>
 
         {!logs || logs.length === 0 ? (
           <div className="bg-card rounded-xl border border-border shadow-card p-12 text-center">
-            <p className="text-muted-foreground text-sm">No activity recorded yet.</p>
+            <p className="text-muted-foreground text-sm">{t('logs_empty')}</p>
           </div>
         ) : (
           <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted text-muted-foreground">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium">Date &amp; Time</th>
-                  <th className="text-left px-4 py-3 font-medium">Admin</th>
-                  <th className="text-left px-4 py-3 font-medium">Action</th>
-                  <th className="text-left px-4 py-3 font-medium">Target</th>
+                  <th className="text-left px-4 py-3 font-medium">{t('logs_col_datetime')}</th>
+                  <th className="text-left px-4 py-3 font-medium">{t('logs_col_admin')}</th>
+                  <th className="text-left px-4 py-3 font-medium">{t('logs_col_action')}</th>
+                  <th className="text-left px-4 py-3 font-medium">{t('logs_col_target')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,7 +84,7 @@ export default async function LogsPage() {
                       </span>
                       {log.action === 'import_universities' && log.details?.count && (
                         <span className="ml-1.5 text-xs text-muted-foreground">
-                          ({String(log.details.count)} rows)
+                          {t('logs_rows_count', { count: String(log.details.count) })}
                         </span>
                       )}
                     </td>

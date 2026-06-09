@@ -8,7 +8,12 @@
     "support": "Поддержка",
     "admin_panel": "Панель администратора",
     "footer_tagline": "Бесплатная платформа-путеводитель для туркменских студентов за рубежом.",
-    "footer_disclaimer": "Не является платёжным процессором."
+    "footer_disclaimer": "Не является платёжным процессором.",
+    "menu_open": "Открыть меню навигации",
+    "menu_close": "Закрыть меню",
+    "main_nav_label": "Основная навигация",
+    "home_link_label": "Главная UniPath",
+    "footer_nav_label": "Навигация подвала"
   },
   "home": {
     "hero_title": "Найдите университет за рубежом",
@@ -192,7 +197,10 @@
     "semester_no_deadline": "Без дедлайна",
     "deadline_days_left": "Осталось {days} дн.",
     "deadline_today": "Закрывается сегодня",
-    "deadline_passed": "Истёк"
+    "deadline_passed": "Истёк",
+    "coverage_section_title": "Что покрывает",
+    "about_section_title": "О стипендии",
+    "university_section_title": "Университет"
   },
   "checklist": {
     "next_deadline": "Следующий дедлайн",
@@ -254,7 +262,9 @@
     "error_email_in_use": "Аккаунт с таким адресом уже существует",
     "error_invalid_credentials": "Неверный email или пароль",
     "error_generic": "Что-то пошло не так. Попробуйте снова.",
-    "profile_link": "Мой профиль"
+    "profile_link": "Мой профиль",
+    "show_password": "Показать пароль",
+    "hide_password": "Скрыть пароль"
   },
   "support": {
     "title": "Поддержка и FAQ",
@@ -283,7 +293,7 @@
     "faq_language_title": "Как изменить язык?",
     "faq_language_body": "Используйте кнопки ТК / РУ / EN в верхней навигации. UniPath доступен на туркменском, русском и английском языках. Выбор языка сохраняется автоматически.",
     "faq_contact_title": "Как связаться с UniPath?",
-    "faq_contact_body": "По вопросам и отзывам пишите на ezizagamyradov@gmail.com. Мы стараемся ответить в течение 2 рабочих дней.",
+    "faq_contact_body": "По вопросам и отзывам пишите на unipathtm@gmail.com. Мы стараемся ответить в течение 2 рабочих дней.",
     "contact_title": "Остались вопросы?",
     "contact_desc": "Напишите нам — мы рады помочь.",
     "contact_email": "Написать в поддержку"

@@ -83,7 +83,7 @@ export default function SupportPage() {
               {t("contact_desc")}
             </p>
             <a
-              href="mailto:ezizagamyradov@gmail.com"
+              href="mailto:unipathtm@gmail.com"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-primary font-semibold text-sm rounded-lg hover:bg-gold/90 transition-colors"
             >
               <svg

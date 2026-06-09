@@ -33,14 +33,14 @@ export async function NavBar({ locale }: Props) {
   return (
     <nav
       className="bg-brand-dark border-b border-white/10 sticky top-0 z-40"
-      aria-label="Main navigation"
+      aria-label={t('main_nav_label')}
     >
       <div className="container mx-auto px-5 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link
             href={`/${locale}`}
             className="font-heading font-bold text-xl tracking-wide text-gold hover:text-gold/80 transition-colors"
-            aria-label="UniPath home"
+            aria-label={t('home_link_label')}
           >
             UniPath
           </Link>

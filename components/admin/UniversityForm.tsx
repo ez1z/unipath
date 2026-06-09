@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { SemesterEditor } from '@/components/admin/SemesterEditor';
 import type { Semester } from '@/lib/types/semester';
 
@@ -34,6 +35,7 @@ const inputClass =
 const labelClass = 'block text-sm font-medium text-foreground mb-1.5';
 
 export function UniversityForm({ defaultValues: d = {}, action, submitLabel, cancelHref }: Props) {
+  const t = useTranslations('admin');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -57,10 +59,10 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
 
       {/* Names */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">Names</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('uni_form_section_names')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="name_en" className={labelClass}>English name *</label>
+            <label htmlFor="name_en" className={labelClass}>{t('uni_form_name_en')}</label>
             <input
               id="name_en" name="name_en" type="text" required
               defaultValue={d.name_en}
@@ -71,7 +73,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
           <div>
-            <label htmlFor="name_ru" className={labelClass}>Russian name *</label>
+            <label htmlFor="name_ru" className={labelClass}>{t('uni_form_name_ru')}</label>
             <input
               id="name_ru" name="name_ru" type="text" required
               defaultValue={d.name_ru}
@@ -82,7 +84,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
           <div>
-            <label htmlFor="name_tk" className={labelClass}>Turkmen name *</label>
+            <label htmlFor="name_tk" className={labelClass}>{t('uni_form_name_tk')}</label>
             <input
               id="name_tk" name="name_tk" type="text" required
               defaultValue={d.name_tk}
@@ -97,10 +99,10 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
 
       {/* Location & Pricing */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">Location & pricing</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('uni_form_section_location')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
-            <label htmlFor="country" className={labelClass}>Country *</label>
+            <label htmlFor="country" className={labelClass}>{t('uni_form_country')}</label>
             <input
               id="country" name="country" type="text" required
               defaultValue={d.country}
@@ -111,7 +113,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
           <div>
-            <label htmlFor="city" className={labelClass}>City *</label>
+            <label htmlFor="city" className={labelClass}>{t('uni_form_city')}</label>
             <input
               id="city" name="city" type="text" required
               defaultValue={d.city}
@@ -124,7 +126,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="tuition_usd" className={labelClass}>Annual tuition (USD) *</label>
+            <label htmlFor="tuition_usd" className={labelClass}>{t('uni_form_tuition')}</label>
             <input
               id="tuition_usd" name="tuition_usd" type="number" min="0" step="1" required
               defaultValue={d.tuition_usd}
@@ -135,12 +137,14 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
           <div>
-            <label htmlFor="ranking_qs" className={labelClass}>QS ranking <span className="text-muted-foreground font-normal">(optional)</span></label>
+            <label htmlFor="ranking_qs" className={labelClass}>
+              {t('uni_form_ranking')} <span className="text-muted-foreground font-normal">{t('optional')}</span>
+            </label>
             <input
               id="ranking_qs" name="ranking_qs" type="number" min="1" step="1"
               defaultValue={d.ranking_qs}
               disabled={isPending}
-              placeholder="Leave blank if unranked"
+              placeholder={t('uni_form_ranking_placeholder')}
               aria-label="QS world ranking"
               className={inputClass}
             />
@@ -150,12 +154,12 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
 
       {/* Academic info */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">Academic info</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('uni_form_section_academic')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
             <label htmlFor="languages" className={labelClass}>
-              Languages of instruction *
-              <span className="text-muted-foreground font-normal ml-1">(separate with |)</span>
+              {t('uni_form_languages')}
+              <span className="text-muted-foreground font-normal ml-1">{t('separator_hint')}</span>
             </label>
             <input
               id="languages" name="languages" type="text" required
@@ -168,8 +172,8 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
           </div>
           <div>
             <label htmlFor="majors" className={labelClass}>
-              Majors / faculties *
-              <span className="text-muted-foreground font-normal ml-1">(separate with |)</span>
+              {t('uni_form_majors')}
+              <span className="text-muted-foreground font-normal ml-1">{t('separator_hint')}</span>
             </label>
             <input
               id="majors" name="majors" type="text" required
@@ -193,8 +197,8 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
               className="rounded border-input accent-primary w-4 h-4"
             />
             <span className="text-sm font-medium text-foreground">
-              MoE approved <span className="text-gold-dark">★</span>
-              <span className="text-muted-foreground font-normal ml-1">(transfer eligible)</span>
+              {t('uni_form_moe_label')}
+              <span className="text-muted-foreground font-normal ml-1">{t('uni_form_moe_hint')}</span>
             </span>
           </label>
         </div>
@@ -202,10 +206,10 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
 
       {/* Links */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">Links</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('uni_form_section_links')}</h2>
         <div className="space-y-4">
           <div>
-            <label htmlFor="official_website" className={labelClass}>Official website *</label>
+            <label htmlFor="official_website" className={labelClass}>{t('uni_form_website')}</label>
             <input
               id="official_website" name="official_website" type="url" required
               defaultValue={d.official_website}
@@ -216,7 +220,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
           <div>
-            <label htmlFor="application_portal_url" className={labelClass}>Application portal *</label>
+            <label htmlFor="application_portal_url" className={labelClass}>{t('uni_form_portal')}</label>
             <input
               id="application_portal_url" name="application_portal_url" type="url" required
               defaultValue={d.application_portal_url}
@@ -231,11 +235,11 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
 
       {/* Entrance requirements */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">Entrance requirements</h2>
+        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{t('uni_form_section_entrance')}</h2>
         <p className="text-sm text-muted-foreground mb-4">
           JSON object mapping country to exam requirements. Optionally include a{' '}
           <code className="bg-muted px-1 rounded text-xs">document_requirements</code> array — these become
-          the student's personal checklist for this university. Example:{' '}
+          the student&apos;s personal checklist for this university. Example:{' '}
           <code className="bg-muted px-1 rounded text-xs">
             {'{"turkey":{"yos":true},"document_requirements":["Passport","Transcript","TOEFL Score"]}'}
           </code>.
@@ -255,10 +259,8 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
 
       {/* Semesters */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">Semesters</h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Each semester has a name (Fall/Spring/custom), a course start date, and an optional application deadline.
-        </p>
+        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{t('uni_form_section_semesters')}</h2>
+        <p className="text-sm text-muted-foreground mb-4">{t('uni_form_semesters_desc')}</p>
         <SemesterEditor defaultValue={d.semesters ?? []} />
       </div>
 
@@ -269,7 +271,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
           aria-label="Cancel and go back"
           className="px-5 py-2.5 border border-border text-foreground rounded-lg text-sm font-semibold hover:bg-muted transition-colors"
         >
-          Cancel
+          {t('cancel')}
         </a>
         <button
           type="submit"
@@ -277,7 +279,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
           aria-label={submitLabel}
           className="px-5 py-2.5 bg-gold text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isPending ? 'Saving…' : submitLabel}
+          {isPending ? t('saving') : submitLabel}
         </button>
       </div>
     </form>

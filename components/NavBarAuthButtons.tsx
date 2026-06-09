@@ -11,6 +11,7 @@ type Props = { locale: Locale; user: User | null; isAdmin?: boolean };
 
 export function NavBarAuthButtons({ locale, user, isAdmin = false }: Props) {
   const t = useTranslations('auth');
+  const tNav = useTranslations('nav');
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -110,7 +111,7 @@ export function NavBarAuthButtons({ locale, user, isAdmin = false }: Props) {
               href="/admin"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-3 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
-              aria-label={t('admin_panel')}
+              aria-label={tNav('admin_panel')}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3" y="3" width="7" height="7" />
@@ -118,7 +119,7 @@ export function NavBarAuthButtons({ locale, user, isAdmin = false }: Props) {
                 <rect x="14" y="14" width="7" height="7" />
                 <rect x="3" y="14" width="7" height="7" />
               </svg>
-              {t('admin_panel')}
+              {tNav('admin_panel')}
             </Link>
           )}
           <button

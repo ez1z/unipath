@@ -64,7 +64,7 @@ export default async function LocaleLayout({ children, params }: Props) {
                     {tNav('footer_tagline')}
                   </p>
                 </div>
-                <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm" aria-label="Footer navigation">
+                <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm" aria-label={tNav('footer_nav_label')}>
                   <Link href={`/${locale}/universities`} className="text-white/40 hover:text-gold transition-colors">{tNav('universities')}</Link>
                   <Link href={`/${locale}/compare`} className="text-white/40 hover:text-gold transition-colors">{tNav('compare')}</Link>
                   <Link href={`/${locale}/transfer`} className="text-white/40 hover:text-gold transition-colors">{tNav('transfer')}</Link>

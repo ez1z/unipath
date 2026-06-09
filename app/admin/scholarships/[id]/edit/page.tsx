@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { ScholarshipForm } from '@/components/admin/ScholarshipForm';
 import type { ScholarshipFormDefaults } from '@/components/admin/ScholarshipForm';
@@ -47,6 +48,7 @@ export default async function EditScholarshipPage({ params: { id } }: Props) {
   };
 
   const boundAction = updateScholarshipAction.bind(null, id);
+  const t = await getTranslations('admin');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -55,16 +57,16 @@ export default async function EditScholarshipPage({ params: { id } }: Props) {
       <main className="flex-1 container mx-auto px-4 py-10 max-w-3xl">
         <div className="mb-8">
           <Link href="/admin/scholarships" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            ← Scholarships
+            {t('back_scholarships')}
           </Link>
-          <h1 className="font-heading text-2xl font-bold text-foreground mt-2">Edit scholarship</h1>
+          <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{t('scholarships_edit_title')}</h1>
           <p className="text-muted-foreground text-sm mt-1 text-gold-dark font-medium">{s.name_en}</p>
         </div>
         <ScholarshipForm
           universities={universities}
           defaultValues={defaultValues}
           action={boundAction}
-          submitLabel="Save changes"
+          submitLabel={t('saving')}
           cancelHref="/admin/scholarships"
         />
       </main>

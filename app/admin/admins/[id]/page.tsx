@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { requireSuperuser } from '@/lib/admin/auth';
 import { createServiceClient } from '@/lib/supabase/service';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -22,6 +23,7 @@ export default async function AdminDetailPage({ params: { id } }: Props) {
 
   const targetEmail = targetUserData?.user?.email ?? '(unknown)';
   const isSelf = id === user.id;
+  const t = await getTranslations('admin');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -29,14 +31,14 @@ export default async function AdminDetailPage({ params: { id } }: Props) {
 
       <main className="flex-1 container mx-auto px-4 py-10 max-w-lg">
         <Link href="/admin/admins" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-          ← Back to Admins
+          {t('back_admins')}
         </Link>
-        <h1 className="font-heading text-2xl font-bold text-foreground mt-4 mb-1">Reset Password</h1>
+        <h1 className="font-heading text-2xl font-bold text-foreground mt-4 mb-1">{t('admins_reset_title')}</h1>
         <p className="text-muted-foreground text-sm mb-6">{targetEmail}</p>
 
         {isSelf ? (
           <div className="bg-card rounded-xl border border-border shadow-card p-6 text-sm text-muted-foreground">
-            You cannot reset your own password from here. Use the sign-in flow to reset it.
+            {t('admins_reset_self_note')}
           </div>
         ) : (
           <div className="bg-card rounded-xl border border-border shadow-card p-6">

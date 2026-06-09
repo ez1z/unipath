@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { ScholarshipCsvImportClient } from '@/components/admin/ScholarshipCsvImportClient';
 import { requireAdmin } from '@/lib/admin/auth';
@@ -33,6 +34,8 @@ export default async function ImportScholarshipsPage() {
     }),
   );
 
+  const t = await getTranslations('admin');
+
   return (
     <div className="min-h-screen flex flex-col">
       <AdminHeader email={user.email!} />
@@ -43,14 +46,12 @@ export default async function ImportScholarshipsPage() {
             href="/admin/scholarships"
             className="text-sm text-muted-foreground hover:text-primary transition-colors"
           >
-            ← Scholarships
+            {t('back_scholarships')}
           </Link>
           <h1 className="font-heading text-2xl font-bold text-foreground mt-2">
-            Import scholarships from CSV
+            {t('scholarships_import_title')}
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Download the current data, edit it, and re-upload to apply changes in bulk.
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">{t('scholarships_import_subtitle')}</p>
         </div>
         <ScholarshipCsvImportClient existingData={existingData} />
       </main>

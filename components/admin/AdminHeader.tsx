@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { signOutAction } from '@/app/admin/actions';
 
 type Props = { email: string; role?: 'admin' | 'superuser' };
 
-export function AdminHeader({ email, role }: Props) {
+export async function AdminHeader({ email, role }: Props) {
+  const t = await getTranslations('admin');
   return (
     <header className="bg-brand-dark border-b border-white/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -20,13 +22,13 @@ export function AdminHeader({ email, role }: Props) {
                 href="/admin/admins"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors"
               >
-                Admins
+                {t('header_admins')}
               </Link>
               <Link
                 href="/admin/logs"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors"
               >
-                Logs
+                {t('header_logs')}
               </Link>
             </nav>
           )}
@@ -37,7 +39,7 @@ export function AdminHeader({ email, role }: Props) {
               aria-label="Sign out of admin"
               className="rounded-md border border-white/15 px-3.5 py-1.5 text-sm font-medium text-white/55 hover:border-gold/50 hover:text-gold transition-colors"
             >
-              Sign out
+              {t('header_sign_out')}
             </button>
           </form>
         </div>
