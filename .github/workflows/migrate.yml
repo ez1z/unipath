@@ -2,38 +2,19 @@ name: Apply Supabase Migrations
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to apply migrations from"
-        required: true
-        default: main
-        type: string
-      environment:
-        description: "Target environment"
-        required: true
-        default: production
-        type: choice
-        options:
-          - production
-          - staging
 
 jobs:
   migrate:
     name: Run Migrations
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: production
     if: github.actor == 'ez1z'
 
     steps:
-      - name: Validate branch exists
-        run: |
-          git ls-remote --heads origin "${{ github.event.inputs.branch }}" | grep -q . \
-            || { echo "Branch '${{ github.event.inputs.branch }}' does not exist."; exit 1; }
-
-      - name: Checkout branch
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: main
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
