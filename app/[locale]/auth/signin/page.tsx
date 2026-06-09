@@ -15,13 +15,15 @@ export async function generateMetadata({ params }: Props) {
 export default async function SignInPage({ params }: Props) {
   const { locale } = await params;
 
+  let user = null;
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) redirect(`/${locale}/tracker/profile`);
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
   } catch {
     // Supabase unreachable — render form
   }
+  if (user) redirect(`/${locale}/tracker/profile`);
 
   return (
     <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16 bg-background">

@@ -260,6 +260,7 @@
     "error_email_invalid": "Please enter a valid email address",
     "error_password_short": "Password must be at least 8 characters",
     "error_email_in_use": "An account with this email already exists",
+    "error_rate_limit": "Too many attempts. Please try again later.",
     "error_invalid_credentials": "Invalid email or password",
     "error_generic": "Something went wrong. Please try again.",
     "profile_link": "My profile",

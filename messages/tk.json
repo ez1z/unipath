@@ -260,6 +260,7 @@
     "error_email_invalid": "Dogry e-poçta adresini giriziň",
     "error_password_short": "Parol azyndan 8 nyşandan ybarat bolmaly",
     "error_email_in_use": "Bu e-poçta bilen hasap eýýäm bar",
+    "error_rate_limit": "Köp synanyşyk. Biraz soňra synanyşyň.",
     "error_invalid_credentials": "Nädogry e-poçta ýa-da parol",
     "error_generic": "Bir zat ýalňyş gitdi. Täzeden synanyşyň.",
     "profile_link": "Meniň profilim",
