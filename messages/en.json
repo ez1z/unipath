@@ -5,7 +5,9 @@
     "compare": "Compare",
     "transfer": "Transfer Guide",
     "scholarships": "Scholarships",
-    "support": "Support"
+    "support": "Support",
+    "footer_tagline": "A free guide platform for Turkmen students studying abroad.",
+    "footer_disclaimer": "Not a payment processor."
   },
   "home": {
     "hero_title": "Find Your University Abroad",
@@ -16,7 +18,14 @@
     "transfer_guide": "Transfer Guide & Calculator",
     "stats_universities": "Universities",
     "stats_countries": "Countries",
-    "stats_moe_approved": "MoE Approved"
+    "stats_moe_approved": "MoE Approved",
+    "hero_eyebrow": "For Turkmen Students",
+    "feature_universities_title": "250+ Universities",
+    "feature_universities_desc": "Browse by country, language, major, and MoE approval — find the right fit for you.",
+    "feature_transfer_title": "MoE Transfer Guide",
+    "feature_transfer_desc": "Calculate your tuition payments under the $12,000 annual cap at official Central Bank rates.",
+    "feature_tracker_title": "Application Tracker",
+    "feature_tracker_desc": "Save dream universities, build document checklists, and track your progress in one place."
   },
   "universities": {
     "title": "Universities",
@@ -85,7 +94,6 @@
     "billion_word": "billion",
     "million_word": "million",
     "thousand_word": "thousand",
-    "tmt_equivalent": "TMT equivalent",
     "tmt_total": "Total TMT"
   },
   "compare": {
@@ -215,7 +223,8 @@
     "data_disclaimer": "University data may be incomplete or outdated. Always verify tuition, requirements, and deadlines on the university's official website before applying.",
     "old_manat_label": "Old Manat equivalent",
     "million": "million",
-    "thousand": "thousand"
+    "thousand": "thousand",
+    "not_found_desc": "The page you're looking for doesn't exist or you don't have access to it."
   },
   "auth": {
     "signin_title": "Sign in",

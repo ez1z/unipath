@@ -8,6 +8,7 @@ import { getAll as getAllScholarships } from '@/lib/data/scholarships';
 import { getChecklistProgress } from '@/lib/data/checklist';
 import { ProfileForm } from './ProfileForm';
 import { ProfileChecklistSummary } from '@/components/checklist/ProfileChecklistSummary';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,21 +55,7 @@ export default async function ProfilePage({ params }: Props) {
 
   return (
     <>
-      <div className="bg-primary">
-        <div className="container mx-auto px-4 py-10">
-          <h1 className="font-heading text-3xl font-bold text-primary-foreground">
-            {t('title')}
-          </h1>
-        </div>
-        <div className="h-1 flex">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className={`flex-1 ${i % 2 === 0 ? 'bg-gold/60' : 'bg-tk-green/60'}`}
-            />
-          ))}
-        </div>
-      </div>
+      <PageHeader title={t('title')} />
 
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <ProfileForm

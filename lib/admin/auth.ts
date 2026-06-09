@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 
@@ -13,7 +13,7 @@ export async function requireAdmin() {
     .select('user_id, role')
     .eq('user_id', user.id)
     .single();
-  if (!adminRow) redirect('/admin/signin');
+  if (!adminRow) notFound();
   return { supabase, user, role: adminRow.role as AdminRole };
 }
 

@@ -87,7 +87,7 @@ export function CompareClient({ universities, locale }: Props) {
       key: 'ranking',
       render: (u) =>
         u.ranking_qs ? (
-          <span className="font-semibold text-primary">{t('ranking_value', { rank: u.ranking_qs })}</span>
+          <span className="font-semibold text-gold-dark">{t('ranking_value', { rank: u.ranking_qs })}</span>
         ) : (
           <span className="text-muted-foreground">{t('ranking_unranked')}</span>
         ),
@@ -152,21 +152,21 @@ export function CompareClient({ universities, locale }: Props) {
         <div className="overflow-x-auto rounded-xl border border-border shadow-card">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-primary">
-                <th className="text-left py-4 px-4 font-medium text-primary-foreground/60 w-36" />
+              <tr className="bg-brand-dark">
+                <th className="text-left py-4 px-4 font-medium text-white/30 w-36" />
                 {selected.map((u) => (
                   <th key={u.id} className="text-left py-4 px-4 border-l border-white/10 align-top">
                     <div className="flex items-start justify-between gap-2">
                       <Link
                         href={`/${locale}/universities/${u.slug}`}
-                        className="font-heading font-semibold text-primary-foreground hover:text-gold transition-colors"
+                        className="font-heading font-semibold text-white hover:text-gold transition-colors"
                       >
                         {u.name[locale] ?? u.name.en}
                       </Link>
                       <button
                         onClick={() => removeUniversity(u.id)}
                         aria-label={`${t('remove')} ${u.name[locale] ?? u.name.en}`}
-                        className="text-primary-foreground/50 hover:text-gold text-base leading-none flex-shrink-0 mt-0.5"
+                        className="text-white/40 hover:text-gold text-base leading-none flex-shrink-0 mt-0.5"
                       >
                         ✕
                       </button>

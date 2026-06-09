@@ -3,7 +3,6 @@ import { getTranslations } from 'next-intl/server';
 import type { Locale } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
-import { GulPattern } from '@/components/ui/GulPattern';
 import { MobileMenu } from '@/components/MobileMenu';
 import { NavBarAuthButtons } from '@/components/NavBarAuthButtons';
 import type { User } from '@supabase/supabase-js';
@@ -24,48 +23,32 @@ export async function NavBar({ locale }: Props) {
 
   return (
     <nav
-      className="bg-primary sticky top-0 z-40 shadow-md"
+      className="bg-brand-dark border-b border-white/10 sticky top-0 z-40"
       aria-label="Main navigation"
     >
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-7">
+      <div className="container mx-auto px-5 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-8">
           <Link
             href={`/${locale}`}
-            className="flex items-center gap-2 group"
+            className="font-heading font-bold text-xl tracking-wide text-gold hover:text-gold/80 transition-colors"
             aria-label="UniPath home"
           >
-            <GulPattern size={28} className="text-gold transition-transform group-hover:scale-110" />
-            <span className="font-heading font-bold text-xl text-gold tracking-wide">UniPath</span>
+            UniPath
           </Link>
-          <div className="hidden sm:flex items-center gap-5 text-sm font-medium">
-            <Link
-              href={`/${locale}/universities`}
-              className="text-primary-foreground/80 hover:text-gold transition-colors"
-            >
+          <div className="hidden sm:flex items-center gap-0.5 text-sm font-medium">
+            <Link href={`/${locale}/universities`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
               {t('universities')}
             </Link>
-            <Link
-              href={`/${locale}/compare`}
-              className="text-primary-foreground/80 hover:text-gold transition-colors"
-            >
+            <Link href={`/${locale}/compare`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
               {t('compare')}
             </Link>
-            <Link
-              href={`/${locale}/transfer`}
-              className="text-primary-foreground/80 hover:text-gold transition-colors"
-            >
+            <Link href={`/${locale}/transfer`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
               {t('transfer')}
             </Link>
-            <Link
-              href={`/${locale}/scholarships`}
-              className="text-primary-foreground/80 hover:text-gold transition-colors"
-            >
+            <Link href={`/${locale}/scholarships`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
               {t('scholarships')}
             </Link>
-            <Link
-              href={`/${locale}/support`}
-              className="text-primary-foreground/80 hover:text-gold transition-colors"
-            >
+            <Link href={`/${locale}/support`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
               {t('support')}
             </Link>
           </div>

@@ -34,7 +34,7 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        /* Turkmen literal tokens — support opacity modifiers */
+        'brand-dark': 'hsl(var(--brand-dark))',
         gold: {
           DEFAULT: '#C49A1E',
           light: '#F7E9B9',
@@ -60,8 +60,8 @@ const config: Config = {
         sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        'card': '0 2px 8px 0 rgba(139, 26, 26, 0.07), 0 1px 2px 0 rgba(0,0,0,0.05)',
-        'card-hover': '0 6px 20px 0 rgba(139, 26, 26, 0.12), 0 2px 6px 0 rgba(0,0,0,0.08)',
+        'card': '0 1px 4px 0 rgba(0,0,0,0.05), 0 1px 2px 0 rgba(0,0,0,0.04)',
+        'card-hover': '0 8px 24px 0 rgba(0,0,0,0.09), 0 2px 8px 0 rgba(0,0,0,0.06)',
       },
     },
   },

@@ -6,7 +6,7 @@ import { formatTuition, computeTuitionBreakdown } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
 import { ScholarshipSection } from '@/components/scholarship/ScholarshipSection';
-import { GulPattern } from '@/components/ui/GulPattern';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
@@ -82,39 +82,13 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
 
   return (
     <>
-      {/* Hero banner */}
-      <div className="bg-primary relative overflow-hidden">
-        <div className="absolute right-0 top-0 opacity-10 pointer-events-none">
-          <GulPattern size={180} className="text-gold" />
-        </div>
-        <div className="container mx-auto px-4 py-10 relative">
-          <Link
-            href={`/${locale}/universities`}
-            className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/60 hover:text-gold transition-colors mb-5"
-            aria-label={t('back')}
-          >
-            ← {t('back')}
-          </Link>
-          <div className="flex flex-wrap items-start gap-2 mb-1">
-            <h1 className="font-heading text-2xl sm:text-4xl font-bold text-primary-foreground leading-tight">
-              {name}
-            </h1>
-            {university.moe_approved && (
-              <div className="mt-1 flex-shrink-0">
-                <MoeBadge />
-              </div>
-            )}
-          </div>
-          <p className="text-primary-foreground/60 mt-2">
-            {university.city}, {university.country}
-          </p>
-        </div>
-        <div className="h-1 flex">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className={`flex-1 ${i % 2 === 0 ? 'bg-gold' : 'bg-tk-green'}`} />
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        title={name}
+        subtitle={`${university.city}, ${university.country}`}
+        backHref={`/${locale}/universities`}
+        backLabel={t('back')}
+        badge={university.moe_approved ? <MoeBadge /> : undefined}
+      />
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         {/* Key stats */}

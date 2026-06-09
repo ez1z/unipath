@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { getBySlug } from '@/lib/data/scholarships';
 import { getById as getUniversityById } from '@/lib/data/universities';
 import { TMT_PER_USD } from '@/lib/constants';
-import { GulPattern } from '@/components/ui/GulPattern';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { createClient } from '@/lib/supabase/server';
 import type { Locale } from '@/lib/constants';
@@ -98,36 +98,17 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
 
   return (
     <>
-      {/* Hero */}
-      <div className="bg-primary relative overflow-hidden">
-        <div className="absolute right-0 top-0 opacity-10 pointer-events-none">
-          <GulPattern size={180} className="text-gold" />
-        </div>
-        <div className="container mx-auto px-4 py-10 relative">
-          <Link
-            href={`/${locale}/scholarships`}
-            className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/60 hover:text-gold transition-colors mb-5"
-          >
-            ← {t('title')}
-          </Link>
-          <div className="flex flex-wrap items-start gap-2 mb-2">
-            <h1 className="font-heading text-2xl sm:text-4xl font-bold text-primary-foreground leading-tight">
-              {name}
-            </h1>
-            <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border mt-1 flex-shrink-0 ${TYPE_STYLES[scholarship.type] ?? TYPE_STYLES.partial}`}
-            >
-              {TYPE_LABELS[scholarship.type] ?? scholarship.type}
-            </span>
-          </div>
-          <p className="text-primary-foreground/60 mt-1">{scholarship.country}</p>
-        </div>
-        <div className="h-1 flex">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className={`flex-1 ${i % 2 === 0 ? 'bg-gold' : 'bg-tk-green'}`} />
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        title={name}
+        subtitle={scholarship.country}
+        backHref={`/${locale}/scholarships`}
+        backLabel={t('title')}
+        badge={
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${TYPE_STYLES[scholarship.type] ?? TYPE_STYLES.partial}`}>
+            {TYPE_LABELS[scholarship.type] ?? scholarship.type}
+          </span>
+        }
+      />
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         {/* Key stats */}

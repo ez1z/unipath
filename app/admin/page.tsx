@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -17,7 +17,8 @@ export default async function AdminPage() {
     .eq('user_id', user.id)
     .single();
 
-  const role = (adminRow?.role ?? 'admin') as AdminRole;
+  if (!adminRow) notFound();
+  const role = adminRow.role as AdminRole;
 
   return (
     <div className="min-h-screen flex flex-col">

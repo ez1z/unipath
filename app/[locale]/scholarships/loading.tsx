@@ -1,16 +1,9 @@
 export default function Loading() {
   return (
     <>
-      {/* Hero skeleton */}
-      <div className="bg-primary">
-        <div className="container mx-auto px-4 py-10 flex items-center justify-between">
-          <div className="h-9 w-44 bg-white/10 rounded animate-pulse" />
-          <div className="w-14 h-14 bg-white/10 rounded-full hidden sm:block animate-pulse" />
-        </div>
-        <div className="h-1 flex">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className={`flex-1 ${i % 2 === 0 ? 'bg-gold/60' : 'bg-tk-green/60'}`} />
-          ))}
+      <div className="bg-background border-b border-border animate-pulse">
+        <div className="container mx-auto px-4 pt-7 pb-6">
+          <div className="h-8 w-44 bg-muted rounded" />
         </div>
       </div>
       <div className="container mx-auto px-4 py-8 animate-pulse">

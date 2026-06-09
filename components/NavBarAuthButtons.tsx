@@ -29,13 +29,13 @@ export function NavBarAuthButtons({ locale, user }: Props) {
       <div className="hidden sm:flex items-center gap-2 ml-1">
         <Link
           href={`/${locale}/auth/signin`}
-          className="px-3 py-1.5 text-xs font-semibold text-primary-foreground/80 hover:text-gold transition-colors"
+          className="px-3 py-1.5 text-xs font-semibold text-white/55 hover:text-gold transition-colors"
         >
           {t('signin_button')}
         </Link>
         <Link
           href={`/${locale}/auth/signup`}
-          className="px-3 py-1.5 text-xs font-semibold rounded-md bg-gold text-white hover:opacity-90 transition-opacity"
+          className="px-3 py-1.5 text-xs font-semibold rounded-md bg-gold text-white hover:bg-gold-dark transition-colors"
         >
           {t('signup_button')}
         </Link>
@@ -69,7 +69,7 @@ export function NavBarAuthButtons({ locale, user }: Props) {
         <span className="w-6 h-6 rounded-full bg-gold flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
           {initial}
         </span>
-        <span className="text-xs font-medium text-primary-foreground/80 max-w-[96px] truncate">
+        <span className="text-xs font-medium text-white/60 max-w-[96px] truncate">
           {displayName}
         </span>
         <svg
@@ -81,7 +81,7 @@ export function NavBarAuthButtons({ locale, user }: Props) {
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`text-primary-foreground/50 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`text-white/30 transition-transform ${open ? 'rotate-180' : ''}`}
           aria-hidden="true"
         >
           <polyline points="6 9 12 15 18 9" />

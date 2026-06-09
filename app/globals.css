@@ -4,23 +4,25 @@
 
 @layer base {
   :root {
-    /* Turkmen heritage palette — deep crimson + gold + warm ivory */
-    --background: 40 70% 96%;
-    --foreground: 22 45% 13%;
+    /* Clean premium palette — warm white base, deep crimson accent, gold */
+    --background: 30 15% 97%;
+    --foreground: 20 35% 8%;
     --card: 0 0% 100%;
-    --card-foreground: 22 45% 13%;
-    --primary: 0 68% 30%;
-    --primary-foreground: 40 70% 96%;
-    --secondary: 40 38% 91%;
-    --secondary-foreground: 22 45% 20%;
-    --muted: 38 28% 88%;
-    --muted-foreground: 25 18% 42%;
-    --accent: 43 70% 42%;
+    --card-foreground: 20 35% 8%;
+    --primary: 355 58% 26%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 30 12% 94%;
+    --secondary-foreground: 20 25% 20%;
+    --muted: 30 10% 91%;
+    --muted-foreground: 20 10% 44%;
+    --accent: 43 68% 38%;
     --accent-foreground: 0 0% 98%;
-    --border: 38 28% 76%;
-    --input: 38 28% 76%;
-    --ring: 0 68% 30%;
-    --radius: 0.5rem;
+    --border: 30 10% 88%;
+    --input: 30 10% 88%;
+    --ring: 355 58% 26%;
+    --radius: 0.625rem;
+    /* Deep warm dark for navbar / footer */
+    --brand-dark: 355 25% 8%;
   }
 }
 

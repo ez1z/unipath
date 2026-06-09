@@ -1,21 +1,23 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { Playfair_Display, Inter } from 'next/font/google';
+import { getMessages, getTranslations } from 'next-intl/server';
+import { Fraunces, DM_Sans } from 'next/font/google';
+import Link from 'next/link';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import type { Locale } from '@/lib/constants';
 import { NavBar } from '@/components/NavBar';
-import { GulPattern } from '@/components/ui/GulPattern';
 import '@/app/globals.css';
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
   variable: '--font-heading',
   display: 'swap',
 });
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
@@ -39,25 +41,40 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = params;
   if (!SUPPORTED_LOCALES.includes(locale as Locale)) notFound();
 
-  const messages = await getMessages();
+  const [messages, tNav] = await Promise.all([
+    getMessages(),
+    getTranslations({ locale: locale as Locale, namespace: 'nav' }),
+  ]);
+
+  const year = new Date().getFullYear();
 
   return (
-    <html lang={locale} className={`${playfair.variable} ${inter.variable}`}>
-      <body className="min-h-screen bg-background font-sans flex flex-col">
+    <html lang={locale} className={`${fraunces.variable} ${dmSans.variable}`}>
+      <body className="min-h-screen bg-background font-sans flex flex-col antialiased">
         <NextIntlClientProvider messages={messages}>
           <NavBar locale={locale as Locale} />
           <main className="flex-1">{children}</main>
-          <footer className="bg-primary text-primary-foreground mt-16">
-            <div className="container mx-auto px-4 py-8">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-2.5">
-                  <GulPattern size={26} className="text-gold" />
-                  <span className="font-heading font-bold text-lg text-gold">UniPath</span>
+
+          <footer className="bg-brand-dark">
+            <div className="container mx-auto px-5 pt-12 pb-8">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-10">
+                <div className="max-w-xs">
+                  <span className="font-heading font-bold text-xl text-gold tracking-wide block mb-3">UniPath</span>
+                  <p className="text-sm text-white/30 leading-relaxed">
+                    {tNav('footer_tagline')}
+                  </p>
                 </div>
-                <span className="text-sm opacity-50">© {new Date().getFullYear()} UniPath</span>
+                <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm" aria-label="Footer navigation">
+                  <Link href={`/${locale}/universities`} className="text-white/40 hover:text-gold transition-colors">{tNav('universities')}</Link>
+                  <Link href={`/${locale}/compare`} className="text-white/40 hover:text-gold transition-colors">{tNav('compare')}</Link>
+                  <Link href={`/${locale}/transfer`} className="text-white/40 hover:text-gold transition-colors">{tNav('transfer')}</Link>
+                  <Link href={`/${locale}/scholarships`} className="text-white/40 hover:text-gold transition-colors">{tNav('scholarships')}</Link>
+                  <Link href={`/${locale}/support`} className="text-white/40 hover:text-gold transition-colors">{tNav('support')}</Link>
+                </nav>
               </div>
-              <div className="border-t border-white/15 pt-4 text-xs opacity-50 text-center">
-                A guide platform for Turkmen students. Not a payment processor.
+              <div className="border-t border-white/10 pt-6 flex flex-wrap justify-between gap-3 text-xs text-white/20">
+                <span>© {year} UniPath</span>
+                <span>{tNav('footer_disclaimer')}</span>
               </div>
             </div>
           </footer>

@@ -29,8 +29,8 @@ export function LocaleSwitcher({ currentLocale }: Props) {
           aria-pressed={loc === currentLocale}
           className={`px-2.5 py-1 rounded text-xs font-semibold tracking-wider transition-colors ${
             loc === currentLocale
-              ? 'bg-gold text-white cursor-default'
-              : 'text-primary-foreground/60 hover:text-gold hover:bg-white/10'
+              ? 'bg-gold/90 text-white cursor-default'
+              : 'text-white/40 hover:text-white/80 hover:bg-white/10'
           }`}
         >
           {LABELS[loc]}

@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { getAll } from "@/lib/data/universities";
 import type { Locale } from "@/lib/constants";
-import { GulPattern } from "@/components/ui/GulPattern";
 
 export const dynamic = 'force-dynamic';
 
@@ -14,59 +13,54 @@ export default async function HomePage({ params: { locale } }: Props) {
   const moeCount = universities.filter((u) => u.moe_approved).length;
   const countryCount = new Set(universities.map((u) => u.country)).size;
 
+  const features = [
+    {
+      title: t("feature_universities_title"),
+      desc: t("feature_universities_desc"),
+    },
+    {
+      title: t("feature_transfer_title"),
+      desc: t("feature_transfer_desc"),
+    },
+    {
+      title: t("feature_tracker_title"),
+      desc: t("feature_tracker_desc"),
+    },
+  ];
+
   return (
     <>
       {/* Hero */}
-      <section className="relative bg-primary overflow-hidden">
-        {/* Background gül decorations */}
-        <div className="absolute -top-12 -right-12 opacity-10 pointer-events-none">
-          <GulPattern size={320} className="text-gold" />
-        </div>
-        <div className="absolute -bottom-16 -left-16 opacity-[0.07] pointer-events-none">
-          <GulPattern size={260} className="text-white" />
-        </div>
-
-        <div className="relative container mx-auto px-4 py-16 sm:py-24 text-center">
-          <div className="flex justify-center mb-6">
-            <GulPattern size={60} className="text-gold" />
-          </div>
-          <h1 className="font-heading text-5xl sm:text-6xl font-bold text-primary-foreground mb-5 leading-tight">
+      <section className="bg-brand-dark overflow-hidden">
+        <div className="container mx-auto px-5 pt-14 pb-12 sm:pt-24 sm:pb-20 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.18em] text-gold/70 uppercase mb-5">
+            {t("hero_eyebrow")}
+          </p>
+          <h1 className="font-heading text-[2.6rem] sm:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-5 max-w-2xl mx-auto">
             {t("hero_title")}
           </h1>
-          <p className="text-lg text-primary-foreground/70 mb-10 max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-white/45 mb-10 max-w-sm sm:max-w-lg mx-auto leading-relaxed">
             {t("hero_subtitle")}
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               href={`/${locale}/universities`}
-              className="px-8 py-3.5 bg-gold text-white rounded-md font-semibold hover:bg-gold-dark transition-colors shadow-md"
+              className="px-8 py-3.5 bg-gold text-white rounded-lg font-semibold hover:bg-gold-dark transition-colors shadow-lg shadow-black/30"
             >
               {t("browse_all")}
             </Link>
             <Link
               href={`/${locale}/transfer`}
-              className="px-8 py-3.5 border-2 border-primary-foreground/30 text-primary-foreground rounded-md font-semibold hover:border-gold hover:text-gold transition-colors"
+              className="px-8 py-3.5 border border-white/15 text-white/75 rounded-lg font-semibold hover:border-gold/40 hover:text-white transition-colors"
             >
               {t("transfer_guide")}
             </Link>
           </div>
         </div>
-
-        {/* Carpet-stripe bottom border */}
-        <div className="h-1.5 w-full flex">
-          <div className="flex-1 bg-gold" />
-          <div className="flex-1 bg-tk-green" />
-          <div className="flex-1 bg-gold" />
-          <div className="flex-1 bg-tk-green" />
-          <div className="flex-1 bg-gold" />
-          <div className="flex-1 bg-tk-green" />
-          <div className="flex-1 bg-gold" />
-          <div className="flex-1 bg-tk-green" />
-        </div>
       </section>
 
       {/* Floating stats */}
-      <section className="container mx-auto px-4 mt-6 sm:mt-20">
+      <section className="container mx-auto px-5 mt-6 sm:mt-20">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto sm:-mt-8">
           {[
             { value: universities.length, label: t("stats_universities") },
@@ -75,14 +69,31 @@ export default async function HomePage({ params: { locale } }: Props) {
           ].map(({ value, label }) => (
             <div
               key={label}
-              className="bg-card rounded-xl border border-border shadow-card text-center p-4 sm:p-6 border-t-4 border-t-gold"
+              className="bg-card rounded-2xl border border-border shadow-card text-center p-5 sm:p-6 border-t-2 border-t-gold"
             >
-              <div className="font-heading text-4xl font-bold text-primary">
+              <div className="font-heading text-4xl font-bold text-foreground">
                 {value}
               </div>
               <div className="text-sm text-muted-foreground mt-1.5">
                 {label}
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="container mx-auto px-5 py-16 sm:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-12 max-w-3xl mx-auto">
+          {features.map((f) => (
+            <div key={f.title}>
+              <div className="w-7 h-0.5 bg-gold mb-5" />
+              <h3 className="font-heading font-semibold text-base text-foreground mb-2.5">
+                {f.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {f.desc}
+              </p>
             </div>
           ))}
         </div>
