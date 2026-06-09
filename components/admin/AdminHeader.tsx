@@ -38,6 +38,12 @@ export async function AdminHeader({ email, role }: Props) {
               </Link>
             </nav>
           )}
+          <Link
+            href="/"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors hidden sm:block"
+          >
+            {t('header_view_platform')}
+          </Link>
           <span className="text-white/30 text-sm hidden sm:block">{email}</span>
           <form action={signOutAction}>
             <button
