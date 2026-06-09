@@ -364,6 +364,7 @@
 
     "header_admins": "Admins",
     "header_logs": "Logs",
+    "header_system_logs": "System Logs",
     "header_sign_out": "Sign out",
 
     "dashboard_title": "Dashboard",
@@ -378,6 +379,12 @@
     "dashboard_admins_desc": "Add admins, reset passwords, and revoke access.",
     "dashboard_logs_title": "Audit Logs",
     "dashboard_logs_desc": "See what each admin has done and when.",
+    "dashboard_system_logs_title": "System Logs",
+    "dashboard_system_logs_desc": "Inspect server errors with full context and stack details.",
+
+    "system_logs_title": "System Logs",
+    "system_logs_last_n": "Last {count} entries",
+    "system_logs_empty": "No errors logged yet.",
 
     "unis_title": "Universities",
     "unis_add": "+ Add university",

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
+import { logError } from '@/lib/logger';
 
 const SignInSchema = z.object({
   email: z.string().email(),
@@ -89,7 +90,14 @@ export async function signUpWithEmailAction(
     password: parsed.data.password,
     options: { data: { full_name: parsed.data.name, age: parsed.data.age } },
   });
-  if (error) return { error: mapSupabaseSignUpError(error.message, t) };
+  if (error) {
+    await logError('signUpWithEmailAction', error.message, {
+      email: parsed.data.email,
+      status: error.status,
+      code: (error as Record<string, unknown>).code,
+    });
+    return { error: mapSupabaseSignUpError(error.message, t) };
+  }
 
   redirect(`/${locale}/tracker/profile`);
 }

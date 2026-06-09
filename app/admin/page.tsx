@@ -74,6 +74,15 @@ export default async function AdminPage() {
                 </div>
                 <p className="text-sm text-muted-foreground">{t('dashboard_logs_desc')}</p>
               </a>
+              <a
+                href="/admin/system-logs"
+                className="bg-card rounded-xl border border-border border-t-4 border-t-red-400 p-6 hover:shadow-card transition-shadow group"
+              >
+                <div className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-red-600 transition-colors">
+                  {t('dashboard_system_logs_title')}
+                </div>
+                <p className="text-sm text-muted-foreground">{t('dashboard_system_logs_desc')}</p>
+              </a>
             </>
           )}
         </div>

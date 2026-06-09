@@ -30,6 +30,12 @@ export async function AdminHeader({ email, role }: Props) {
               >
                 {t('header_logs')}
               </Link>
+              <Link
+                href="/admin/system-logs"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors"
+              >
+                {t('header_system_logs')}
+              </Link>
             </nav>
           )}
           <span className="text-white/30 text-sm hidden sm:block">{email}</span>
