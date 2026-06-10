@@ -85,7 +85,7 @@ export async function signUpWithEmailAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: { data: { full_name: parsed.data.name, age: parsed.data.age } },
@@ -97,6 +97,14 @@ export async function signUpWithEmailAction(
       code: (error as unknown as Record<string, unknown>).code,
     });
     return { error: mapSupabaseSignUpError(error.message, t) };
+  }
+  if (!data.session) {
+    // Email confirmation is enabled on the Supabase project — this platform
+    // does not use email verification. Disable it in Supabase Auth settings.
+    await logError('signUpWithEmailAction', 'signUp succeeded but returned no session', {
+      email: parsed.data.email,
+    });
+    return { error: t('error_generic') };
   }
 
   redirect(`/${locale}/tracker/profile`);

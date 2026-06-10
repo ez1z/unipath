@@ -77,11 +77,6 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // ── OAuth callback — bypass intl routing ─────────────────────────────────
-  if (pathname.startsWith('/auth/callback')) {
-    return NextResponse.next();
-  }
-
   // ── Public locale routes ──────────────────────────────────────────────────
   // Skip Supabase entirely for anonymous visitors (no sb-* cookies present)
   if (
