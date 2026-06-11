@@ -1,4 +1,5 @@
 import type { Scholarship, ScholarshipFilterParams } from './scholarship-types';
+import { getNextDeadline } from '@/lib/types/semester';
 
 export function filterScholarships(
   scholarships: Scholarship[],
@@ -14,6 +15,21 @@ export function filterScholarships(
   }
   if (params.coverage) {
     result = result.filter((s) => s.coverage.includes(params.coverage!));
+  }
+  if (params.hasAmount || params.minAmount !== undefined) {
+    result = result.filter((s) => s.amount_usd !== null);
+  }
+  if (params.minAmount !== undefined) {
+    result = result.filter((s) => s.amount_usd! >= params.minAmount!);
+  }
+  if (params.deadlineStatus === 'upcoming') {
+    result = result.filter((s) => getNextDeadline(s.semesters) !== null);
+  } else if (params.deadlineStatus === 'passed') {
+    result = result.filter(
+      (s) =>
+        getNextDeadline(s.semesters) === null &&
+        s.semesters.some((sem) => sem.deadline !== null),
+    );
   }
   if (params.query) {
     const q = params.query.toLowerCase();

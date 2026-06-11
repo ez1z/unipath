@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Scholarship } from '@/lib/data/scholarships';
 import { filterScholarships } from '@/lib/data/filter-scholarships';
+import type { ScholarshipSortBy } from '@/lib/data/scholarship-types';
+import { getNextDeadline } from '@/lib/types/semester';
 import { ScholarshipCard } from './ScholarshipCard';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
@@ -35,11 +37,14 @@ export function ScholarshipListClient({
   const [country, setCountry] = useState('');
   const [type, setType] = useState('');
   const [coverage, setCoverage] = useState('');
+  const [hasAmount, setHasAmount] = useState(false);
+  const [minAmount, setMinAmount] = useState('');
+  const [deadlineStatus, setDeadlineStatus] = useState('');
+  const [sortBy, setSortBy] = useState<ScholarshipSortBy>('name');
   const [prefsActive, setPrefsActive] = useState(false);
 
   const hasPrefs = userPrefs !== null && userPrefs.countries.length > 0;
 
-  // When prefs are active, narrow the pool by the user's desired countries
   const basePool = useMemo(() => {
     if (!prefsActive || !userPrefs) return scholarships;
     return scholarships.filter((s) =>
@@ -54,18 +59,67 @@ export function ScholarshipListClient({
         country: country || undefined,
         type: type || undefined,
         coverage: coverage || undefined,
+        hasAmount,
+        minAmount: minAmount ? Number(minAmount) : undefined,
+        deadlineStatus: (deadlineStatus as 'upcoming' | 'passed') || undefined,
       }),
-    [basePool, query, country, type, coverage],
+    [basePool, query, country, type, coverage, hasAmount, minAmount, deadlineStatus],
   );
+
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    switch (sortBy) {
+      case 'amount_desc':
+        return arr.sort((a, b) => {
+          if (a.amount_usd === null && b.amount_usd === null) return 0;
+          if (a.amount_usd === null) return 1;
+          if (b.amount_usd === null) return -1;
+          return b.amount_usd - a.amount_usd;
+        });
+      case 'amount_asc':
+        return arr.sort((a, b) => {
+          if (a.amount_usd === null && b.amount_usd === null) return 0;
+          if (a.amount_usd === null) return 1;
+          if (b.amount_usd === null) return -1;
+          return a.amount_usd - b.amount_usd;
+        });
+      case 'deadline_asc':
+        return arr.sort((a, b) => {
+          const da = getNextDeadline(a.semesters);
+          const db = getNextDeadline(b.semesters);
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return da.localeCompare(db);
+        });
+      case 'deadline_desc':
+        return arr.sort((a, b) => {
+          const da = getNextDeadline(a.semesters);
+          const db = getNextDeadline(b.semesters);
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return db.localeCompare(da);
+        });
+      default:
+        return arr.sort((a, b) => a.name.en.localeCompare(b.name.en));
+    }
+  }, [filtered, sortBy]);
 
   function clearFilters() {
     setQuery('');
     setCountry('');
     setType('');
     setCoverage('');
+    setHasAmount(false);
+    setMinAmount('');
+    setDeadlineStatus('');
+    setSortBy('name');
   }
 
-  const hasFilters = query || country || type || coverage;
+  const hasFilters =
+    query || country || type || coverage || hasAmount || minAmount ||
+    deadlineStatus || sortBy !== 'name';
 
   const countryOptions = [
     { value: '', label: t('filter_all_countries'), muted: true },
@@ -103,12 +157,26 @@ export function ScholarshipListClient({
     })),
   ];
 
+  const deadlineStatusOptions = [
+    { value: '', label: t('filter_deadline_all'), muted: true },
+    { value: 'upcoming', label: t('filter_deadline_upcoming') },
+    { value: 'passed', label: t('filter_deadline_passed') },
+  ];
+
+  const sortOptions: { value: ScholarshipSortBy; label: string }[] = [
+    { value: 'name', label: t('sort_name') },
+    { value: 'amount_desc', label: t('sort_amount_desc') },
+    { value: 'amount_asc', label: t('sort_amount_asc') },
+    { value: 'deadline_asc', label: t('sort_deadline_asc') },
+    { value: 'deadline_desc', label: t('sort_deadline_desc') },
+  ];
+
   return (
     <div>
       {/* Filter bar */}
       <div className="bg-card border border-border rounded-xl p-4 mb-6 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
-          {/* Search input */}
+          {/* Search */}
           <div className="relative flex-1 min-w-0 sm:min-w-48">
             <input
               type="search"
@@ -156,10 +224,53 @@ export function ScholarshipListClient({
             aria-label={t('filter_coverage')}
             className="sm:w-52"
           />
+
+          {/* Min amount input */}
+          <div className="relative sm:w-44">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none select-none">
+              $
+            </span>
+            <input
+              type="number"
+              min="0"
+              step="500"
+              value={minAmount}
+              onChange={(e) => setMinAmount(e.target.value)}
+              placeholder={t('filter_min_amount')}
+              aria-label={t('filter_min_amount')}
+              className="w-full pl-7 pr-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+
+          <Select
+            value={deadlineStatus}
+            onChange={setDeadlineStatus}
+            options={deadlineStatusOptions}
+            aria-label={t('filter_deadline')}
+            className="sm:w-40"
+          />
+          <Select
+            value={sortBy}
+            onChange={(v) => setSortBy(v as ScholarshipSortBy)}
+            options={sortOptions}
+            aria-label={t('sort_label')}
+            className="sm:w-48"
+          />
         </div>
 
         <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
-          <div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={hasAmount}
+                onChange={(e) => setHasAmount(e.target.checked)}
+                className="rounded border-input accent-primary"
+                aria-label={t('filter_has_amount')}
+              />
+              <span className="text-muted-foreground">{t('filter_has_amount')}</span>
+            </label>
+
             {hasPrefs && (
               <button
                 type="button"
@@ -201,10 +312,10 @@ export function ScholarshipListClient({
       </div>
 
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
-        <span>{t('results_count', { count: filtered.length })}</span>
+        <span>{t('results_count', { count: sorted.length })}</span>
       </div>
 
-      {filtered.length === 0 ? (
+      {sorted.length === 0 ? (
         <div className="text-center py-16">
           <svg
             width="48"
@@ -223,7 +334,7 @@ export function ScholarshipListClient({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((s) => (
+          {sorted.map((s) => (
             <ScholarshipCard
               key={s.id}
               scholarship={s}

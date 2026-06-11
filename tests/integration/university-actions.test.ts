@@ -36,7 +36,8 @@ const validFormFields = {
   application_portal_url: 'https://apply.test.edu',
 };
 
-function makeAdminSupabase({ insertError = null, updateError = null, deleteError = null } = {}) {
+type DbError = { message: string; code: string } | null;
+function makeAdminSupabase({ insertError = null, updateError = null, deleteError = null }: { insertError?: DbError; updateError?: DbError; deleteError?: DbError } = {}) {
   const adminChain = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),

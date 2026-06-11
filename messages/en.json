@@ -56,7 +56,20 @@
     "ranking": "QS Ranking",
     "ranking_value": "#{rank}",
     "ranking_unranked": "Unranked",
-    "tuition_label": "Tuition / year"
+    "tuition_label": "Tuition / year",
+    "sort_label": "Sort by",
+    "sort_name": "Name A–Z",
+    "sort_ranking": "Best ranked",
+    "sort_tuition_asc": "Tuition: low to high",
+    "sort_tuition_desc": "Tuition: high to low",
+    "sort_deadline_asc": "Deadline: closest",
+    "sort_deadline_desc": "Deadline: farthest",
+    "filter_ranked_only": "Ranked only",
+    "filter_max_tuition": "Max tuition",
+    "filter_deadline": "Deadline",
+    "filter_deadline_all": "Any deadline",
+    "filter_deadline_upcoming": "Upcoming",
+    "filter_deadline_passed": "Passed"
   },
   "university": {
     "moe_badge": "MoE Approved",
@@ -200,7 +213,19 @@
     "deadline_passed": "Passed",
     "coverage_section_title": "What it covers",
     "about_section_title": "About",
-    "university_section_title": "University"
+    "university_section_title": "University",
+    "sort_label": "Sort by",
+    "sort_name": "Name A–Z",
+    "sort_amount_desc": "Amount: high to low",
+    "sort_amount_asc": "Amount: low to high",
+    "sort_deadline_asc": "Deadline: closest",
+    "sort_deadline_desc": "Deadline: farthest",
+    "filter_has_amount": "With stated amount",
+    "filter_min_amount": "Min amount",
+    "filter_deadline": "Deadline",
+    "filter_deadline_all": "Any deadline",
+    "filter_deadline_upcoming": "Upcoming",
+    "filter_deadline_passed": "Passed"
   },
   "checklist": {
     "next_deadline": "Next deadline",

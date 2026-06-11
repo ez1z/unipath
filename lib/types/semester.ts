@@ -17,6 +17,15 @@ export function parseSemestersJson(raw: unknown): Semester[] {
   );
 }
 
+export function getNextDeadline(semesters: Semester[]): string | null {
+  const today = new Date().toISOString().split('T')[0];
+  const futures = semesters
+    .filter((s) => s.deadline !== null && s.deadline! >= today)
+    .map((s) => s.deadline!);
+  if (futures.length === 0) return null;
+  return futures.reduce((a, b) => (a < b ? a : b));
+}
+
 export function parseSemestersCsv(raw: string): Semester[] {
   if (!raw.trim()) return [];
   return raw

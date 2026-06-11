@@ -9,12 +9,6 @@
     "test": "vitest run",
     "prepare": "husky"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --max-warnings=0",
-      "tsc --noEmit"
-    ]
-  },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.107.0",

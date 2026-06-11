@@ -61,11 +61,16 @@ export function dbRowToScholarship(row: ScholarshipDbRow): Scholarship {
   };
 }
 
+export type ScholarshipSortBy = 'name' | 'amount_desc' | 'amount_asc' | 'deadline_asc' | 'deadline_desc';
+
 export type ScholarshipFilterParams = {
   query?: string;
   country?: string;
   type?: string;
   coverage?: string;
+  hasAmount?: boolean;
+  minAmount?: number;
+  deadlineStatus?: 'upcoming' | 'passed';
 };
 
 export const ScholarshipCsvRowSchema = z.object({

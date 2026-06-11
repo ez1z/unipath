@@ -59,12 +59,17 @@ export function dbRowToUniversity(row: UniversityDbRow): University {
   };
 }
 
+export type UniversitySortBy = 'name' | 'ranking' | 'tuition_asc' | 'tuition_desc' | 'deadline_asc' | 'deadline_desc';
+
 export type FilterParams = {
   query?: string;
   country?: string;
   language?: string;
   major?: string;
   moeOnly?: boolean;
+  rankedOnly?: boolean;
+  maxTuition?: number;
+  deadlineStatus?: 'upcoming' | 'passed';
 };
 
 export const CsvRowSchema = z.object({

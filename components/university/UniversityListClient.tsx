@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
 import { filterUniversities } from '@/lib/data/filter-universities';
+import type { UniversitySortBy } from '@/lib/data/university-types';
+import { getNextDeadline } from '@/lib/types/semester';
 import { UniversityCard } from './UniversityCard';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
@@ -36,6 +38,10 @@ export function UniversityListClient({
   const [language, setLanguage] = useState('');
   const [major, setMajor] = useState('');
   const [moeOnly, setMoeOnly] = useState(false);
+  const [rankedOnly, setRankedOnly] = useState(false);
+  const [maxTuition, setMaxTuition] = useState('');
+  const [deadlineStatus, setDeadlineStatus] = useState('');
+  const [sortBy, setSortBy] = useState<UniversitySortBy>('name');
   const [prefsActive, setPrefsActive] = useState(false);
 
   const hasPrefs =
@@ -44,7 +50,6 @@ export function UniversityListClient({
       userPrefs.majors.length > 0 ||
       savedUniversityIds.length > 0);
 
-  // When prefs are active, include bookmarked universities OR country+major matches
   const basePool = useMemo(() => {
     if (!prefsActive || !userPrefs) return universities;
     return universities.filter((u) => {
@@ -70,9 +75,49 @@ export function UniversityListClient({
         language: language || undefined,
         major: major || undefined,
         moeOnly,
+        rankedOnly,
+        maxTuition: maxTuition ? Number(maxTuition) : undefined,
+        deadlineStatus: (deadlineStatus as 'upcoming' | 'passed') || undefined,
       }),
-    [basePool, query, country, language, major, moeOnly],
+    [basePool, query, country, language, major, moeOnly, rankedOnly, maxTuition, deadlineStatus],
   );
+
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    switch (sortBy) {
+      case 'ranking':
+        return arr.sort((a, b) => {
+          if (a.ranking_qs === null && b.ranking_qs === null) return 0;
+          if (a.ranking_qs === null) return 1;
+          if (b.ranking_qs === null) return -1;
+          return a.ranking_qs - b.ranking_qs;
+        });
+      case 'tuition_asc':
+        return arr.sort((a, b) => a.tuition_usd - b.tuition_usd);
+      case 'tuition_desc':
+        return arr.sort((a, b) => b.tuition_usd - a.tuition_usd);
+      case 'deadline_asc':
+        return arr.sort((a, b) => {
+          const da = getNextDeadline(a.semesters);
+          const db = getNextDeadline(b.semesters);
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return da.localeCompare(db);
+        });
+      case 'deadline_desc':
+        return arr.sort((a, b) => {
+          const da = getNextDeadline(a.semesters);
+          const db = getNextDeadline(b.semesters);
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return db.localeCompare(da);
+        });
+      default:
+        return arr.sort((a, b) => a.name.en.localeCompare(b.name.en));
+    }
+  }, [filtered, sortBy]);
 
   function clearFilters() {
     setQuery('');
@@ -80,9 +125,15 @@ export function UniversityListClient({
     setLanguage('');
     setMajor('');
     setMoeOnly(false);
+    setRankedOnly(false);
+    setMaxTuition('');
+    setDeadlineStatus('');
+    setSortBy('name');
   }
 
-  const hasFilters = query || country || language || major || moeOnly;
+  const hasFilters =
+    query || country || language || major || moeOnly || rankedOnly ||
+    maxTuition || deadlineStatus || sortBy !== 'name';
 
   const countryOptions = [
     { value: '', label: t('filter_all_countries'), muted: true },
@@ -96,13 +147,26 @@ export function UniversityListClient({
     { value: '', label: t('filter_all_majors'), muted: true },
     ...majors.map((m) => ({ value: m, label: m })),
   ];
+  const deadlineStatusOptions = [
+    { value: '', label: t('filter_deadline_all'), muted: true },
+    { value: 'upcoming', label: t('filter_deadline_upcoming') },
+    { value: 'passed', label: t('filter_deadline_passed') },
+  ];
+  const sortOptions: { value: UniversitySortBy; label: string }[] = [
+    { value: 'name', label: t('sort_name') },
+    { value: 'ranking', label: t('sort_ranking') },
+    { value: 'tuition_asc', label: t('sort_tuition_asc') },
+    { value: 'tuition_desc', label: t('sort_tuition_desc') },
+    { value: 'deadline_asc', label: t('sort_deadline_asc') },
+    { value: 'deadline_desc', label: t('sort_deadline_desc') },
+  ];
 
   return (
     <div>
       {/* Filter bar */}
       <div className="bg-card border border-border rounded-xl p-4 mb-6 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
-          {/* Search input */}
+          {/* Search */}
           <div className="relative flex-1 min-w-0 sm:min-w-48">
             <input
               type="search"
@@ -150,6 +214,38 @@ export function UniversityListClient({
             aria-label={t('filter_major')}
             className="sm:w-52"
           />
+
+          {/* Max tuition input */}
+          <div className="relative sm:w-44">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none select-none">
+              $
+            </span>
+            <input
+              type="number"
+              min="0"
+              step="500"
+              value={maxTuition}
+              onChange={(e) => setMaxTuition(e.target.value)}
+              placeholder={t('filter_max_tuition')}
+              aria-label={t('filter_max_tuition')}
+              className="w-full pl-7 pr-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+
+          <Select
+            value={deadlineStatus}
+            onChange={setDeadlineStatus}
+            options={deadlineStatusOptions}
+            aria-label={t('filter_deadline')}
+            className="sm:w-40"
+          />
+          <Select
+            value={sortBy}
+            onChange={(v) => setSortBy(v as UniversitySortBy)}
+            options={sortOptions}
+            aria-label={t('sort_label')}
+            className="sm:w-48"
+          />
         </div>
 
         <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
@@ -163,6 +259,17 @@ export function UniversityListClient({
                 aria-label={t('filter_moe')}
               />
               <span className="text-gold-dark font-medium">★ {t('filter_moe')}</span>
+            </label>
+
+            <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rankedOnly}
+                onChange={(e) => setRankedOnly(e.target.checked)}
+                className="rounded border-input accent-primary"
+                aria-label={t('filter_ranked_only')}
+              />
+              <span className="text-muted-foreground">{t('filter_ranked_only')}</span>
             </label>
 
             {hasPrefs && (
@@ -206,10 +313,10 @@ export function UniversityListClient({
       </div>
 
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
-        <span>{t('results_count', { count: filtered.length })}</span>
+        <span>{t('results_count', { count: sorted.length })}</span>
       </div>
 
-      {filtered.length === 0 ? (
+      {sorted.length === 0 ? (
         <div className="text-center py-16">
           <svg
             width="48"
@@ -228,7 +335,7 @@ export function UniversityListClient({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((u) => (
+          {sorted.map((u) => (
             <UniversityCard
               key={u.id}
               university={u}

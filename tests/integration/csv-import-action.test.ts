@@ -27,7 +27,7 @@ const validRow = {
   entrance_requirements: '',
 };
 
-function makeAdminSupabase({ upsertError = null } = {}) {
+function makeAdminSupabase({ upsertError = null }: { upsertError?: { message: string; code: string } | null } = {}) {
   const adminChain = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),

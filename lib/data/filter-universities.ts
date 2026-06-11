@@ -1,4 +1,5 @@
 import type { University, FilterParams } from './university-types';
+import { getNextDeadline } from '@/lib/types/semester';
 
 export function filterUniversities(universities: University[], params: FilterParams): University[] {
   let result = universities;
@@ -15,6 +16,21 @@ export function filterUniversities(universities: University[], params: FilterPar
   if (params.major) {
     result = result.filter((u) =>
       u.majors.some((m) => m.toLowerCase().includes(params.major!.toLowerCase()))
+    );
+  }
+  if (params.rankedOnly) {
+    result = result.filter((u) => u.ranking_qs !== null);
+  }
+  if (params.maxTuition !== undefined) {
+    result = result.filter((u) => u.tuition_usd <= params.maxTuition!);
+  }
+  if (params.deadlineStatus === 'upcoming') {
+    result = result.filter((u) => getNextDeadline(u.semesters) !== null);
+  } else if (params.deadlineStatus === 'passed') {
+    result = result.filter(
+      (u) =>
+        getNextDeadline(u.semesters) === null &&
+        u.semesters.some((s) => s.deadline !== null),
     );
   }
   if (params.query) {

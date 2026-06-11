@@ -56,7 +56,20 @@
     "ranking": "QS Reýting",
     "ranking_value": "#{rank}",
     "ranking_unranked": "Reýting ýok",
-    "tuition_label": "Töleg / ýyl"
+    "tuition_label": "Töleg / ýyl",
+    "sort_label": "Tertiplemek",
+    "sort_name": "At boýunça A–Z",
+    "sort_ranking": "Iň gowy reýting",
+    "sort_tuition_asc": "Töleg: azdan köpe",
+    "sort_tuition_desc": "Töleg: köpden aza",
+    "sort_deadline_asc": "Möhlet: iň ýakyn",
+    "sort_deadline_desc": "Möhlet: iň uzak",
+    "filter_ranked_only": "Diňe reýtingliler",
+    "filter_max_tuition": "Iň köp töleg",
+    "filter_deadline": "Möhlet",
+    "filter_deadline_all": "Islendik möhlet",
+    "filter_deadline_upcoming": "Gelejekki",
+    "filter_deadline_passed": "Geçen"
   },
   "university": {
     "moe_badge": "Oblono Tassyklady",
@@ -200,7 +213,19 @@
     "deadline_passed": "Geçdi",
     "coverage_section_title": "Näme üpjün edýär",
     "about_section_title": "Barada",
-    "university_section_title": "Uniwersitet"
+    "university_section_title": "Uniwersitet",
+    "sort_label": "Tertiplemek",
+    "sort_name": "At boýunça A–Z",
+    "sort_amount_desc": "Mukdar: köpden aza",
+    "sort_amount_asc": "Mukdar: azdan köpe",
+    "sort_deadline_asc": "Möhlet: iň ýakyn",
+    "sort_deadline_desc": "Möhlet: iň uzak",
+    "filter_has_amount": "Kesgitli mukdar bilen",
+    "filter_min_amount": "Iň az mukdar",
+    "filter_deadline": "Möhlet",
+    "filter_deadline_all": "Islendik möhlet",
+    "filter_deadline_upcoming": "Gelejekki",
+    "filter_deadline_passed": "Geçen"
   },
   "checklist": {
     "next_deadline": "Indiki möhlet",

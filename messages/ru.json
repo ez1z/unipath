@@ -56,7 +56,20 @@
     "ranking": "Рейтинг QS",
     "ranking_value": "#{rank}",
     "ranking_unranked": "Не ранжирован",
-    "tuition_label": "Стоимость / год"
+    "tuition_label": "Стоимость / год",
+    "sort_label": "Сортировать",
+    "sort_name": "Название А–Я",
+    "sort_ranking": "Лучший рейтинг",
+    "sort_tuition_asc": "Стоимость: по возрастанию",
+    "sort_tuition_desc": "Стоимость: по убыванию",
+    "sort_deadline_asc": "Дедлайн: ближайший",
+    "sort_deadline_desc": "Дедлайн: самый дальний",
+    "filter_ranked_only": "Только в рейтинге",
+    "filter_max_tuition": "Макс. стоимость",
+    "filter_deadline": "Дедлайн",
+    "filter_deadline_all": "Любой дедлайн",
+    "filter_deadline_upcoming": "Предстоящие",
+    "filter_deadline_passed": "Прошедшие"
   },
   "university": {
     "moe_badge": "Одобрено МОН",
@@ -200,7 +213,19 @@
     "deadline_passed": "Истёк",
     "coverage_section_title": "Что покрывает",
     "about_section_title": "О стипендии",
-    "university_section_title": "Университет"
+    "university_section_title": "Университет",
+    "sort_label": "Сортировать",
+    "sort_name": "Название А–Я",
+    "sort_amount_desc": "Сумма: по убыванию",
+    "sort_amount_asc": "Сумма: по возрастанию",
+    "sort_deadline_asc": "Дедлайн: ближайший",
+    "sort_deadline_desc": "Дедлайн: самый дальний",
+    "filter_has_amount": "С указанной суммой",
+    "filter_min_amount": "Мин. сумма",
+    "filter_deadline": "Дедлайн",
+    "filter_deadline_all": "Любой дедлайн",
+    "filter_deadline_upcoming": "Предстоящие",
+    "filter_deadline_passed": "Прошедшие"
   },
   "checklist": {
     "next_deadline": "Следующий дедлайн",

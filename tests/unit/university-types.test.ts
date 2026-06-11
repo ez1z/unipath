@@ -18,6 +18,7 @@ const baseRow: UniversityDbRow = {
   official_website: 'https://test.edu',
   application_portal_url: 'https://apply.test.edu',
   entrance_requirements: { turkey: { yos: true } },
+  semesters: null,
   created_at: '2024-01-01T00:00:00Z',
 };
 
