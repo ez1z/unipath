@@ -63,6 +63,41 @@ export async function addAdminAction(formData: FormData): Promise<{ error: strin
   redirect('/admin/admins');
 }
 
+export async function setUserRoleAction(
+  targetUserId: string,
+  role: 'admin' | 'superuser' | 'none',
+): Promise<{ error?: string }> {
+  const { user } = await requireSuperuser();
+  if (targetUserId === user.id) return { error: 'You cannot change your own role.' };
+
+  const service = createServiceClient();
+  const { data: targetUserData } = await service.auth.admin.getUserById(targetUserId);
+  const targetEmail = targetUserData?.user?.email ?? targetUserId;
+
+  if (role === 'none') {
+    const { error } = await service.from('admins').delete().eq('user_id', targetUserId);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await service
+      .from('admins')
+      .upsert({ user_id: targetUserId, role }, { onConflict: 'user_id' });
+    if (error) return { error: error.message };
+  }
+
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'set_role',
+    entityType: 'admin',
+    entityId: targetUserId,
+    entityName: targetEmail,
+    details: { role },
+  });
+
+  revalidatePath('/admin/admins');
+  return {};
+}
+
 export async function removeAdminAction(targetUserId: string): Promise<{ error?: string }> {
   const { user } = await requireSuperuser();
   if (targetUserId === user.id) return { error: 'You cannot remove yourself.' };

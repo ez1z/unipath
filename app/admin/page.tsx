@@ -40,9 +40,18 @@ export default async function AdminPage() {
             className="bg-card rounded-xl border border-border border-t-4 border-t-gold p-6 hover:shadow-card transition-shadow group"
           >
             <div className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
-              {t('dashboard_import_title')}
+              {t('dashboard_import_unis_title')}
             </div>
-            <p className="text-sm text-muted-foreground">{t('dashboard_import_desc')}</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard_import_unis_desc')}</p>
+          </a>
+          <a
+            href="/admin/scholarships/import"
+            className="bg-card rounded-xl border border-border border-t-4 border-t-gold p-6 hover:shadow-card transition-shadow group"
+          >
+            <div className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+              {t('dashboard_import_scholarships_title')}
+            </div>
+            <p className="text-sm text-muted-foreground">{t('dashboard_import_scholarships_desc')}</p>
           </a>
           <a
             href="/admin/scholarships"

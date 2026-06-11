@@ -3,9 +3,9 @@ import { getTranslations } from 'next-intl/server';
 import { requireSuperuser } from '@/lib/admin/auth';
 import { createServiceClient } from '@/lib/supabase/service';
 import { AdminHeader } from '@/components/admin/AdminHeader';
-import { AdminAdminRow } from '@/components/admin/AdminAdminRow';
+import { AdminUserRow } from '@/components/admin/AdminUserRow';
 
-export const metadata = { title: 'Manage Admins — UniPath Admin' };
+export const metadata = { title: 'Users & Roles — UniPath Admin' };
 
 export default async function AdminsPage() {
   const { user } = await requireSuperuser();
@@ -16,18 +16,19 @@ export default async function AdminsPage() {
     service.auth.admin.listUsers({ perPage: 1000 }),
   ]);
 
-  const userMap = new Map((listData?.users ?? []).map((u) => [u.id, u]));
+  const roleMap = new Map((adminRows ?? []).map((r) => [r.user_id, r.role as 'admin' | 'superuser']));
 
-  const admins = (adminRows ?? [])
-    .map((row) => ({
-      userId: row.user_id,
-      role: row.role as 'admin' | 'superuser',
-      email: userMap.get(row.user_id)?.email ?? '(unknown)',
-      createdAt: userMap.get(row.user_id)?.created_at,
+  const allUsers = (listData?.users ?? [])
+    .map((u) => ({
+      userId: u.id,
+      email: u.email ?? '(no email)',
+      role: roleMap.get(u.id) ?? 'none' as 'admin' | 'superuser' | 'none',
+      createdAt: u.created_at,
     }))
     .sort((a, b) => {
-      if (a.role === 'superuser') return -1;
-      if (b.role === 'superuser') return 1;
+      const order = { superuser: 0, admin: 1, none: 2 };
+      const diff = order[a.role] - order[b.role];
+      if (diff !== 0) return diff;
       return a.email.localeCompare(b.email);
     });
 
@@ -44,7 +45,7 @@ export default async function AdminsPage() {
               {t('back_dashboard')}
             </Link>
             <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{t('admins_title')}</h1>
-            <p className="text-muted-foreground text-sm mt-1">{t('total_count', { count: admins.length })}</p>
+            <p className="text-muted-foreground text-sm mt-1">{t('total_count', { count: allUsers.length })}</p>
           </div>
           <Link
             href="/admin/admins/new"
@@ -65,11 +66,11 @@ export default async function AdminsPage() {
               </tr>
             </thead>
             <tbody>
-              {admins.map((admin) => (
-                <AdminAdminRow
-                  key={admin.userId}
-                  admin={admin}
-                  isSelf={admin.userId === user.id}
+              {allUsers.map((u) => (
+                <AdminUserRow
+                  key={u.userId}
+                  user={u}
+                  isSelf={u.userId === user.id}
                 />
               ))}
             </tbody>
