@@ -1,16 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import type { TuitionOption } from '@/lib/types/tuition';
 
 const inputCls =
   'w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-shadow';
 
-type Props = { defaultValue?: TuitionOption[] };
+type Props = {
+  defaultValue?: TuitionOption[];
+  /** The university's current semester names, languages and majors — the variant
+   *  dropdowns are sourced from these so the fields stay connected. */
+  semesterNames: string[];
+  languages: string[];
+  majors: string[];
+};
 
-export function TuitionOptionsEditor({ defaultValue = [] }: Props) {
-  const t = useTranslations('admin');
+export function TuitionOptionsEditor({ defaultValue = [], semesterNames, languages, majors }: Props) {
   const [options, setOptions] = useState<TuitionOption[]>(defaultValue);
 
   function add() {
@@ -28,8 +33,8 @@ export function TuitionOptionsEditor({ defaultValue = [] }: Props) {
     setOptions((prev) => prev.map((o, idx) => (idx === i ? { ...o, [field]: value } : o)));
   }
 
-  // Serialise for the form action. Empty strings become null so unset
-  // dimensions mean "applies regardless of this variable".
+  // Serialise for the form action. Empty strings become null so an unset
+  // dimension means "applies regardless of this variable".
   const serialised = options.map((o) => ({
     semester: o.semester?.trim() || null,
     language: o.language?.trim() || null,
@@ -38,62 +43,74 @@ export function TuitionOptionsEditor({ defaultValue = [] }: Props) {
     note: o.note?.trim() || null,
   }));
 
+  // Build select options from the live lists, preserving any already-saved value
+  // that is no longer in the list so the admin doesn't silently lose it.
+  function optionsFor(list: string[], current: string | null): string[] {
+    const set = new Set(list.filter(Boolean));
+    if (current && !set.has(current)) set.add(current);
+    return [...set];
+  }
+
+  function DimensionSelect({
+    i,
+    field,
+    label,
+    list,
+  }: {
+    i: number;
+    field: 'semester' | 'language' | 'major';
+    label: string;
+    list: string[];
+  }) {
+    const current = options[i][field];
+    return (
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-1">{label}</label>
+        <select
+          value={current ?? ''}
+          onChange={(e) => update(i, field, e.target.value || null)}
+          aria-label={`Tuition variant ${i + 1} ${field}`}
+          className={inputCls}
+        >
+          <option value="">{"Any"}</option>
+          {optionsFor(list, current).map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  const noDimensions = semesterNames.length === 0 && languages.length === 0 && majors.length === 0;
+
   return (
     <div className="space-y-3">
       <input type="hidden" name="tuition_options" value={JSON.stringify(serialised)} />
 
       {options.length === 0 && (
-        <p className="text-sm text-muted-foreground italic">{t('tuition_opt_empty')}</p>
+        <p className="text-sm text-muted-foreground italic">{"No tuition variants. The annual tuition above applies to all programs. Add a variant only if cost differs by semester, language, or major."}</p>
+      )}
+
+      {options.length > 0 && noDimensions && (
+        <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+          {"Define semesters, languages or majors above first — tuition variants are built from those."}
+        </p>
       )}
 
       {options.map((opt, i) => (
         <div key={i} className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
             <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1">
-                  {t('tuition_opt_semester')}
-                </label>
-                <input
-                  type="text"
-                  value={opt.semester ?? ''}
-                  onChange={(e) => update(i, 'semester', e.target.value || null)}
-                  placeholder="Fall"
-                  aria-label={`Tuition option ${i + 1} semester`}
-                  className={inputCls}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1">
-                  {t('tuition_opt_language')}
-                </label>
-                <input
-                  type="text"
-                  value={opt.language ?? ''}
-                  onChange={(e) => update(i, 'language', e.target.value || null)}
-                  placeholder="English"
-                  aria-label={`Tuition option ${i + 1} language`}
-                  className={inputCls}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1">
-                  {t('tuition_opt_major')}
-                </label>
-                <input
-                  type="text"
-                  value={opt.major ?? ''}
-                  onChange={(e) => update(i, 'major', e.target.value || null)}
-                  placeholder="Engineering"
-                  aria-label={`Tuition option ${i + 1} major`}
-                  className={inputCls}
-                />
-              </div>
+              <DimensionSelect i={i} field="semester" label={"Semester"} list={semesterNames} />
+              <DimensionSelect i={i} field="language" label={"Language"} list={languages} />
+              <DimensionSelect i={i} field="major" label={"Major"} list={majors} />
             </div>
             <button
               type="button"
               onClick={() => remove(i)}
-              aria-label={t('tuition_opt_remove_label', { n: i + 1 })}
+              aria-label={`Remove tuition variant ${i + 1}`}
               className="mt-6 text-xl leading-none text-muted-foreground hover:text-red-500 transition-colors"
             >
               ×
@@ -103,7 +120,7 @@ export function TuitionOptionsEditor({ defaultValue = [] }: Props) {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">
-                {t('tuition_opt_amount')}
+                {"Amount (USD) *"}
               </label>
               <input
                 type="number"
@@ -112,19 +129,19 @@ export function TuitionOptionsEditor({ defaultValue = [] }: Props) {
                 value={Number.isFinite(opt.amount_usd) ? opt.amount_usd : 0}
                 onChange={(e) => update(i, 'amount_usd', Number(e.target.value))}
                 placeholder="5000"
-                aria-label={`Tuition option ${i + 1} amount in USD`}
+                aria-label={`Tuition variant ${i + 1} amount in USD`}
                 className={inputCls}
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">
-                {t('tuition_opt_note')} <span className="font-normal">{t('optional')}</span>
+                {"Note"} <span className="font-normal">{"(optional)"}</span>
               </label>
               <input
                 type="text"
                 value={opt.note ?? ''}
                 onChange={(e) => update(i, 'note', e.target.value || null)}
-                aria-label={`Tuition option ${i + 1} note`}
+                aria-label={`Tuition variant ${i + 1} note`}
                 className={inputCls}
               />
             </div>
@@ -133,7 +150,7 @@ export function TuitionOptionsEditor({ defaultValue = [] }: Props) {
       ))}
 
       <button type="button" onClick={add} className="text-sm font-medium text-primary hover:underline">
-        {t('tuition_opt_add')}
+        {"+ Add tuition variant"}
       </button>
     </div>
   );

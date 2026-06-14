@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
 import { requireSuperuser } from '@/lib/admin/auth';
 import { createServiceClient } from '@/lib/supabase/service';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -32,8 +31,6 @@ export default async function AdminsPage() {
       return a.email.localeCompare(b.email);
     });
 
-  const t = await getTranslations('admin');
-
   return (
     <div className="min-h-screen flex flex-col">
       <AdminHeader email={user.email!} role="superuser" />
@@ -42,16 +39,16 @@ export default async function AdminsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <Link href="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              {t('back_dashboard')}
+              {"← Dashboard"}
             </Link>
-            <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{t('admins_title')}</h1>
-            <p className="text-muted-foreground text-sm mt-1">{t('total_count', { count: allUsers.length })}</p>
+            <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{"Users & Roles"}</h1>
+            <p className="text-muted-foreground text-sm mt-1">{`${allUsers.length} total`}</p>
           </div>
           <Link
             href="/admin/admins/new"
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
           >
-            {t('admins_add')}
+            {"+ Add Admin"}
           </Link>
         </div>
 
@@ -59,9 +56,9 @@ export default async function AdminsPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>
-                <th className="text-left px-4 py-3 font-medium">{t('admins_col_email')}</th>
-                <th className="text-left px-4 py-3 font-medium">{t('admins_col_role')}</th>
-                <th className="text-left px-4 py-3 font-medium">{t('admins_col_added')}</th>
+                <th className="text-left px-4 py-3 font-medium">{"Email"}</th>
+                <th className="text-left px-4 py-3 font-medium">{"Role"}</th>
+                <th className="text-left px-4 py-3 font-medium">{"Joined"}</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>

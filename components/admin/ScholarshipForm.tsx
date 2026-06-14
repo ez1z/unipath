@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { useTranslations } from 'next-intl';
 import { COVERAGE_ITEMS } from '@/lib/data/scholarship-types';
 import { SemesterEditor } from '@/components/admin/SemesterEditor';
 import type { Semester } from '@/lib/types/semester';
@@ -39,28 +38,27 @@ const inputClass =
 const labelClass = 'block text-sm font-medium text-foreground mb-1.5';
 
 export function ScholarshipForm({ universities, defaultValues: d = {}, action, submitLabel, cancelHref }: Props) {
-  const t = useTranslations('admin');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const nameLabelKeys = {
-    en: 'sch_form_name_en_label',
-    ru: 'sch_form_name_ru_label',
-    tk: 'sch_form_name_tk_label',
+  const nameLabels = {
+    en: 'English name *',
+    ru: 'Russian name *',
+    tk: 'Turkmen name *',
   } as const;
 
-  const descLabelKeys = {
-    en: 'sch_form_desc_en_label',
-    ru: 'sch_form_desc_ru_label',
-    tk: 'sch_form_desc_tk_label',
+  const descLabels = {
+    en: 'English description',
+    ru: 'Russian description',
+    tk: 'Turkmen description',
   } as const;
 
-  const coverageLabelKeys: Record<string, 'sch_form_coverage_tuition' | 'sch_form_coverage_accommodation' | 'sch_form_coverage_flights' | 'sch_form_coverage_stipend' | 'sch_form_coverage_health'> = {
-    tuition: 'sch_form_coverage_tuition',
-    accommodation: 'sch_form_coverage_accommodation',
-    flights: 'sch_form_coverage_flights',
-    stipend: 'sch_form_coverage_stipend',
-    health: 'sch_form_coverage_health',
+  const coverageLabels: Record<string, string> = {
+    tuition: 'Tuition',
+    accommodation: 'Accommodation',
+    flights: 'Flights',
+    stipend: 'Monthly stipend',
+    health: 'Health insurance',
   };
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -83,12 +81,12 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
 
       {/* Names */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('sch_form_section_names')}</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{"Names"}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {(['en', 'ru', 'tk'] as const).map((lang) => (
             <div key={lang}>
               <label htmlFor={`name_${lang}`} className={labelClass}>
-                {t(nameLabelKeys[lang])}
+                {nameLabels[lang]}
               </label>
               <input
                 id={`name_${lang}`}
@@ -108,10 +106,10 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
 
       {/* Location & type */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('sch_form_section_location')}</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{"Location & type"}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="country" className={labelClass}>{t('sch_form_country')}</label>
+            <label htmlFor="country" className={labelClass}>{"Country *"}</label>
             <input
               id="country"
               name="country"
@@ -125,7 +123,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
             />
           </div>
           <div>
-            <label htmlFor="type" className={labelClass}>{t('sch_form_type_label')}</label>
+            <label htmlFor="type" className={labelClass}>{"Scholarship type *"}</label>
             <select
               id="type"
               name="type"
@@ -135,18 +133,18 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
               aria-label="Scholarship type"
               className={inputClass}
             >
-              <option value="">{t('sch_form_type_placeholder')}</option>
-              <option value="government">{t('sch_form_type_government')}</option>
-              <option value="merit">{t('sch_form_type_merit')}</option>
-              <option value="need-based">{t('sch_form_type_need_based')}</option>
-              <option value="partial">{t('sch_form_type_partial')}</option>
+              <option value="">{"Select type…"}</option>
+              <option value="government">{"Government"}</option>
+              <option value="merit">{"Merit"}</option>
+              <option value="need-based">{"Need-based"}</option>
+              <option value="partial">{"Partial"}</option>
             </select>
           </div>
         </div>
 
         <div className="mt-4">
           <label htmlFor="university_id" className={labelClass}>
-            {t('sch_form_uni_label')} <span className="text-muted-foreground font-normal">{t('sch_form_uni_hint')}</span>
+            {"Linked university"} <span className="text-muted-foreground font-normal">{"(leave blank for country-wide)"}</span>
           </label>
           <select
             id="university_id"
@@ -156,7 +154,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
             aria-label="Linked university (optional)"
             className={inputClass}
           >
-            <option value="">{t('sch_form_uni_nationwide')}</option>
+            <option value="">{"Country-wide (no specific university)"}</option>
             {universities.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.name_en} — {u.country}
@@ -168,10 +166,10 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
 
       {/* Coverage & amount */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('sch_form_section_coverage')}</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{"Coverage & amount"}</h2>
 
         <div className="mb-4">
-          <span className={labelClass}>{t('sch_form_coverage_question')}</span>
+          <span className={labelClass}>{"What does it cover?"}</span>
           <div className="flex flex-wrap gap-x-6 gap-y-2 mt-1">
             {COVERAGE_ITEMS.map((item) => (
               <label key={item} className="flex items-center gap-2 cursor-pointer select-none text-sm">
@@ -183,7 +181,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
                   defaultChecked={d.coverage?.includes(item) ?? false}
                   className="rounded border-input accent-primary"
                 />
-                {coverageLabelKeys[item] ? t(coverageLabelKeys[item]) : item}
+                {coverageLabels[item] ?? item}
               </label>
             ))}
           </div>
@@ -192,7 +190,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="amount_usd" className={labelClass}>
-              {t('sch_form_amount_label')} <span className="text-muted-foreground font-normal">{t('optional')}</span>
+              {"Annual amount (USD)"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
             </label>
             <input
               id="amount_usd"
@@ -202,14 +200,14 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
               step="1"
               disabled={isPending}
               defaultValue={d.amount_usd}
-              placeholder={t('sch_form_amount_placeholder')}
+              placeholder={"Leave blank if varies"}
               aria-label="Annual scholarship amount in USD"
               className={inputClass}
             />
           </div>
           <div>
             <label htmlFor="deadline_text" className={labelClass}>
-              {t('sch_form_deadline_label')} <span className="text-muted-foreground font-normal">{t('optional')}</span>
+              {"Deadline"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
             </label>
             <input
               id="deadline_text"
@@ -217,7 +215,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
               type="text"
               disabled={isPending}
               defaultValue={d.deadline_text ?? ''}
-              placeholder={t('sch_form_deadline_placeholder')}
+              placeholder={"April 15 / Rolling"}
               aria-label="Application deadline"
               className={inputClass}
             />
@@ -227,20 +225,20 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
 
       {/* Semesters */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{t('sch_form_section_semesters')}</h2>
-        <p className="text-sm text-muted-foreground mb-4">{t('sch_form_semesters_desc')}</p>
+        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{"Semesters"}</h2>
+        <p className="text-sm text-muted-foreground mb-4">{"Each semester has a name (Fall/Spring/custom), a course start date, and an optional application deadline."}</p>
         <SemesterEditor defaultValue={d.semesters ?? []} />
       </div>
 
       {/* Descriptions */}
       <div className="bg-card border border-border rounded-xl p-6">
         <h2 className="font-heading font-semibold text-base mb-4 text-foreground">
-          {t('sch_form_section_desc')} <span className="text-muted-foreground font-normal text-sm">{t('sch_form_desc_optional')}</span>
+          {"Descriptions"} <span className="text-muted-foreground font-normal text-sm">{"(optional)"}</span>
         </h2>
         {(['en', 'ru', 'tk'] as const).map((lang) => (
           <div key={lang} className="mb-4 last:mb-0">
             <label htmlFor={`description_${lang}`} className={labelClass}>
-              {t(descLabelKeys[lang])}
+              {descLabels[lang]}
             </label>
             <textarea
               id={`description_${lang}`}
@@ -257,9 +255,9 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
 
       {/* Application URL */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{t('sch_form_section_link')}</h2>
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{"Application link"}</h2>
         <label htmlFor="application_url" className={labelClass}>
-          {t('sch_form_link_label')} <span className="text-muted-foreground font-normal">{t('optional')}</span>
+          {"Application URL"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
         </label>
         <input
           id="application_url"
@@ -280,7 +278,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
           aria-label="Cancel and go back"
           className="px-5 py-2.5 border border-border text-foreground rounded-lg text-sm font-semibold hover:bg-muted transition-colors"
         >
-          {t('cancel')}
+          {"Cancel"}
         </a>
         <button
           type="submit"
@@ -288,7 +286,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
           aria-label={submitLabel}
           className="px-5 py-2.5 bg-gold text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isPending ? t('saving') : submitLabel}
+          {isPending ? "Saving…" : submitLabel}
         </button>
       </div>
     </form>

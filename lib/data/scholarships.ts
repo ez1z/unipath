@@ -72,6 +72,24 @@ export async function getByUniversity(universityId: string, country: string) {
   return all.map(dbRowToScholarship);
 }
 
+// Returns the ids of universities that have at least one scholarship available
+// to their students — either a scholarship linked directly to the university,
+// or a nationwide scholarship (university_id null) for the university's country.
+export async function getScholarshipEligibleUniversityIds(
+  universities: { id: string; country: string }[],
+): Promise<string[]> {
+  const all = await queryAll();
+  const linkedUniIds = new Set(
+    all.filter((s) => s.university_id !== null).map((s) => s.university_id as string),
+  );
+  const nationwideCountries = new Set(
+    all.filter((s) => s.university_id === null).map((s) => s.country),
+  );
+  return universities
+    .filter((u) => linkedUniIds.has(u.id) || nationwideCountries.has(u.country))
+    .map((u) => u.id);
+}
+
 export async function getUniqueCountries(): Promise<string[]> {
   const all = await queryAll();
   return [...new Set(all.map((s) => s.country))].sort();

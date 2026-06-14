@@ -1,9 +1,8 @@
 'use client';
 
 import { useTransition } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { setUserRoleAction, removeAdminAction } from '@/app/admin/admins/actions';
+import { setUserRoleAction } from '@/app/admin/admins/actions';
 
 type UserRow = {
   userId: string;
@@ -13,23 +12,14 @@ type UserRow = {
 };
 
 export function AdminUserRow({ user, isSelf }: { user: UserRow; isSelf: boolean }) {
-  const t = useTranslations('admin');
   const [isPending, startTransition] = useTransition();
 
   function handleRoleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const newRole = e.target.value as 'admin' | 'superuser' | 'none';
-    if (!confirm(t('admins_set_role_confirm', { email: user.email, role: newRole === 'none' ? 'None' : newRole }))) return;
+    if (!confirm(`Change role for "${user.email}" to ${newRole === 'none' ? 'None' : newRole}?`)) return;
     startTransition(async () => {
       const result = await setUserRoleAction(user.userId, newRole);
-      if (result?.error) alert(t('admins_set_role_error', { error: result.error }));
-    });
-  }
-
-  function handleRemove() {
-    if (!confirm(t('admins_remove_confirm', { email: user.email }))) return;
-    startTransition(async () => {
-      const result = await removeAdminAction(user.userId);
-      if (result?.error) alert(`Error: ${result.error}`);
+      if (result?.error) alert(`Failed to update role: ${result.error}`);
     });
   }
 
@@ -44,11 +34,11 @@ export function AdminUserRow({ user, isSelf }: { user: UserRow; isSelf: boolean 
     <tr className="border-t border-border hover:bg-muted/30 transition-colors">
       <td className="px-4 py-3 font-medium text-foreground">
         {user.email}
-        {isSelf && <span className="ml-2 text-xs text-muted-foreground">{t('admins_you')}</span>}
+        {isSelf && <span className="ml-2 text-xs text-muted-foreground">{"(you)"}</span>}
       </td>
       <td className="px-4 py-3">
         <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${roleBadgeClass}`}>
-          {user.role === 'none' ? t('admins_role_none') : user.role}
+          {user.role === 'none' ? "None" : user.role}
         </span>
       </td>
       <td className="px-4 py-3 text-muted-foreground text-sm">
@@ -64,9 +54,9 @@ export function AdminUserRow({ user, isSelf }: { user: UserRow; isSelf: boolean 
               aria-label={`Change role for ${user.email}`}
               className="text-xs border border-border rounded px-2 py-1 bg-background text-foreground disabled:opacity-50 cursor-pointer"
             >
-              <option value="none">{t('admins_role_none')}</option>
-              <option value="admin">{t('admins_role_admin')}</option>
-              <option value="superuser">{t('admins_role_superuser')}</option>
+              <option value="none">{"None"}</option>
+              <option value="admin">{"Admin"}</option>
+              <option value="superuser">{"Superuser"}</option>
             </select>
             {user.role !== 'none' && user.role !== 'superuser' && (
               <Link
@@ -74,7 +64,7 @@ export function AdminUserRow({ user, isSelf }: { user: UserRow; isSelf: boolean 
                 aria-label={`Reset password for ${user.email}`}
                 className="text-xs text-primary hover:underline"
               >
-                {t('admins_reset_password')}
+                {"Reset Password"}
               </Link>
             )}
           </div>

@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAll, getUniqueCountries, getUniqueLanguages, getUniqueMajors } from '@/lib/data/universities';
+import { getScholarshipEligibleUniversityIds } from '@/lib/data/scholarships';
 import { UniversityListClient } from '@/components/university/UniversityListClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { createClient } from '@/lib/supabase/server';
@@ -29,6 +30,8 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
       : Promise.resolve({ data: null }),
   ]);
 
+  const scholarshipEligibleIds = await getScholarshipEligibleUniversityIds(universities);
+
   const savedUniversityIds: string[] = profileResult.data?.dream_university_ids ?? [];
   const userPrefs = user
     ? {
@@ -48,6 +51,7 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
           languages={languages}
           majors={majors}
           savedUniversityIds={savedUniversityIds}
+          scholarshipEligibleIds={scholarshipEligibleIds}
           userPrefs={userPrefs}
         />
       </div>

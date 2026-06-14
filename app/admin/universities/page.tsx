@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { UniversityAdminRow } from '@/components/admin/UniversityAdminRow';
@@ -10,7 +9,6 @@ export const metadata = { title: 'Universities — UniPath Admin' };
 
 export default async function AdminUniversitiesPage() {
   const { supabase, user } = await requireAdmin();
-  const t = await getTranslations('admin');
 
   const { data, error } = await supabase
     .from('universities')
@@ -30,23 +28,23 @@ export default async function AdminUniversitiesPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <Link href="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              {t('back_dashboard')}
+              {"← Dashboard"}
             </Link>
-            <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{t('unis_title')}</h1>
-            <p className="text-muted-foreground text-sm mt-1">{t('total_count', { count: universities.length })}</p>
+            <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{"Universities"}</h1>
+            <p className="text-muted-foreground text-sm mt-1">{`${universities.length} total`}</p>
           </div>
           <div className="flex items-center gap-2">
             <Link
               href="/admin/universities/new"
               className="px-4 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              {t('unis_add')}
+              {"+ Add university"}
             </Link>
             <Link
               href="/admin/universities/import"
               className="px-4 py-2 border border-border text-foreground rounded-lg text-sm font-semibold hover:bg-muted transition-colors"
             >
-              {t('unis_import')}
+              {"Import CSV"}
             </Link>
           </div>
         </div>
@@ -54,14 +52,14 @@ export default async function AdminUniversitiesPage() {
         {universities.length === 0 ? (
           <div className="bg-card rounded-xl border border-border shadow-card p-12 text-center">
             <GulPattern size={48} className="text-muted-foreground/20 mx-auto mb-4" />
-            <p className="text-muted-foreground text-sm mb-4">{t('unis_empty')}</p>
+            <p className="text-muted-foreground text-sm mb-4">{"No universities yet."}</p>
             <div className="flex items-center justify-center gap-4">
               <Link href="/admin/universities/new" className="text-sm font-semibold text-gold hover:underline">
-                {t('unis_add_manually')}
+                {"Add one manually →"}
               </Link>
-              <span className="text-muted-foreground text-sm">{t('or')}</span>
+              <span className="text-muted-foreground text-sm">{"or"}</span>
               <Link href="/admin/universities/import" className="text-sm font-semibold text-primary hover:underline">
-                {t('unis_import_csv')}
+                {"Import from CSV →"}
               </Link>
             </div>
           </div>
@@ -70,10 +68,10 @@ export default async function AdminUniversitiesPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted text-muted-foreground">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium">{t('unis_col_name')}</th>
-                  <th className="text-left px-4 py-3 font-medium">{t('unis_col_country')}</th>
-                  <th className="text-left px-4 py-3 font-medium">{t('unis_col_moe')}</th>
-                  <th className="text-left px-4 py-3 font-medium">{t('unis_col_created')}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"University"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"MoE Approved"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"Created"}</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>

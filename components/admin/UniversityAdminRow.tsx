@@ -1,7 +1,6 @@
 'use client';
 
 import { useTransition } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { formatDate } from '@/lib/format';
 import {
@@ -18,11 +17,10 @@ type RowData = {
 };
 
 export function UniversityAdminRow({ university: u }: { university: RowData }) {
-  const t = useTranslations('admin');
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
-    if (!confirm(t('unis_delete_confirm', { name: u.name_en }))) return;
+    if (!confirm(`Delete "${u.name_en}"? This cannot be undone.`)) return;
     startTransition(async () => {
       const result = await deleteUniversityAction(u.id);
       if (!result.success) alert(`Error: ${result.error}`);
@@ -51,7 +49,7 @@ export function UniversityAdminRow({ university: u }: { university: RowData }) {
               : 'bg-muted text-muted-foreground border-border hover:bg-muted/60'
           } disabled:opacity-50`}
         >
-          {u.moe_approved ? t('unis_moe_approved') : t('unis_moe_not_approved')}
+          {u.moe_approved ? "★ Approved" : "Not approved"}
         </button>
       </td>
       <td className="px-4 py-3 text-muted-foreground text-sm">
@@ -64,7 +62,7 @@ export function UniversityAdminRow({ university: u }: { university: RowData }) {
             aria-label={`Edit ${u.name_en}`}
             className="text-xs text-primary hover:underline"
           >
-            {t('edit')}
+            {"Edit"}
           </Link>
           <button
             onClick={handleDelete}
@@ -72,7 +70,7 @@ export function UniversityAdminRow({ university: u }: { university: RowData }) {
             aria-label={`Delete ${u.name_en}`}
             className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
           >
-            {t('delete')}
+            {"Delete"}
           </button>
         </div>
       </td>

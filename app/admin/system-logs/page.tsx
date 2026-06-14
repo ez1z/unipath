@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
 import { requireSuperuser } from '@/lib/admin/auth';
 import { createServiceClient } from '@/lib/supabase/service';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -16,7 +15,6 @@ const LEVEL_STYLES: Record<string, string> = {
 export default async function SystemLogsPage() {
   const { user } = await requireSuperuser();
   const service = createServiceClient();
-  const t = await getTranslations('admin');
 
   const { data: logs } = await service
     .from('system_logs')
@@ -31,19 +29,19 @@ export default async function SystemLogsPage() {
       <main className="flex-1 container mx-auto px-4 py-10">
         <div className="mb-8">
           <Link href="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            {t('back_dashboard')}
+            {"← Dashboard"}
           </Link>
           <h1 className="font-heading text-2xl font-bold text-foreground mt-2">
-            {t('system_logs_title')}
+            {"System Logs"}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {t('system_logs_last_n', { count: logs?.length ?? 0 })}
+            {`Last ${logs?.length ?? 0} entries`}
           </p>
         </div>
 
         {!logs || logs.length === 0 ? (
           <div className="bg-card rounded-xl border border-border shadow-card p-12 text-center">
-            <p className="text-muted-foreground text-sm">{t('system_logs_empty')}</p>
+            <p className="text-muted-foreground text-sm">{"No errors logged yet."}</p>
           </div>
         ) : (
           <div className="space-y-3">

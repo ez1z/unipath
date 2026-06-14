@@ -1,18 +1,17 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { getByUniversity } from '@/lib/data/scholarships';
 import { ScholarshipCard } from './ScholarshipCard';
+import type { Scholarship } from '@/lib/data/scholarships';
 import type { Locale } from '@/lib/constants';
 
 type Props = {
-  universityId: string;
+  scholarships: Scholarship[];
   country: string;
   locale: Locale;
 };
 
-export async function ScholarshipSection({ universityId, country, locale }: Props) {
+export async function ScholarshipSection({ scholarships, country, locale }: Props) {
   const t = await getTranslations('scholarships');
-  const scholarships = await getByUniversity(universityId, country);
 
   return (
     <section className="mb-8">

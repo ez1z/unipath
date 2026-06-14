@@ -1,12 +1,10 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { useTranslations } from 'next-intl';
 import { Eye, EyeOff } from 'lucide-react';
 import { addAdminAction } from '@/app/admin/admins/actions';
 
 export function AddAdminForm() {
-  const t = useTranslations('admin');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +23,7 @@ export function AddAdminForm() {
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
-          {t('add_admin_email')}
+          {"Email address"}
         </label>
         <input
           id="email"
@@ -36,12 +34,12 @@ export function AddAdminForm() {
           disabled={isPending}
           aria-label="Admin email address"
           className="w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:opacity-50 transition-shadow"
-          placeholder={t('add_admin_email_placeholder')}
+          placeholder={"admin@example.com"}
         />
       </div>
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
-          {t('add_admin_password')}
+          {"Password"}
         </label>
         <div className="relative">
           <input
@@ -53,7 +51,7 @@ export function AddAdminForm() {
             disabled={isPending}
             aria-label="Admin password"
             className="w-full rounded-md border border-input bg-background px-3.5 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:opacity-50 transition-shadow"
-            placeholder={t('add_admin_pw_placeholder')}
+            placeholder={"Min. 8 characters"}
           />
           <button
             type="button"
@@ -76,7 +74,7 @@ export function AddAdminForm() {
         aria-label="Create admin account"
         className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-60 transition-colors shadow-sm"
       >
-        {isPending ? t('add_admin_submitting') : t('add_admin_submit')}
+        {isPending ? "Creating…" : "Create Admin"}
       </button>
     </form>
   );

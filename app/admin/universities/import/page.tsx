@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { CsvImportClient } from '@/components/admin/CsvImportClient';
 import { requireAdmin } from '@/lib/admin/auth';
@@ -34,7 +33,6 @@ export default async function ImportPage() {
         : '',
   }));
 
-  const t = await getTranslations('admin');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -43,10 +41,10 @@ export default async function ImportPage() {
       <main className="flex-1 container mx-auto px-4 py-10 max-w-4xl">
         <div className="mb-8">
           <Link href="/admin/universities" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            {t('back_universities')}
+            {"← Universities"}
           </Link>
-          <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{t('unis_import_title')}</h1>
-          <p className="text-muted-foreground text-sm mt-1">{t('unis_import_subtitle')}</p>
+          <h1 className="font-heading text-2xl font-bold text-foreground mt-2">{"Import universities from CSV"}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{"Download the current data, edit it, and re-upload to apply changes in bulk."}</p>
         </div>
         <CsvImportClient existingData={existingData} />
       </main>

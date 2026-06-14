@@ -3,18 +3,26 @@ import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
 import { computeTuitionBreakdown } from '@/lib/format';
 import { MoeBadge } from './MoeBadge';
+import { ScholarshipBadge } from './ScholarshipBadge';
 import type { Locale } from '@/lib/constants';
 
 type Props = {
   university: University;
   locale: Locale;
   bookmarkSlot?: React.ReactNode;
+  /** Active list filters, so the detail page can offer a "back" link that restores them. */
+  filtersQuery?: string;
+  /** Whether scholarships are available to this university's students. */
+  hasScholarships?: boolean;
 };
 
-export function UniversityCard({ university, locale, bookmarkSlot }: Props) {
+export function UniversityCard({ university, locale, bookmarkSlot, filtersQuery, hasScholarships }: Props) {
   const t = useTranslations('universities');
   const tUni = useTranslations('university');
   const name = university.name[locale] ?? university.name.en;
+  const detailHref = filtersQuery
+    ? `/${locale}/universities/${university.slug}?from=${encodeURIComponent(filtersQuery)}`
+    : `/${locale}/universities/${university.slug}`;
 
   const bd = computeTuitionBreakdown(university.tuition_usd);
   const oldManatParts: string[] = [];
@@ -26,7 +34,7 @@ export function UniversityCard({ university, locale, bookmarkSlot }: Props) {
   return (
     <div data-testid="university-card" className="relative bg-white rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 flex flex-col gap-0 group overflow-hidden">
       <Link
-        href={`/${locale}/universities/${university.slug}`}
+        href={detailHref}
         className="absolute inset-0 z-0"
         aria-label={`${t('view_details')}: ${name}`}
       />
@@ -92,10 +100,11 @@ export function UniversityCard({ university, locale, bookmarkSlot }: Props) {
       </div>
 
       {/* Footer strip */}
-      <div className="px-5 py-3 border-t border-border bg-secondary/30 flex items-center justify-between">
+      <div className="px-5 py-3 border-t border-border bg-secondary/30 flex items-center justify-between gap-2">
         <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">
           {t('view_details')} →
         </span>
+        {hasScholarships && <ScholarshipBadge />}
       </div>
     </div>
   );

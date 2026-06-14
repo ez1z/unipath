@@ -21,6 +21,7 @@ type Props = {
   languages: string[];
   majors: string[];
   savedUniversityIds: string[];
+  scholarshipEligibleIds: string[];
   userPrefs: UserPrefs | null;
 };
 
@@ -31,6 +32,7 @@ export function UniversityListClient({
   languages,
   majors,
   savedUniversityIds,
+  scholarshipEligibleIds,
   userPrefs,
 }: Props) {
   const t = useTranslations('universities');
@@ -55,11 +57,10 @@ export function UniversityListClient({
   );
   const [prefsActive, setPrefsActive] = useState(() => searchParams.get('prefs') === '1');
 
-  // Keep the URL in sync with the active filters. We use the native History API
-  // (integrated with the Next.js router in 14.2+) rather than router.replace so
-  // that typing in the search box doesn't trigger a server round-trip on every
-  // keystroke — the list is already filtered entirely on the client.
-  useEffect(() => {
+  // Single source of truth for the active filters as a query string. Reused for
+  // both the URL sync below and the per-card links, so opening a university and
+  // pressing "back" returns to the exact filtered view.
+  const filtersQuery = useMemo(() => {
     const params = new URLSearchParams();
     if (query) params.set('q', query);
     if (country) params.set('country', country);
@@ -71,9 +72,18 @@ export function UniversityListClient({
     if (deadlineStatus) params.set('deadline', deadlineStatus);
     if (sortBy !== 'name') params.set('sort', sortBy);
     if (prefsActive) params.set('prefs', '1');
-    const qs = params.toString();
-    window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname);
-  }, [query, country, language, major, moeOnly, rankedOnly, maxTuition, deadlineStatus, sortBy, prefsActive, pathname]);
+    return params.toString();
+  }, [query, country, language, major, moeOnly, rankedOnly, maxTuition, deadlineStatus, sortBy, prefsActive]);
+
+  // Keep the URL in sync with the active filters. We use the native History API
+  // (integrated with the Next.js router in 14.2+) rather than router.replace so
+  // that typing in the search box doesn't trigger a server round-trip on every
+  // keystroke — the list is already filtered entirely on the client.
+  useEffect(() => {
+    window.history.replaceState(null, '', filtersQuery ? `${pathname}?${filtersQuery}` : pathname);
+  }, [filtersQuery, pathname]);
+
+  const scholarshipSet = useMemo(() => new Set(scholarshipEligibleIds), [scholarshipEligibleIds]);
 
   const hasPrefs =
     userPrefs !== null &&
@@ -371,6 +381,8 @@ export function UniversityListClient({
               key={u.id}
               university={u}
               locale={locale}
+              filtersQuery={filtersQuery}
+              hasScholarships={scholarshipSet.has(u.id)}
               bookmarkSlot={
                 <BookmarkButton
                   type="university"

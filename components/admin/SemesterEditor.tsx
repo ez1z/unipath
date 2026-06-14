@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect } from 'react';
 import type { Semester } from '@/lib/types/semester';
 
 const PRESET_NAMES = ['Fall', 'Spring', 'Summer', 'Winter'];
@@ -9,9 +8,19 @@ const PRESET_NAMES = ['Fall', 'Spring', 'Summer', 'Winter'];
 const inputCls =
   'w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-shadow';
 
-export function SemesterEditor({ defaultValue = [] }: { defaultValue?: Semester[] }) {
-  const t = useTranslations('admin');
+type Props = {
+  defaultValue?: Semester[];
+  /** Notified whenever the semester list changes, so a parent can keep dependent fields in sync. */
+  onChange?: (semesters: Semester[]) => void;
+};
+
+export function SemesterEditor({ defaultValue = [], onChange }: Props) {
   const [semesters, setSemesters] = useState<Semester[]>(defaultValue);
+
+  useEffect(() => {
+    // onChange is expected to be stable (a setState updater); only re-run on data change.
+    onChange?.(semesters);
+  }, [semesters]);
 
   function add() {
     setSemesters((prev) => [...prev, { name: '', start_date: '', deadline: null }]);
@@ -32,7 +41,7 @@ export function SemesterEditor({ defaultValue = [] }: { defaultValue?: Semester[
       <input type="hidden" name="semesters" value={JSON.stringify(semesters)} />
 
       {semesters.length === 0 && (
-        <p className="text-sm text-muted-foreground italic">{t('semester_empty')}</p>
+        <p className="text-sm text-muted-foreground italic">{"No semesters added yet."}</p>
       )}
 
       {semesters.map((sem, i) => (
@@ -59,15 +68,15 @@ export function SemesterEditor({ defaultValue = [] }: { defaultValue?: Semester[
                 type="text"
                 value={sem.name}
                 onChange={(e) => update(i, 'name', e.target.value)}
-                placeholder={t('semester_name_placeholder')}
-                aria-label={t('semester_remove_label', { n: i + 1 })}
+                placeholder={"Semester name (e.g. Fall 2025)"}
+                aria-label={`Remove semester ${i + 1}`}
                 className={inputCls}
               />
             </div>
             <button
               type="button"
               onClick={() => remove(i)}
-              aria-label={t('semester_remove_label', { n: i + 1 })}
+              aria-label={`Remove semester ${i + 1}`}
               className="mt-6 text-xl leading-none text-muted-foreground hover:text-red-500 transition-colors"
             >
               ×
@@ -77,7 +86,7 @@ export function SemesterEditor({ defaultValue = [] }: { defaultValue?: Semester[
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">
-                {t('semester_starts_label')}
+                {"Course starts *"}
               </label>
               <input
                 type="date"
@@ -89,8 +98,8 @@ export function SemesterEditor({ defaultValue = [] }: { defaultValue?: Semester[
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">
-                {t('semester_deadline_label')}{' '}
-                <span className="font-normal">{t('optional')}</span>
+                {"Application deadline"}{' '}
+                <span className="font-normal">{"(optional)"}</span>
               </label>
               <input
                 type="date"
@@ -109,7 +118,7 @@ export function SemesterEditor({ defaultValue = [] }: { defaultValue?: Semester[
         onClick={add}
         className="text-sm font-medium text-primary hover:underline"
       >
-        {t('semester_add')}
+        {"+ Add semester"}
       </button>
     </div>
   );

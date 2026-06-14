@@ -1,7 +1,6 @@
 'use client';
 
 import { useTransition } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { removeAdminAction } from '@/app/admin/admins/actions';
 
@@ -13,11 +12,10 @@ type AdminRow = {
 };
 
 export function AdminAdminRow({ admin, isSelf }: { admin: AdminRow; isSelf: boolean }) {
-  const t = useTranslations('admin');
   const [isPending, startTransition] = useTransition();
 
   function handleRemove() {
-    if (!confirm(t('admins_remove_confirm', { email: admin.email }))) return;
+    if (!confirm(`Remove admin access for "${admin.email}"? They will no longer be able to sign in.`)) return;
     startTransition(async () => {
       const result = await removeAdminAction(admin.userId);
       if (result?.error) alert(`Error: ${result.error}`);
@@ -28,7 +26,7 @@ export function AdminAdminRow({ admin, isSelf }: { admin: AdminRow; isSelf: bool
     <tr className="border-t border-border hover:bg-muted/30 transition-colors">
       <td className="px-4 py-3 font-medium text-foreground">
         {admin.email}
-        {isSelf && <span className="ml-2 text-xs text-muted-foreground">{t('admins_you')}</span>}
+        {isSelf && <span className="ml-2 text-xs text-muted-foreground">{"(you)"}</span>}
       </td>
       <td className="px-4 py-3">
         <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${
@@ -50,7 +48,7 @@ export function AdminAdminRow({ admin, isSelf }: { admin: AdminRow; isSelf: bool
               aria-label={`Reset password for ${admin.email}`}
               className="text-xs text-primary hover:underline"
             >
-              {t('admins_reset_password')}
+              {"Reset Password"}
             </Link>
             <button
               onClick={handleRemove}
@@ -58,7 +56,7 @@ export function AdminAdminRow({ admin, isSelf }: { admin: AdminRow; isSelf: bool
               aria-label={`Remove admin ${admin.email}`}
               className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
             >
-              {t('admins_remove')}
+              {"Remove"}
             </button>
           </div>
         )}

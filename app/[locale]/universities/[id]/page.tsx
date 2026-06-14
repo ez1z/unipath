@@ -3,24 +3,34 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getBySlug } from '@/lib/data/universities';
 import { formatTuition, computeTuitionBreakdown } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
+import { ScholarshipBadge } from '@/components/university/ScholarshipBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
 import { ScholarshipSection } from '@/components/scholarship/ScholarshipSection';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
+import { getByUniversity } from '@/lib/data/scholarships';
 import { getOrInitChecklist } from '@/lib/data/checklist';
 import type { Locale } from '@/lib/constants';
 import type { Semester } from '@/lib/types/semester';
 
-type Props = { params: { locale: Locale; id: string } };
+type Props = {
+  params: { locale: Locale; id: string };
+  searchParams: { from?: string };
+};
 
 export const dynamic = 'force-dynamic';
 
-export default async function UniversityDetailPage({ params: { locale, id } }: Props) {
+export default async function UniversityDetailPage({ params: { locale, id }, searchParams }: Props) {
   setRequestLocale(locale);
   const university = await getBySlug(id);
   if (!university) notFound();
+
+  // Rebuild the list URL the user came from so "back" restores their filters.
+  const backHref = searchParams.from
+    ? `/${locale}/universities?${searchParams.from}`
+    : `/${locale}/universities`;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -37,6 +47,8 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
   const checklistItems = user
     ? await getOrInitChecklist(university.id, locale)
     : [];
+
+  const scholarships = await getByUniversity(university.id, university.country);
 
   const t = await getTranslations('university');
   const tCommon = await getTranslations('common');
@@ -84,9 +96,16 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
       <PageHeader
         title={name}
         subtitle={`${university.city}, ${university.country}`}
-        backHref={`/${locale}/universities`}
+        backHref={backHref}
         backLabel={t('back')}
-        badge={university.moe_approved ? <MoeBadge /> : undefined}
+        badge={
+          university.moe_approved || scholarships.length > 0 ? (
+            <span className="flex items-center gap-1.5 flex-wrap">
+              {university.moe_approved && <MoeBadge />}
+              {scholarships.length > 0 && <ScholarshipBadge />}
+            </span>
+          ) : undefined
+        }
       />
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -303,7 +322,7 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
 
         {/* Scholarships */}
         <ScholarshipSection
-          universityId={university.id}
+          scholarships={scholarships}
           country={university.country}
           locale={locale}
         />

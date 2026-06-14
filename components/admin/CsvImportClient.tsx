@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { useTranslations } from 'next-intl';
 import Papa from 'papaparse';
 import { CsvRowSchema } from '@/lib/data/university-types';
 import { importUniversitiesAction } from '@/app/admin/universities/actions';
@@ -60,7 +59,6 @@ function triggerDownload(content: string, filename: string) {
 type Props = { existingData: Record<string, string>[] };
 
 export function CsvImportClient({ existingData }: Props) {
-  const t = useTranslations('admin');
   const [rows, setRows] = useState<ParsedRow[]>([]);
   const [isPending, startTransition] = useTransition();
   const [importResult, setImportResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -104,10 +102,10 @@ export function CsvImportClient({ existingData }: Props) {
     startTransition(async () => {
       const result = await importUniversitiesAction(rows.map((r) => r.raw));
       if (result.success) {
-        setImportResult({ ok: true, message: t('csv_success_unis', { count: result.count }) });
+        setImportResult({ ok: true, message: `Successfully imported ${result.count} universities.` });
         setRows([]);
       } else {
-        setImportResult({ ok: false, message: t('csv_error', { error: result.error ?? '' }) });
+        setImportResult({ ok: false, message: `Import failed: ${result.error ?? ''}` });
       }
     });
   }
@@ -116,30 +114,43 @@ export function CsvImportClient({ existingData }: Props) {
     <div className="space-y-6">
       {/* Step 1: Template */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-2">{t('csv_step1_title')}</h2>
+        <h2 className="font-heading font-semibold text-base mb-2">{"Step 1: Download current data"}</h2>
         <p className="text-sm text-muted-foreground mb-4">
           {existingData.length > 0
-            ? t('csv_uni_step1_has_data', { count: existingData.length })
-            : t('csv_uni_step1_empty')
+            ? `Downloads all ${existingData.length} existing universities as CSV. Edit the rows, then re-upload — unchanged rows are left as-is.`
+            : "No universities in the database yet. Downloads a blank template with one example row."
           }
           {' '}Use <code className="bg-muted px-1 rounded text-xs">|</code> to separate multiple languages or majors.{' '}
           <code className="bg-muted px-1 rounded text-xs">ranking_qs</code> can be blank.
           To set the student document checklist, add a <code className="bg-muted px-1 rounded text-xs">document_requirements</code> array inside <code className="bg-muted px-1 rounded text-xs">entrance_requirements</code> JSON.
         </p>
+        <div className="text-sm text-muted-foreground mb-4 space-y-1.5 border-l-2 border-border pl-3">
+          <p>
+            <code className="bg-muted px-1 rounded text-xs">semesters</code>: pipe-separated, each{' '}
+            <code className="bg-muted px-1 rounded text-xs">name:start_date:deadline</code> — e.g.{' '}
+            <code className="bg-muted px-1 rounded text-xs">Fall:2025-09-15:2025-07-01|Spring:2026-02-10:</code> (deadline optional).
+          </p>
+          <p>
+            <code className="bg-muted px-1 rounded text-xs">tuition_options</code>: pipe-separated, each{' '}
+            <code className="bg-muted px-1 rounded text-xs">semester:language:major:amount_usd:note</code>. Leave a field blank to mean &ldquo;any&rdquo; — e.g.{' '}
+            <code className="bg-muted px-1 rounded text-xs">Fall:English:Engineering:5000|::Medicine:8000</code>. The flat{' '}
+            <code className="bg-muted px-1 rounded text-xs">tuition_usd</code> stays the baseline shown in search.
+          </p>
+        </div>
         <button
           onClick={() => triggerDownload(buildCsv(existingData), 'universities.csv')}
           aria-label="Download universities as CSV"
           className="px-4 py-2 border border-primary text-primary rounded-lg text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           {existingData.length > 0
-            ? t('csv_download_data_unis', { count: existingData.length })
-            : t('csv_download_template')}
+            ? `Download data (${existingData.length} universities)`
+            : "Download blank template"}
         </button>
       </div>
 
       {/* Step 2: Upload */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-4">{t('csv_step2_title')}</h2>
+        <h2 className="font-heading font-semibold text-base mb-4">{"Step 2: Upload CSV"}</h2>
         <input
           type="file"
           accept=".csv"
@@ -154,18 +165,18 @@ export function CsvImportClient({ existingData }: Props) {
         <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-heading font-semibold text-base">
-              {t('csv_preview_title', { count: rows.length })}
+              {`Preview — ${rows.length} rows`}
               {invalidCount > 0 && (
-                <span className="ml-2 text-sm font-normal text-red-600">{t('csv_invalid_count', { count: invalidCount })}</span>
+                <span className="ml-2 text-sm font-normal text-red-600">{`(${invalidCount} invalid)`}</span>
               )}
             </h2>
             <button
               onClick={handleImport}
               disabled={!canImport}
-              aria-label={t('csv_import_unis_button', { count: rows.length })}
+              aria-label={`Import ${rows.length} universities`}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isPending ? t('csv_importing') : t('csv_import_unis_button', { count: rows.length })}
+              {isPending ? "Importing…" : `Import ${rows.length} universities`}
             </button>
           </div>
 
@@ -178,7 +189,7 @@ export function CsvImportClient({ existingData }: Props) {
                   <th className="text-left px-3 py-2 font-medium">country</th>
                   <th className="text-left px-3 py-2 font-medium">tuition_usd</th>
                   <th className="text-left px-3 py-2 font-medium">moe_approved</th>
-                  <th className="text-left px-3 py-2 font-medium">{t('csv_col_issues')}</th>
+                  <th className="text-left px-3 py-2 font-medium">{"Issues"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -199,7 +210,7 @@ export function CsvImportClient({ existingData }: Props) {
             </table>
             {rows.length > 10 && (
               <p className="text-xs text-muted-foreground mt-2 px-3">
-                {t('csv_more_rows', { count: rows.length - 10 })}
+                {`…and ${rows.length - 10} more rows (all validated above)`}
               </p>
             )}
           </div>
