@@ -113,7 +113,10 @@
     "billion_word": "миллиардов",
     "tmt_total": "Итого TMT",
     "million_word": "миллионов",
-    "thousand_word": "тысяч"
+    "thousand_word": "тысяч",
+    "tuition_options_title": "Стоимость по программам",
+    "tuition_options_desc": "Стоимость зависит от семестра, языка обучения и специальности.",
+    "tuition_option_all": "Все программы"
   },
   "compare": {
     "title": "Сравнение университетов",

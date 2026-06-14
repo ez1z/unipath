@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
-import Link from 'next/link';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getBySlug } from '@/lib/data/universities';
 import { formatTuition, computeTuitionBreakdown } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
@@ -11,7 +10,6 @@ import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
 import { getOrInitChecklist } from '@/lib/data/checklist';
-import { TRANSFER_CAP_USD } from '@/lib/constants';
 import type { Locale } from '@/lib/constants';
 import type { Semester } from '@/lib/types/semester';
 
@@ -20,6 +18,7 @@ type Props = { params: { locale: Locale; id: string } };
 export const dynamic = 'force-dynamic';
 
 export default async function UniversityDetailPage({ params: { locale, id } }: Props) {
+  setRequestLocale(locale);
   const university = await getBySlug(id);
   if (!university) notFound();
 
@@ -155,6 +154,54 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
             </div>
           </div>
         </section>
+
+        {/* Tuition options (differentiated by semester / language / major) */}
+        {university.tuition_options.length > 0 && (
+          <section className="mb-8">
+            <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-1">
+              {t('tuition_options_title')}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-3">{t('tuition_options_desc')}</p>
+            <div className="space-y-2">
+              {university.tuition_options.map((opt, i) => {
+                const hasDimensions = opt.semester || opt.language || opt.major;
+                return (
+                  <div
+                    key={i}
+                    className="bg-card border border-border rounded-xl px-5 py-3 flex flex-wrap items-center justify-between gap-3"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      {opt.semester && (
+                        <span className="px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-medium">
+                          {opt.semester}
+                        </span>
+                      )}
+                      {opt.language && (
+                        <span className="px-2.5 py-0.5 bg-gold/10 text-gold-dark border border-gold/30 rounded-full text-xs font-medium">
+                          {opt.language.toUpperCase()}
+                        </span>
+                      )}
+                      {opt.major && (
+                        <span className="px-2.5 py-0.5 bg-secondary text-secondary-foreground border border-border rounded-full text-xs">
+                          {opt.major}
+                        </span>
+                      )}
+                      {!hasDimensions && (
+                        <span className="text-sm text-muted-foreground">{t('tuition_option_all')}</span>
+                      )}
+                      {opt.note && (
+                        <span className="text-xs text-muted-foreground italic">{opt.note}</span>
+                      )}
+                    </div>
+                    <div className="font-heading font-semibold text-foreground whitespace-nowrap">
+                      {formatTuition(opt.amount_usd)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Languages */}
         <section className="mb-6">

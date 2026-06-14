@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAll } from '@/lib/data/universities';
 import { CompareClient } from '@/components/university/CompareClient';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic';
 type Props = { params: { locale: Locale } };
 
 export default async function ComparePage({ params: { locale } }: Props) {
+  setRequestLocale(locale);
   const t = await getTranslations('compare');
   const universities = await getAll();
 

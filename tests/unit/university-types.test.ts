@@ -19,6 +19,7 @@ const baseRow: UniversityDbRow = {
   application_portal_url: 'https://apply.test.edu',
   entrance_requirements: { turkey: { yos: true } },
   semesters: null,
+  tuition_options: null,
   created_at: '2024-01-01T00:00:00Z',
 };
 
@@ -70,5 +71,20 @@ describe('dbRowToUniversity', () => {
   it('excludes created_at from the result', () => {
     const u = dbRowToUniversity(baseRow);
     expect('created_at' in u).toBe(false);
+  });
+
+  it('defaults null tuition_options to an empty array', () => {
+    const u = dbRowToUniversity(baseRow);
+    expect(u.tuition_options).toEqual([]);
+  });
+
+  it('parses tuition_options when present', () => {
+    const u = dbRowToUniversity({
+      ...baseRow,
+      tuition_options: [{ semester: 'Fall', language: 'English', major: null, amount_usd: 5000, note: null }],
+    });
+    expect(u.tuition_options).toEqual([
+      { semester: 'Fall', language: 'English', major: null, amount_usd: 5000, note: null },
+    ]);
   });
 });

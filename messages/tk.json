@@ -113,7 +113,10 @@
     "billion_word": "milliard",
     "tmt_total": "Jemi TMT",
     "million_word": "million",
-    "thousand_word": "müň"
+    "thousand_word": "müň",
+    "tuition_options_title": "Programma boýunça okuw tölegi",
+    "tuition_options_desc": "Töleg semestre, okuw diline we hünäre baglylykda üýtgeýär.",
+    "tuition_option_all": "Ähli programmalar"
   },
   "compare": {
     "title": "Uniwersitetleri deňeşdir",

@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, logAction } from '@/lib/admin/auth';
 import { CsvRowSchema } from '@/lib/data/university-types';
 import type { UniversityInsert } from '@/lib/data/university-types';
@@ -53,6 +52,7 @@ export async function importUniversitiesAction(
     application_portal_url: r.application_portal_url,
     entrance_requirements: r.entrance_requirements,
     semesters: r.semesters ?? [],
+    tuition_options: r.tuition_options ?? [],
   }));
 
   const { error } = await supabase
@@ -127,6 +127,7 @@ export async function createUniversityAction(
     ...parsed.data,
     slug: slugify(parsed.data.name_en),
     semesters: parsed.data.semesters ?? [],
+    tuition_options: parsed.data.tuition_options ?? [],
   });
   if (error) return { error: friendlyDbError(error) };
 
@@ -156,7 +157,12 @@ export async function updateUniversityAction(
 
   const { error } = await supabase
     .from('universities')
-    .update({ ...parsed.data, slug: slugify(parsed.data.name_en), semesters: parsed.data.semesters ?? [] })
+    .update({
+      ...parsed.data,
+      slug: slugify(parsed.data.name_en),
+      semesters: parsed.data.semesters ?? [],
+      tuition_options: parsed.data.tuition_options ?? [],
+    })
     .eq('id', id);
   if (error) return { error: friendlyDbError(error) };
 

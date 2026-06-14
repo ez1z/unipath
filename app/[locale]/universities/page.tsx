@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAll, getUniqueCountries, getUniqueLanguages, getUniqueMajors } from '@/lib/data/universities';
 import { UniversityListClient } from '@/components/university/UniversityListClient';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 type Props = { params: { locale: Locale } };
 
 export default async function UniversitiesPage({ params: { locale } }: Props) {
+  setRequestLocale(locale);
   const t = await getTranslations('universities');
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

@@ -1,8 +1,13 @@
 import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FaqAccordion } from "@/components/support/FaqAccordion";
+import type { Locale } from "@/lib/constants";
 
-export default function SupportPage() {
+type Props = { params: { locale: Locale } };
+
+export default function SupportPage({ params: { locale } }: Props) {
+  setRequestLocale(locale);
   const t = useTranslations("support");
 
   const faqItems = [

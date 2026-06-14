@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { SignInForm } from './SignInForm';
 import type { Locale } from '@/lib/constants';
@@ -14,6 +14,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function SignInPage({ params }: Props) {
   const { locale } = await params;
+  setRequestLocale(locale);
 
   let user = null;
   try {

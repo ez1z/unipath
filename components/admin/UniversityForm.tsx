@@ -3,7 +3,9 @@
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { SemesterEditor } from '@/components/admin/SemesterEditor';
+import { TuitionOptionsEditor } from '@/components/admin/TuitionOptionsEditor';
 import type { Semester } from '@/lib/types/semester';
+import type { TuitionOption } from '@/lib/types/tuition';
 
 export type UniversityFormDefaults = {
   name_en?: string;
@@ -20,6 +22,7 @@ export type UniversityFormDefaults = {
   application_portal_url?: string;
   entrance_requirements?: string;
   semesters?: Semester[];
+  tuition_options?: TuitionOption[];
 };
 
 type Props = {
@@ -150,6 +153,13 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
         </div>
+      </div>
+
+      {/* Tuition options (differentiated costs) */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{t('uni_form_section_tuition_options')}</h2>
+        <p className="text-sm text-muted-foreground mb-4">{t('uni_form_tuition_options_desc')}</p>
+        <TuitionOptionsEditor defaultValue={d.tuition_options ?? []} />
       </div>
 
       {/* Academic info */}

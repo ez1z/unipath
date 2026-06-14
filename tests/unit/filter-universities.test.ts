@@ -18,6 +18,7 @@ function makeUni(overrides: Partial<University> = {}): University {
     application_portal_url: 'https://apply.example.edu',
     entrance_requirements: {},
     semesters: [],
+    tuition_options: [],
     ...overrides,
   };
 }

@@ -10,6 +10,7 @@ const CSV_HEADERS = [
   'name_en', 'name_ru', 'name_tk', 'country', 'city', 'tuition_usd',
   'moe_approved', 'ranking_qs', 'languages', 'majors',
   'official_website', 'application_portal_url', 'entrance_requirements',
+  'semesters', 'tuition_options',
 ];
 
 const CSV_EXAMPLE_ROW: Record<string, string> = {
@@ -26,6 +27,8 @@ const CSV_EXAMPLE_ROW: Record<string, string> = {
   official_website: 'https://metu.edu.tr',
   application_portal_url: 'https://oidb.metu.edu.tr',
   entrance_requirements: '{"turkey":{"yos":true},"document_requirements":["Passport","Transcript","YÖS Score","Visa Documents"]}',
+  semesters: 'Fall:2025-09-15:2025-07-01|Spring:2026-02-10:2025-12-01',
+  tuition_options: 'Fall:English:Engineering:5000|Fall:Turkish:Engineering:1200|::Medicine:8000',
 };
 
 type ParsedRow = {

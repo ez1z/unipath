@@ -1,10 +1,15 @@
 import { useTranslations } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
 import { TMT_PER_USD, TRANSFER_CAP_USD, TRANSFER_CAP_TMT } from '@/lib/constants';
 import { TransferCalculator } from '@/components/transfer/TransferCalculator';
 import { TransferGuideSteps } from '@/components/transfer/TransferGuideSteps';
 import { PageHeader } from '@/components/ui/PageHeader';
+import type { Locale } from '@/lib/constants';
 
-export default function TransferPage() {
+type Props = { params: { locale: Locale } };
+
+export default function TransferPage({ params: { locale } }: Props) {
+  setRequestLocale(locale);
   const t = useTranslations('transfer');
 
   return (

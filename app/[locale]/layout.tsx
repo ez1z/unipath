@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Fraunces, DM_Sans } from 'next/font/google';
 import Link from 'next/link';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
@@ -41,6 +41,11 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = params;
   if (!SUPPORTED_LOCALES.includes(locale as Locale)) notFound();
 
+  // Make the locale available to next-intl during static rendering. Without
+  // this, statically-generated pages fall back to DEFAULT_LOCALE regardless of
+  // the URL segment, producing the wrong language on non-dynamic routes.
+  setRequestLocale(locale);
+
   const [messages, tNav] = await Promise.all([
     getMessages(),
     getTranslations({ locale: locale as Locale, namespace: 'nav' }),
@@ -51,7 +56,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} className={`${fraunces.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-background font-sans flex flex-col antialiased">
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <NavBar locale={locale as Locale} />
           <main className="flex-1">{children}</main>
 

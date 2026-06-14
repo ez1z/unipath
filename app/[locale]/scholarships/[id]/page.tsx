@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 import { getBySlug } from '@/lib/data/scholarships';
 import { getById as getUniversityById } from '@/lib/data/universities';
@@ -49,6 +49,7 @@ function formatDate(iso: string): string {
 }
 
 export default async function ScholarshipDetailPage({ params: { locale, id } }: Props) {
+  setRequestLocale(locale);
   const scholarship = await getBySlug(id);
   if (!scholarship) notFound();
 

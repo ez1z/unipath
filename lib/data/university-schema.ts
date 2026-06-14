@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { parseSemestersJson } from '@/lib/types/semester';
+import { parseTuitionOptionsJson } from '@/lib/types/tuition';
 
 export const FormSchema = z.object({
   name_en: z.string().min(1, 'English name is required'),
@@ -34,5 +35,9 @@ export const FormSchema = z.object({
   semesters: z.string().optional().transform((v) => {
     if (!v?.trim()) return [];
     try { return parseSemestersJson(JSON.parse(v)); } catch { return []; }
+  }),
+  tuition_options: z.string().optional().transform((v) => {
+    if (!v?.trim()) return [];
+    try { return parseTuitionOptionsJson(JSON.parse(v)); } catch { return []; }
   }),
 });

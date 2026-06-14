@@ -113,7 +113,10 @@
     "billion_word": "billion",
     "million_word": "million",
     "thousand_word": "thousand",
-    "tmt_total": "Total TMT"
+    "tmt_total": "Total TMT",
+    "tuition_options_title": "Tuition by program",
+    "tuition_options_desc": "Tuition varies by semester, language of instruction, and major.",
+    "tuition_option_all": "All programs"
   },
   "compare": {
     "title": "Compare Universities",
@@ -514,6 +517,15 @@
     "semester_add": "+ Add semester",
     "semester_remove_label": "Remove semester {n}",
 
+    "tuition_opt_empty": "No tuition variants. The annual tuition above applies to all programs. Add a variant only if cost differs by semester, language, or major.",
+    "tuition_opt_add": "+ Add tuition variant",
+    "tuition_opt_remove_label": "Remove tuition variant {n}",
+    "tuition_opt_semester": "Semester",
+    "tuition_opt_language": "Language",
+    "tuition_opt_major": "Major",
+    "tuition_opt_amount": "Amount (USD) *",
+    "tuition_opt_note": "Note",
+
     "uni_form_section_names": "Names",
     "uni_form_name_en": "English name *",
     "uni_form_name_ru": "Russian name *",
@@ -535,6 +547,8 @@
     "uni_form_section_entrance": "Entrance requirements",
     "uni_form_section_semesters": "Semesters",
     "uni_form_semesters_desc": "Each semester has a name (Fall/Spring/custom), a course start date, and an optional application deadline.",
+    "uni_form_section_tuition_options": "Tuition variants",
+    "uni_form_tuition_options_desc": "Optional. Add rows only when tuition differs by semester, language of instruction, or major. Leave a dimension blank if it doesn't affect the price. The annual tuition above stays the baseline used for search and comparison.",
 
     "sch_form_section_names": "Names",
     "sch_form_name_en_label": "English name *",

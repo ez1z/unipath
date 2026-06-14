@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { getAll } from "@/lib/data/universities";
 import type { Locale } from "@/lib/constants";
@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 type Props = { params: { locale: Locale } };
 
 export default async function HomePage({ params: { locale } }: Props) {
+  setRequestLocale(locale);
   const t = await getTranslations("home");
   const universities = await getAll();
   const moeCount = universities.filter((u) => u.moe_approved).length;

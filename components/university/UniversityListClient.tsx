@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
 import { filterUniversities } from '@/lib/data/filter-universities';
@@ -33,16 +34,46 @@ export function UniversityListClient({
   userPrefs,
 }: Props) {
   const t = useTranslations('universities');
-  const [query, setQuery] = useState('');
-  const [country, setCountry] = useState('');
-  const [language, setLanguage] = useState('');
-  const [major, setMajor] = useState('');
-  const [moeOnly, setMoeOnly] = useState(false);
-  const [rankedOnly, setRankedOnly] = useState(false);
-  const [maxTuition, setMaxTuition] = useState('');
-  const [deadlineStatus, setDeadlineStatus] = useState('');
-  const [sortBy, setSortBy] = useState<UniversitySortBy>('name');
-  const [prefsActive, setPrefsActive] = useState(false);
+
+  // Filters are mirrored to the URL query string so the exact filtered view is
+  // preserved across navigation. When the user opens a university and presses
+  // "back", the browser restores this URL and the state below re-initialises
+  // from it — instead of resetting to the unfiltered list.
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
+  const [country, setCountry] = useState(() => searchParams.get('country') ?? '');
+  const [language, setLanguage] = useState(() => searchParams.get('language') ?? '');
+  const [major, setMajor] = useState(() => searchParams.get('major') ?? '');
+  const [moeOnly, setMoeOnly] = useState(() => searchParams.get('moe') === '1');
+  const [rankedOnly, setRankedOnly] = useState(() => searchParams.get('ranked') === '1');
+  const [maxTuition, setMaxTuition] = useState(() => searchParams.get('maxTuition') ?? '');
+  const [deadlineStatus, setDeadlineStatus] = useState(() => searchParams.get('deadline') ?? '');
+  const [sortBy, setSortBy] = useState<UniversitySortBy>(
+    () => (searchParams.get('sort') as UniversitySortBy) || 'name',
+  );
+  const [prefsActive, setPrefsActive] = useState(() => searchParams.get('prefs') === '1');
+
+  // Keep the URL in sync with the active filters. We use the native History API
+  // (integrated with the Next.js router in 14.2+) rather than router.replace so
+  // that typing in the search box doesn't trigger a server round-trip on every
+  // keystroke — the list is already filtered entirely on the client.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (country) params.set('country', country);
+    if (language) params.set('language', language);
+    if (major) params.set('major', major);
+    if (moeOnly) params.set('moe', '1');
+    if (rankedOnly) params.set('ranked', '1');
+    if (maxTuition) params.set('maxTuition', maxTuition);
+    if (deadlineStatus) params.set('deadline', deadlineStatus);
+    if (sortBy !== 'name') params.set('sort', sortBy);
+    if (prefsActive) params.set('prefs', '1');
+    const qs = params.toString();
+    window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname);
+  }, [query, country, language, major, moeOnly, rankedOnly, maxTuition, deadlineStatus, sortBy, prefsActive, pathname]);
 
   const hasPrefs =
     userPrefs !== null &&
