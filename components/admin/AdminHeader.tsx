@@ -38,7 +38,7 @@ export async function AdminHeader({ email, role }: Props) {
           )}
           <Link
             href="/"
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors hidden sm:block"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors"
           >
             {"View Platform"}
           </Link>
