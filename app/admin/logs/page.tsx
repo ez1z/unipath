@@ -20,6 +20,7 @@ export default async function LogsPage() {
     delete_scholarship: "Deleted scholarship",
     add_admin: "Added admin",
     remove_admin: "Removed admin",
+    set_role: "Changed role",
     reset_admin_password: "Reset admin password",
   };
 
@@ -83,6 +84,11 @@ export default async function LogsPage() {
                       {log.action === 'import_universities' && log.details?.count && (
                         <span className="ml-1.5 text-xs text-muted-foreground">
                           {`(${String(log.details.count)} rows)`}
+                        </span>
+                      )}
+                      {log.action === 'set_role' && log.details?.role && (
+                        <span className="ml-1.5 text-xs text-muted-foreground">
+                          {`→ ${String(log.details.role)}`}
                         </span>
                       )}
                     </td>

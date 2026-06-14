@@ -53,25 +53,13 @@ export default async function AdminsPage() {
         </div>
 
         <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted text-muted-foreground">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium">{"Email"}</th>
-                <th className="text-left px-4 py-3 font-medium">{"Role"}</th>
-                <th className="text-left px-4 py-3 font-medium">{"Joined"}</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {allUsers.map((u) => (
-                <AdminUserRow
-                  key={u.userId}
-                  user={u}
-                  isSelf={u.userId === user.id}
-                />
-              ))}
-            </tbody>
-          </table>
+          {allUsers.map((u) => (
+            <AdminUserRow
+              key={u.userId}
+              user={u}
+              isSelf={u.userId === user.id}
+            />
+          ))}
         </div>
       </main>
     </div>
