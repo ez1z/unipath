@@ -17,15 +17,15 @@ University search and application platform for Turkmen students. Students discov
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 14 (App Router) |
-| Language | TypeScript strict |
-| Styling | Tailwind CSS + shadcn/ui |
-| Database | PostgreSQL via Supabase |
-| Auth | Supabase Auth (email + Google OAuth) |
-| i18n | next-intl (`tk` · `ru` · `en`) |
-| Hosting | Vercel + Supabase |
+| Layer     | Technology                           |
+| --------- | ------------------------------------ |
+| Framework | Next.js 14 (App Router)              |
+| Language  | TypeScript strict                    |
+| Styling   | Tailwind CSS + shadcn/ui             |
+| Database  | PostgreSQL via Supabase              |
+| Auth      | Supabase Auth (email + Google OAuth) |
+| i18n      | next-intl (`tk` · `ru` · `en`)       |
+| Hosting   | Vercel + Supabase                    |
 
 ## Getting Started
 
@@ -41,11 +41,11 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Environment Variables
 
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon (public) key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service role key — server-side only, never exposed to the client |
+| Variable                        | Description                                                      |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                                             |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon (public) key                                       |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Service role key — server-side only, never exposed to the client |
 
 ## Project Structure
 
@@ -126,10 +126,10 @@ The admin panel lives at `/admin` (no locale prefix). It is completely separate 
 
 ### Roles
 
-| Role | Capabilities |
-|---|---|
-| `admin` | Manage universities and scholarships (create, edit, delete, CSV import) |
-| `superuser` | Everything admins can do, plus: manage admin accounts, view audit logs |
+| Role        | Capabilities                                                            |
+| ----------- | ----------------------------------------------------------------------- |
+| `admin`     | Manage universities and scholarships (create, edit, delete, CSV import) |
+| `superuser` | Everything admins can do, plus: manage admin accounts, view audit logs  |
 
 ### Getting Admin Access
 
@@ -220,14 +220,14 @@ description_tk, application_url
 
 These rules reflect real-world legal and regulatory constraints. Do not work around them:
 
-| Rule | Detail |
-|---|---|
-| Exchange rate | **3.51 TMT = 1 USD** (Central Bank of Turkmenistan, fixed) — always import from `lib/constants.ts`, never hardcode |
-| Transfer cap | **$12,000 USD / year** per student — never add UI that bypasses this |
-| Currency display | Always show **both** TMT and USD wherever a monetary value appears |
-| MoE approval | `universities.moe_approved` is **admin-only** — never expose a user path to set it |
-| MoE badge | Always render an "MoE Approved" badge when `moe_approved = true` |
-| Transfer filter | "Transfer eligible" search must query `moe_approved = true` only |
+| Rule             | Detail                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Exchange rate    | **3.51 TMT = 1 USD** (Central Bank of Turkmenistan, fixed) — always import from `lib/constants.ts`, never hardcode |
+| Transfer cap     | **$12,000 USD / year** per student — never add UI that bypasses this                                               |
+| Currency display | Always show **both** TMT and USD wherever a monetary value appears                                                 |
+| MoE approval     | `universities.moe_approved` is **admin-only** — never expose a user path to set it                                 |
+| MoE badge        | Always render an "MoE Approved" badge when `moe_approved = true`                                                   |
+| Transfer filter  | "Transfer eligible" search must query `moe_approved = true` only                                                   |
 
 ### Out of Scope
 
@@ -269,9 +269,9 @@ admins (
 After inserting or updating university records, revalidate the listing path:
 
 ```ts
-revalidatePath('/universities');
+revalidatePath("/universities");
 ```
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE) for the full text.
+see [LICENSE](LICENSE) for the full text.
