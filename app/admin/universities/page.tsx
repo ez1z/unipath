@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { AdminHeader } from '@/components/admin/AdminHeader';
-import { UniversityAdminRow } from '@/components/admin/UniversityAdminRow';
+import { UniversityAdminTable } from '@/components/admin/UniversityAdminTable';
 import { requireAdmin } from '@/lib/admin/auth';
 import type { UniversityDbRow } from '@/lib/data/university-types';
 
@@ -64,24 +64,7 @@ export default async function AdminUniversitiesPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-muted-foreground">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium">{"University"}</th>
-                  <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
-                  <th className="text-left px-4 py-3 font-medium">{"MoE Approved"}</th>
-                  <th className="text-left px-4 py-3 font-medium">{"Created"}</th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {universities.map((u) => (
-                  <UniversityAdminRow key={u.id} university={u} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <UniversityAdminTable universities={universities} />
         )}
       </main>
     </div>

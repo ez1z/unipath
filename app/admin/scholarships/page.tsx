@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { GulPattern } from '@/components/ui/GulPattern';
 import { AdminHeader } from '@/components/admin/AdminHeader';
-import { ScholarshipAdminRow } from '@/components/admin/ScholarshipAdminRow';
+import { ScholarshipAdminTable } from '@/components/admin/ScholarshipAdminTable';
 import { requireAdmin } from '@/lib/admin/auth';
 import type { ScholarshipDbRow } from '@/lib/data/scholarship-types';
 
@@ -59,23 +59,7 @@ export default async function AdminScholarshipsPage() {
             </Link>
           </div>
         ) : (
-          <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-muted-foreground">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium">{"Scholarship"}</th>
-                  <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
-                  <th className="text-left px-4 py-3 font-medium">{"Type"}</th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {scholarships.map((s) => (
-                  <ScholarshipAdminRow key={s.id} scholarship={s} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ScholarshipAdminTable scholarships={scholarships} />
         )}
       </main>
     </div>
