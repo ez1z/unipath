@@ -23,6 +23,10 @@ export const ScholarshipFormSchema = z.object({
     if (!v?.trim()) return [];
     try { return parseSemestersJson(JSON.parse(v)); } catch { return []; }
   }),
+  requirements: z.string().optional().transform((v) => {
+    if (!v?.trim()) return {};
+    try { return JSON.parse(v) as Record<string, unknown>; } catch { return {}; }
+  }),
   description_en: z.string().default(''),
   description_ru: z.string().default(''),
   description_tk: z.string().default(''),

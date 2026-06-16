@@ -49,8 +49,11 @@ export function EntranceRequirements({ requirements }: Props) {
   const tests = Array.isArray(requirements.tests) ? (requirements.tests as TestEntry[]) : [];
   const essays = Array.isArray(requirements.essays) ? (requirements.essays as EssayEntry[]) : [];
   const countryEntries = Object.entries(requirements).filter(([k]) => COUNTRY_KEYS.includes(k));
+  const docRequirements = Array.isArray(requirements.document_requirements)
+    ? (requirements.document_requirements as string[])
+    : [];
 
-  if (tests.length === 0 && essays.length === 0 && countryEntries.length === 0) return null;
+  if (tests.length === 0 && essays.length === 0 && countryEntries.length === 0 && docRequirements.length === 0) return null;
 
   const essayTypeKey = (type: EssayType) =>
     `essay_type_${type}` as Parameters<typeof t>[0];
@@ -142,6 +145,22 @@ export function EntranceRequirements({ requirements }: Props) {
                 {essay.description && (
                   <p className="mt-1 ml-5 text-muted-foreground">{essay.description}</p>
                 )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Document requirements */}
+      {docRequirements.length > 0 && (
+        <div className="border border-border rounded-xl p-4 bg-card">
+          <h3 className="font-heading font-semibold text-sm uppercase tracking-wider text-primary mb-3">
+            {t('documents_title')}
+          </h3>
+          <ul className="space-y-1.5 text-sm">
+            {docRequirements.map((doc, i) => (
+              <li key={i} className="flex items-center gap-2 text-foreground">
+                <span className="text-tk-green font-bold">✓</span> {doc}
               </li>
             ))}
           </ul>

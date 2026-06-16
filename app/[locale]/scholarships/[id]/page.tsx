@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 import { getBySlug } from '@/lib/data/scholarships';
+import { EntranceRequirements } from '@/components/university/EntranceRequirements';
 import { getById as getUniversityById } from '@/lib/data/universities';
 import { TMT_PER_USD } from '@/lib/constants';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -196,6 +197,16 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
                 </span>
               ))}
             </div>
+          </section>
+        )}
+
+        {/* Requirements */}
+        {Object.keys(scholarship.requirements).length > 0 && (
+          <section className="mb-8">
+            <h2 className="font-heading font-semibold text-base uppercase tracking-wider text-primary mb-3">
+              {t('requirements_section_title')}
+            </h2>
+            <EntranceRequirements requirements={scholarship.requirements} />
           </section>
         )}
 

@@ -15,6 +15,7 @@ const baseRow: ScholarshipDbRow = {
   amount_usd: '5000',
   deadline_text: 'March 31',
   semesters: [{ name: 'Fall', start_date: '2024-09-01', deadline: null }],
+  requirements: {},
   description_en: 'Desc EN',
   description_ru: 'Desc RU',
   description_tk: 'Desc TK',

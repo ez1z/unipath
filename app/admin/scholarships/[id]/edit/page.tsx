@@ -40,6 +40,7 @@ export default async function EditScholarshipPage({ params: { id } }: Props) {
     amount_usd: s.amount_usd != null ? String(Number(s.amount_usd)) : '',
     deadline_text: s.deadline_text ?? '',
     semesters: parseSemestersJson(s.semesters),
+    requirements: s.requirements ? JSON.stringify(s.requirements) : '',
     description_en: s.description_en,
     description_ru: s.description_ru,
     description_tk: s.description_tk,

@@ -21,6 +21,7 @@ export type ScholarshipDbRow = {
   amount_usd: string | number | null;
   deadline_text: string | null;
   semesters: unknown;
+  requirements: Record<string, unknown>;
   description_en: string;
   description_ru: string;
   description_tk: string;
@@ -40,6 +41,7 @@ export type Scholarship = {
   amount_usd: number | null;
   deadline_text: string | null;
   semesters: Semester[];
+  requirements: Record<string, unknown>;
   description: { tk: string; ru: string; en: string };
   application_url: string;
 };
@@ -56,6 +58,7 @@ export function dbRowToScholarship(row: ScholarshipDbRow): Scholarship {
     amount_usd: row.amount_usd !== null ? Number(row.amount_usd) : null,
     deadline_text: row.deadline_text,
     semesters: parseSemestersJson(row.semesters),
+    requirements: row.requirements ?? {},
     description: { en: row.description_en, ru: row.description_ru, tk: row.description_tk },
     application_url: row.application_url,
   };
@@ -118,6 +121,7 @@ export type ScholarshipInsert = {
   amount_usd: number | null;
   deadline_text: string | null;
   semesters: Semester[];
+  requirements: Record<string, unknown>;
   description_en: string;
   description_ru: string;
   description_tk: string;

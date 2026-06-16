@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { COVERAGE_ITEMS } from '@/lib/data/scholarship-types';
 import { SemesterEditor } from '@/components/admin/SemesterEditor';
+import { EntranceRequirementsEditor } from '@/components/admin/EntranceRequirementsEditor';
 import type { Semester } from '@/lib/types/semester';
 
 type UniversityOption = { id: string; name_en: string; country: string };
@@ -22,6 +23,7 @@ export type ScholarshipFormDefaults = {
   description_ru?: string;
   description_tk?: string;
   application_url?: string;
+  requirements?: string;
 };
 
 type Props = {
@@ -228,6 +230,17 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
         <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{"Semesters"}</h2>
         <p className="text-sm text-muted-foreground mb-4">{"Each semester has a name (Fall/Spring/custom), a course start date, and an optional application deadline."}</p>
         <SemesterEditor defaultValue={d.semesters ?? []} />
+      </div>
+
+      {/* Requirements */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{"Requirements"}</h2>
+        <p className="text-sm text-muted-foreground mb-4">{"Standardized tests, required essays, and documents applicants must submit."}</p>
+        <EntranceRequirementsEditor
+          defaultValue={d.requirements ?? ''}
+          name="requirements"
+          disabled={isPending}
+        />
       </div>
 
       {/* Descriptions */}

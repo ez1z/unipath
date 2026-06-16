@@ -14,6 +14,7 @@ function makeScholarship(overrides: Partial<Scholarship> = {}): Scholarship {
     amount_usd: null,
     deadline_text: null,
     semesters: [],
+    requirements: {},
     description: { en: '', ru: '', tk: '' },
     application_url: '',
     ...overrides,
