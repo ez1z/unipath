@@ -3,6 +3,7 @@
 import { useState, useTransition, useMemo } from 'react';
 import { SemesterEditor } from '@/components/admin/SemesterEditor';
 import { TuitionOptionsEditor } from '@/components/admin/TuitionOptionsEditor';
+import { EntranceRequirementsEditor } from '@/components/admin/EntranceRequirementsEditor';
 import type { Semester } from '@/lib/types/semester';
 import type { TuitionOption } from '@/lib/types/tuition';
 
@@ -257,25 +258,11 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
 
       {/* Entrance requirements */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{"Entrance requirements"}</h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          JSON object mapping country to exam requirements. Optionally include a{' '}
-          <code className="bg-muted px-1 rounded text-xs">document_requirements</code> array — these become
-          the student&apos;s personal checklist for this university. Example:{' '}
-          <code className="bg-muted px-1 rounded text-xs">
-            {'{"turkey":{"yos":true},"document_requirements":["Passport","Transcript","TOEFL Score"]}'}
-          </code>.
-          Leave blank if none.
-        </p>
-        <textarea
-          id="entrance_requirements"
+        <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{"Entrance requirements"}</h2>
+        <EntranceRequirementsEditor
           name="entrance_requirements"
-          rows={5}
           defaultValue={d.entrance_requirements}
           disabled={isPending}
-          placeholder='{"turkey":{"yos":true},"document_requirements":["Passport","Transcript","TOEFL Score"]}'
-          aria-label="Entrance requirements as JSON"
-          className={`${inputClass} resize-y font-mono text-xs`}
         />
       </div>
 
