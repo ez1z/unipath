@@ -13,6 +13,26 @@ import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
 
 type UserPrefs = { countries: string[]; majors: string[] };
+type UserScores = { toefl: number | null; ielts: number | null; sat: number | null; duolingo: number | null };
+
+type TestEntry = { type: string; min_score?: number; min_math?: number; min_verbal?: number };
+
+function meetsTestRequirements(university: University, scores: UserScores): boolean {
+  const tests = Array.isArray(university.entrance_requirements?.tests)
+    ? (university.entrance_requirements.tests as TestEntry[])
+    : [];
+  if (tests.length === 0) return true;
+  return tests.some((test) => {
+    if (test.type === 'toefl') return scores.toefl != null && scores.toefl >= (test.min_score ?? 0);
+    if (test.type === 'ielts') return scores.ielts != null && scores.ielts >= (test.min_score ?? 0);
+    if (test.type === 'sat') {
+      if (scores.sat == null) return false;
+      return scores.sat >= (test.min_math ?? 0) + (test.min_verbal ?? 0);
+    }
+    if (test.type === 'duolingo') return scores.duolingo != null && scores.duolingo >= (test.min_score ?? 0);
+    return false;
+  });
+}
 
 type Props = {
   universities: University[];
@@ -23,6 +43,7 @@ type Props = {
   savedUniversityIds: string[];
   scholarshipEligibleIds: string[];
   userPrefs: UserPrefs | null;
+  userScores: UserScores | null;
 };
 
 export function UniversityListClient({
@@ -34,6 +55,7 @@ export function UniversityListClient({
   savedUniversityIds,
   scholarshipEligibleIds,
   userPrefs,
+  userScores,
 }: Props) {
   const t = useTranslations('universities');
 
@@ -56,6 +78,7 @@ export function UniversityListClient({
     () => (searchParams.get('sort') as UniversitySortBy) || 'name',
   );
   const [prefsActive, setPrefsActive] = useState(() => searchParams.get('prefs') === '1');
+  const [scoresActive, setScoresActive] = useState(() => searchParams.get('scores') === '1');
 
   // Single source of truth for the active filters as a query string. Reused for
   // both the URL sync below and the per-card links, so opening a university and
@@ -72,8 +95,9 @@ export function UniversityListClient({
     if (deadlineStatus) params.set('deadline', deadlineStatus);
     if (sortBy !== 'name') params.set('sort', sortBy);
     if (prefsActive) params.set('prefs', '1');
+    if (scoresActive) params.set('scores', '1');
     return params.toString();
-  }, [query, country, language, major, moeOnly, rankedOnly, maxTuition, deadlineStatus, sortBy, prefsActive]);
+  }, [query, country, language, major, moeOnly, rankedOnly, maxTuition, deadlineStatus, sortBy, prefsActive, scoresActive]);
 
   // Keep the URL in sync with the active filters. We use the native History API
   // (integrated with the Next.js router in 14.2+) rather than router.replace so
@@ -91,22 +115,33 @@ export function UniversityListClient({
       userPrefs.majors.length > 0 ||
       savedUniversityIds.length > 0);
 
+  const hasScores =
+    userScores !== null &&
+    (userScores.toefl != null || userScores.ielts != null ||
+      userScores.sat != null || userScores.duolingo != null);
+
   const basePool = useMemo(() => {
-    if (!prefsActive || !userPrefs) return universities;
-    return universities.filter((u) => {
-      if (savedUniversityIds.includes(u.id)) return true;
-      const countryOk =
-        userPrefs.countries.length === 0 || userPrefs.countries.includes(u.country);
-      const majorOk =
-        userPrefs.majors.length === 0 ||
-        u.majors.some((m) =>
-          userPrefs.majors.some((pm) =>
-            m.toLowerCase().includes(pm.toLowerCase()),
-          ),
-        );
-      return countryOk && majorOk;
-    });
-  }, [universities, prefsActive, userPrefs, savedUniversityIds]);
+    let pool = universities;
+    if (prefsActive && userPrefs) {
+      pool = pool.filter((u) => {
+        if (savedUniversityIds.includes(u.id)) return true;
+        const countryOk =
+          userPrefs.countries.length === 0 || userPrefs.countries.includes(u.country);
+        const majorOk =
+          userPrefs.majors.length === 0 ||
+          u.majors.some((m) =>
+            userPrefs.majors.some((pm) =>
+              m.toLowerCase().includes(pm.toLowerCase()),
+            ),
+          );
+        return countryOk && majorOk;
+      });
+    }
+    if (scoresActive && userScores) {
+      pool = pool.filter((u) => meetsTestRequirements(u, userScores));
+    }
+    return pool;
+  }, [universities, prefsActive, userPrefs, savedUniversityIds, scoresActive, userScores]);
 
   const filtered = useMemo(
     () =>
@@ -175,6 +210,7 @@ export function UniversityListClient({
   const hasFilters =
     query || country || language || major || moeOnly || rankedOnly ||
     maxTuition || deadlineStatus || sortBy !== 'name';
+  const hasActivePersonalization = prefsActive || scoresActive;
 
   const countryOptions = [
     { value: '', label: t('filter_all_countries'), muted: true },
@@ -340,11 +376,40 @@ export function UniversityListClient({
                 {t('filter_my_preferences')}
               </button>
             )}
+
+            {hasScores && (
+              <button
+                type="button"
+                onClick={() => setScoresActive((v) => !v)}
+                aria-pressed={scoresActive}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                  scoresActive
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
+                }`}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+                {t('filter_my_results')}
+              </button>
+            )}
           </div>
 
-          {(hasFilters || prefsActive) && (
+          {(hasFilters || hasActivePersonalization) && (
             <button
-              onClick={() => { clearFilters(); setPrefsActive(false); }}
+              onClick={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
               className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
             >
               {t('clear_filters')}

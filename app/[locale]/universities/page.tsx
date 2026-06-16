@@ -24,7 +24,7 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
     user
       ? supabase
           .from('profiles')
-          .select('dream_university_ids, desired_countries, desired_majors')
+          .select('dream_university_ids, desired_countries, desired_majors, toefl_total, ielts_overall, sat_total, duolingo_score')
           .eq('id', user.id)
           .maybeSingle()
       : Promise.resolve({ data: null }),
@@ -37,6 +37,14 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
     ? {
         countries: (profileResult.data?.desired_countries as string[] | null) ?? [],
         majors: (profileResult.data?.desired_majors as string[] | null) ?? [],
+      }
+    : null;
+  const userScores = user
+    ? {
+        toefl: (profileResult.data?.toefl_total as number | null) ?? null,
+        ielts: (profileResult.data?.ielts_overall as number | null) ?? null,
+        sat: (profileResult.data?.sat_total as number | null) ?? null,
+        duolingo: (profileResult.data?.duolingo_score as number | null) ?? null,
       }
     : null;
 
@@ -53,6 +61,7 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
           savedUniversityIds={savedUniversityIds}
           scholarshipEligibleIds={scholarshipEligibleIds}
           userPrefs={userPrefs}
+          userScores={userScores}
         />
       </div>
     </>

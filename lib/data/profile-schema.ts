@@ -12,9 +12,6 @@ export const ProfileSchema = z.object({
     .optional()
     .nullable(),
   sat_total: z.coerce.number().int().min(400).max(1600).optional().nullable(),
-  act_total: z.coerce.number().int().min(1).max(36).optional().nullable(),
-  gre_total: z.coerce.number().int().min(260).max(340).optional().nullable(),
-  gmat_total: z.coerce.number().int().min(200).max(800).optional().nullable(),
   duolingo_score: z.coerce.number().int().min(10).max(160).optional().nullable(),
 
   gpa: z.coerce.number().min(0).max(100).optional().nullable(),

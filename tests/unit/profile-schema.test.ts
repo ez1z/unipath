@@ -78,48 +78,6 @@ describe('ProfileSchema', () => {
     });
   });
 
-  describe('act_total', () => {
-    it('accepts valid range 1–36', () => {
-      expect(ProfileSchema.safeParse({ act_total: 1 }).success).toBe(true);
-      expect(ProfileSchema.safeParse({ act_total: 36 }).success).toBe(true);
-    });
-
-    it('fails at 0', () => {
-      expect(ProfileSchema.safeParse({ act_total: 0 }).success).toBe(false);
-    });
-
-    it('fails above 36', () => {
-      expect(ProfileSchema.safeParse({ act_total: 37 }).success).toBe(false);
-    });
-  });
-
-  describe('gre_total', () => {
-    it('accepts valid range 260–340', () => {
-      expect(ProfileSchema.safeParse({ gre_total: 260 }).success).toBe(true);
-      expect(ProfileSchema.safeParse({ gre_total: 340 }).success).toBe(true);
-    });
-
-    it('fails below 260', () => {
-      expect(ProfileSchema.safeParse({ gre_total: 259 }).success).toBe(false);
-    });
-
-    it('fails above 340', () => {
-      expect(ProfileSchema.safeParse({ gre_total: 341 }).success).toBe(false);
-    });
-  });
-
-  describe('gmat_total', () => {
-    it('accepts valid range 200–800', () => {
-      expect(ProfileSchema.safeParse({ gmat_total: 200 }).success).toBe(true);
-      expect(ProfileSchema.safeParse({ gmat_total: 800 }).success).toBe(true);
-    });
-
-    it('fails outside range', () => {
-      expect(ProfileSchema.safeParse({ gmat_total: 199 }).success).toBe(false);
-      expect(ProfileSchema.safeParse({ gmat_total: 801 }).success).toBe(false);
-    });
-  });
-
   describe('duolingo_score', () => {
     it('accepts valid range 10–160', () => {
       expect(ProfileSchema.safeParse({ duolingo_score: 10 }).success).toBe(true);

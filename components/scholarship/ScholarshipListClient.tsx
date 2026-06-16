@@ -20,6 +20,7 @@ type Props = {
   types: string[];
   savedScholarshipIds: string[];
   userPrefs: UserPrefs | null;
+  qualifiedUniversityIds: string[] | null;
 };
 
 const COVERAGE_FILTER_OPTIONS = ['tuition', 'accommodation', 'flights', 'stipend', 'health'];
@@ -31,6 +32,7 @@ export function ScholarshipListClient({
   types,
   savedScholarshipIds,
   userPrefs,
+  qualifiedUniversityIds,
 }: Props) {
   const t = useTranslations('scholarships');
   const [query, setQuery] = useState('');
@@ -42,15 +44,28 @@ export function ScholarshipListClient({
   const [deadlineStatus, setDeadlineStatus] = useState('');
   const [sortBy, setSortBy] = useState<ScholarshipSortBy>('name');
   const [prefsActive, setPrefsActive] = useState(false);
+  const [scoresActive, setScoresActive] = useState(false);
 
   const hasPrefs = userPrefs !== null && userPrefs.countries.length > 0;
+  const hasScores = qualifiedUniversityIds !== null;
+
+  const qualifiedSet = useMemo(
+    () => (qualifiedUniversityIds ? new Set(qualifiedUniversityIds) : null),
+    [qualifiedUniversityIds],
+  );
 
   const basePool = useMemo(() => {
-    if (!prefsActive || !userPrefs) return scholarships;
-    return scholarships.filter((s) =>
-      userPrefs.countries.length === 0 || userPrefs.countries.includes(s.country),
-    );
-  }, [scholarships, prefsActive, userPrefs]);
+    let pool = scholarships;
+    if (prefsActive && userPrefs) {
+      pool = pool.filter((s) =>
+        userPrefs.countries.length === 0 || userPrefs.countries.includes(s.country),
+      );
+    }
+    if (scoresActive && qualifiedSet) {
+      pool = pool.filter((s) => s.university_id === null || qualifiedSet.has(s.university_id));
+    }
+    return pool;
+  }, [scholarships, prefsActive, userPrefs, scoresActive, qualifiedSet]);
 
   const filtered = useMemo(
     () =>
@@ -120,6 +135,7 @@ export function ScholarshipListClient({
   const hasFilters =
     query || country || type || coverage || hasAmount || minAmount ||
     deadlineStatus || sortBy !== 'name';
+  const hasActivePersonalization = prefsActive || scoresActive;
 
   const countryOptions = [
     { value: '', label: t('filter_all_countries'), muted: true },
@@ -298,11 +314,40 @@ export function ScholarshipListClient({
                 {t('filter_my_preferences')}
               </button>
             )}
+
+            {hasScores && (
+              <button
+                type="button"
+                onClick={() => setScoresActive((v) => !v)}
+                aria-pressed={scoresActive}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                  scoresActive
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
+                }`}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+                {t('filter_my_results')}
+              </button>
+            )}
           </div>
 
-          {(hasFilters || prefsActive) && (
+          {(hasFilters || hasActivePersonalization) && (
             <button
-              onClick={() => { clearFilters(); setPrefsActive(false); }}
+              onClick={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
               className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
             >
               {t('clear_filters')}

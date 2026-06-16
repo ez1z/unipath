@@ -23,9 +23,6 @@ type ProfileRow = {
   toefl_total: number | null;
   ielts_overall: number | null;
   sat_total: number | null;
-  act_total: number | null;
-  gre_total: number | null;
-  gmat_total: number | null;
   duolingo_score: number | null;
   gpa: number | null;
   gpa_scale: string;
@@ -313,27 +310,6 @@ export function ProfileForm({
             defaultValue={numStr(profile?.sat_total)}
             min={400}
             max={1600}
-          />
-          <ScoreField
-            label={t('act_label')}
-            name="act_total"
-            defaultValue={numStr(profile?.act_total)}
-            min={1}
-            max={36}
-          />
-          <ScoreField
-            label={t('gre_label')}
-            name="gre_total"
-            defaultValue={numStr(profile?.gre_total)}
-            min={260}
-            max={340}
-          />
-          <ScoreField
-            label={t('gmat_label')}
-            name="gmat_total"
-            defaultValue={numStr(profile?.gmat_total)}
-            min={200}
-            max={800}
           />
           <ScoreField
             label={t('duolingo_label')}
