@@ -89,6 +89,40 @@ export async function deleteUniversityAction(
   return { success: true };
 }
 
+export async function bulkDeleteUniversitiesAction(
+  ids: string[]
+): Promise<{ success: boolean; error?: string }> {
+  const { supabase, user } = await requireAdmin();
+  const { error } = await supabase.from('universities').delete().in('id', ids);
+  if (error) return { success: false, error: error.message };
+  revalidateUniversityPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'bulk_delete_universities',
+    entityType: 'university',
+    details: { count: ids.length },
+  });
+  return { success: true };
+}
+
+export async function bulkSetMoeApprovedAction(
+  ids: string[]
+): Promise<{ success: boolean; error?: string }> {
+  const { supabase, user } = await requireAdmin();
+  const { error } = await supabase.from('universities').update({ moe_approved: true }).in('id', ids);
+  if (error) return { success: false, error: error.message };
+  revalidateUniversityPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'bulk_set_moe_approved',
+    entityType: 'university',
+    details: { count: ids.length },
+  });
+  return { success: true };
+}
+
 export async function toggleMoeApprovedAction(
   id: string,
   currentValue: boolean

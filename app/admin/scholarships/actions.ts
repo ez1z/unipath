@@ -162,6 +162,23 @@ export async function deleteScholarshipAction(
   return { success: true };
 }
 
+export async function bulkDeleteScholarshipsAction(
+  ids: string[]
+): Promise<{ success: boolean; error?: string }> {
+  const { supabase, user } = await requireAdmin();
+  const { error } = await supabase.from('scholarships').delete().in('id', ids);
+  if (error) return { success: false, error: error.message };
+  revalidateScholarshipPaths();
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'bulk_delete_scholarships',
+    entityType: 'scholarship',
+    details: { count: ids.length },
+  });
+  return { success: true };
+}
+
 export async function importScholarshipsAction(
   rawRows: Record<string, string>[],
 ): Promise<{ success: boolean; count?: number; error?: string }> {

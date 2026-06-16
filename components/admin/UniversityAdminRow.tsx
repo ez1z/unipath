@@ -16,7 +16,13 @@ type RowData = {
   created_at: string;
 };
 
-export function UniversityAdminRow({ university: u }: { university: RowData }) {
+type Props = {
+  university: RowData;
+  selected: boolean;
+  onToggle: () => void;
+};
+
+export function UniversityAdminRow({ university: u, selected, onToggle }: Props) {
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
@@ -35,7 +41,16 @@ export function UniversityAdminRow({ university: u }: { university: RowData }) {
   }
 
   return (
-    <tr className="border-t border-border hover:bg-muted/30 transition-colors">
+    <tr className={`border-t border-border hover:bg-muted/30 transition-colors ${selected ? 'bg-primary/5' : ''}`}>
+      <td className="px-4 py-3 w-10">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onToggle}
+          aria-label={`Select ${u.name_en}`}
+          className="rounded border-border accent-primary cursor-pointer"
+        />
+      </td>
       <td className="px-4 py-3 font-medium text-foreground">{u.name_en}</td>
       <td className="px-4 py-3 text-muted-foreground">{u.country}</td>
       <td className="px-4 py-3">

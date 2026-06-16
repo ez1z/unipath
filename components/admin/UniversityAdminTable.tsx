@@ -1,7 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { UniversityAdminRow } from '@/components/admin/UniversityAdminRow';
+import {
+  bulkDeleteUniversitiesAction,
+  bulkSetMoeApprovedAction,
+} from '@/app/admin/universities/actions';
 
 type RowData = {
   id: string;
@@ -32,6 +36,9 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
   const [search, setSearch] = useState('');
   const [country, setCountry] = useState('');
   const [sort, setSort] = useState<SortKey>('name-asc');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isPending, startTransition] = useTransition();
+  const selectAllRef = useRef<HTMLInputElement>(null);
 
   const countries = useMemo(
     () => Array.from(new Set(universities.map((u) => u.country))).sort(),
@@ -71,6 +78,56 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
     return sorted;
   }, [universities, search, country, sort]);
 
+  const allFilteredSelected = filtered.length > 0 && filtered.every((u) => selectedIds.has(u.id));
+  const someFilteredSelected = filtered.some((u) => selectedIds.has(u.id));
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someFilteredSelected && !allFilteredSelected;
+    }
+  }, [someFilteredSelected, allFilteredSelected]);
+
+  function toggleAll() {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allFilteredSelected) {
+        filtered.forEach((u) => next.delete(u.id));
+      } else {
+        filtered.forEach((u) => next.add(u.id));
+      }
+      return next;
+    });
+  }
+
+  function toggleOne(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function handleBulkDelete() {
+    const ids = Array.from(selectedIds);
+    const label = ids.length === 1 ? 'university' : 'universities';
+    if (!confirm(`Delete ${ids.length} ${label}? This cannot be undone.`)) return;
+    startTransition(async () => {
+      const result = await bulkDeleteUniversitiesAction(ids);
+      if (!result.success) alert(`Error: ${result.error}`);
+      else setSelectedIds(new Set());
+    });
+  }
+
+  function handleBulkMoe() {
+    const ids = Array.from(selectedIds);
+    startTransition(async () => {
+      const result = await bulkSetMoeApprovedAction(ids);
+      if (!result.success) alert(`Error: ${result.error}`);
+      else setSelectedIds(new Set());
+    });
+  }
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -109,6 +166,29 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
         </select>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 mb-4 px-4 py-2.5 bg-card border border-border rounded-lg">
+          <span className="text-sm text-muted-foreground">
+            {selectedIds.size} {selectedIds.size === 1 ? 'university' : 'universities'} selected
+          </span>
+          <div className="flex-1" />
+          <button
+            onClick={handleBulkMoe}
+            disabled={isPending}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-300 hover:bg-yellow-100 transition-colors disabled:opacity-50"
+          >
+            {"★ Set MoE Approved"}
+          </button>
+          <button
+            onClick={handleBulkDelete}
+            disabled={isPending}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 border border-red-200 hover:bg-red-50 transition-colors disabled:opacity-50"
+          >
+            {"Delete selected"}
+          </button>
+        </div>
+      )}
+
       {filtered.length === 0 ? (
         <div className="bg-card rounded-xl border border-border shadow-card p-12 text-center">
           <p className="text-muted-foreground text-sm">{"No universities match your filters."}</p>
@@ -118,6 +198,16 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>
+                <th className="px-4 py-3 w-10">
+                  <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    checked={allFilteredSelected}
+                    onChange={toggleAll}
+                    aria-label="Select all universities"
+                    className="rounded border-border accent-primary cursor-pointer"
+                  />
+                </th>
                 <th className="text-left px-4 py-3 font-medium">{"University"}</th>
                 <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
                 <th className="text-left px-4 py-3 font-medium">{"MoE Approved"}</th>
@@ -127,7 +217,12 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
             </thead>
             <tbody>
               {filtered.map((u) => (
-                <UniversityAdminRow key={u.id} university={u} />
+                <UniversityAdminRow
+                  key={u.id}
+                  university={u}
+                  selected={selectedIds.has(u.id)}
+                  onToggle={() => toggleOne(u.id)}
+                />
               ))}
             </tbody>
           </table>
