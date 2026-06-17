@@ -10,20 +10,55 @@ const inputCls =
 
 type Props = {
   defaultValue?: Semester[];
-  /** Notified whenever the semester list changes, so a parent can keep dependent fields in sync. */
   onChange?: (semesters: Semester[]) => void;
+  languages?: string[];
+  majors?: string[];
 };
 
-export function SemesterEditor({ defaultValue = [], onChange }: Props) {
+function DimensionSelect({
+  label,
+  value,
+  list,
+  onChange,
+}: {
+  label: string;
+  value: string | null | undefined;
+  list: string[];
+  onChange: (v: string | null) => void;
+}) {
+  const current = value ?? '';
+  const opts = [...new Set(list.filter(Boolean))];
+  if (current && !opts.includes(current)) opts.push(current);
+
+  if (opts.length === 0) return null;
+
+  return (
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-1">{label}</label>
+      <select
+        value={current}
+        onChange={(e) => onChange(e.target.value || null)}
+        aria-label={label}
+        className={inputCls}
+      >
+        <option value="">{"Any"}</option>
+        {opts.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+export function SemesterEditor({ defaultValue = [], onChange, languages = [], majors = [] }: Props) {
   const [semesters, setSemesters] = useState<Semester[]>(defaultValue);
 
   useEffect(() => {
-    // onChange is expected to be stable (a setState updater); only re-run on data change.
     onChange?.(semesters);
   }, [semesters]);
 
   function add() {
-    setSemesters((prev) => [...prev, { name: '', start_date: '', deadline: null }]);
+    setSemesters((prev) => [...prev, { name: '', start_date: '', deadline: null, language: null, major: null }]);
   }
 
   function remove(i: number) {
@@ -35,6 +70,8 @@ export function SemesterEditor({ defaultValue = [], onChange }: Props) {
       prev.map((s, idx) => (idx === i ? { ...s, [field]: value } : s))
     );
   }
+
+  const hasDimensions = languages.length > 0 || majors.length > 0;
 
   return (
     <div className="space-y-3">
@@ -69,7 +106,7 @@ export function SemesterEditor({ defaultValue = [], onChange }: Props) {
                 value={sem.name}
                 onChange={(e) => update(i, 'name', e.target.value)}
                 placeholder={"Semester name (e.g. Fall 2025)"}
-                aria-label={`Remove semester ${i + 1}`}
+                aria-label={`Semester ${i + 1} name`}
                 className={inputCls}
               />
             </div>
@@ -110,6 +147,23 @@ export function SemesterEditor({ defaultValue = [], onChange }: Props) {
               />
             </div>
           </div>
+
+          {hasDimensions && (
+            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-border/50">
+              <DimensionSelect
+                label={"Applies to language"}
+                value={sem.language}
+                list={languages}
+                onChange={(v) => update(i, 'language', v)}
+              />
+              <DimensionSelect
+                label={"Applies to major"}
+                value={sem.major}
+                list={majors}
+                onChange={(v) => update(i, 'major', v)}
+              />
+            </div>
+          )}
         </div>
       ))}
 

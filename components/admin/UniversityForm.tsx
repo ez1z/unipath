@@ -4,6 +4,7 @@ import { useState, useTransition, useMemo, useEffect } from 'react';
 import { SemesterEditor } from '@/components/admin/SemesterEditor';
 import { TuitionOptionsEditor } from '@/components/admin/TuitionOptionsEditor';
 import { EntranceRequirementsEditor } from '@/components/admin/EntranceRequirementsEditor';
+import { TagInput } from '@/components/admin/TagInput';
 import type { Semester } from '@/lib/types/semester';
 import type { TuitionOption } from '@/lib/types/tuition';
 
@@ -16,8 +17,8 @@ export type UniversityFormDefaults = {
   tuition_usd?: string;
   moe_approved?: boolean;
   ranking_qs?: string;
-  languages?: string;
-  majors?: string;
+  languages?: string[];
+  majors?: string[];
   official_website?: string;
   application_portal_url?: string;
   entrance_requirements?: string;
@@ -47,20 +48,10 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
   const [isPending, startTransition] = useTransition();
   const [moeMatch, setMoeMatch] = useState(false);
 
-  // Languages, majors and semesters are held in state so the tuition-variant
-  // editor can offer them as dropdown choices — keeping all four fields in sync.
-  const [languagesText, setLanguagesText] = useState(d.languages ?? '');
-  const [majorsText, setMajorsText] = useState(d.majors ?? '');
+  const [languages, setLanguages] = useState<string[]>(d.languages ?? []);
+  const [majors, setMajors] = useState<string[]>(d.majors ?? []);
   const [semesters, setSemesters] = useState<Semester[]>(d.semesters ?? []);
 
-  const languageList = useMemo(
-    () => languagesText.split('|').map((s) => s.trim()).filter(Boolean),
-    [languagesText],
-  );
-  const majorList = useMemo(
-    () => majorsText.split('|').map((s) => s.trim()).filter(Boolean),
-    [majorsText],
-  );
   const semesterNames = useMemo(
     () => semesters.map((s) => s.name.trim()).filter(Boolean),
     [semesters],
@@ -200,40 +191,30 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
         <h2 className="font-heading font-semibold text-base mb-4 text-foreground">{"Academic info"}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
-            <label htmlFor="languages" className={labelClass}>
-              {"Languages of instruction *"}
-              <span className="text-muted-foreground font-normal ml-1">{"(separate with |)"}</span>
-            </label>
-            <input
-              id="languages" name="languages" type="text" required
-              value={languagesText}
-              onChange={(e) => setLanguagesText(e.target.value)}
+            <label className={labelClass}>{"Languages of instruction *"}</label>
+            <TagInput
+              name="languages"
+              defaultValue={d.languages ?? []}
+              placeholder="English, Turkish…"
               disabled={isPending}
-              placeholder="English|Turkish"
-              aria-label="Languages of instruction, pipe-separated"
-              className={inputClass}
+              onChange={setLanguages}
             />
           </div>
           <div>
-            <label htmlFor="majors" className={labelClass}>
-              {"Majors / faculties *"}
-              <span className="text-muted-foreground font-normal ml-1">{"(separate with |)"}</span>
-            </label>
-            <input
-              id="majors" name="majors" type="text" required
-              value={majorsText}
-              onChange={(e) => setMajorsText(e.target.value)}
+            <label className={labelClass}>{"Majors / faculties *"}</label>
+            <TagInput
+              name="majors"
+              defaultValue={d.majors ?? []}
+              placeholder="Engineering, Medicine…"
               disabled={isPending}
-              placeholder="Engineering|Computer Science"
-              aria-label="Majors or faculties, pipe-separated"
-              className={inputClass}
+              onChange={setMajors}
             />
           </div>
         </div>
         {moeMatch && (
           <div
             role="note"
-            className="flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+            className="flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 mb-4"
           >
             <span aria-hidden="true" className="shrink-0 text-base leading-5">★</span>
             <span>{"This university is on the official MoE approved list — consider checking \"MoE approved\" below."}</span>
@@ -300,20 +281,24 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
       {/* Semesters */}
       <div className="bg-card border border-border rounded-xl p-6">
         <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{"Semesters"}</h2>
-        <p className="text-sm text-muted-foreground mb-4">{"Each semester has a name (Fall/Spring/custom), a course start date, and an optional application deadline."}</p>
-        <SemesterEditor defaultValue={d.semesters ?? []} onChange={setSemesters} />
+        <p className="text-sm text-muted-foreground mb-4">{"Each semester has a name, a course start date, and an optional application deadline. If a semester only applies to a specific language or major, set those filters."}</p>
+        <SemesterEditor
+          defaultValue={d.semesters ?? []}
+          onChange={setSemesters}
+          languages={languages}
+          majors={majors}
+        />
       </div>
 
-      {/* Tuition variants (differentiated costs) — placed last so semesters,
-          languages and majors are already defined and selectable here. */}
+      {/* Tuition variants */}
       <div className="bg-card border border-border rounded-xl p-6">
         <h2 className="font-heading font-semibold text-base mb-1 text-foreground">{"Tuition variants"}</h2>
         <p className="text-sm text-muted-foreground mb-4">{"Optional. Add rows only when tuition differs by semester, language of instruction, or major. Leave a dimension blank if it doesn't affect the price. The annual tuition above stays the baseline used for search and comparison."}</p>
         <TuitionOptionsEditor
           defaultValue={d.tuition_options ?? []}
           semesterNames={semesterNames}
-          languages={languageList}
-          majors={majorList}
+          languages={languages}
+          majors={majors}
         />
       </div>
 

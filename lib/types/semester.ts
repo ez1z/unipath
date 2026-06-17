@@ -2,19 +2,38 @@ export type Semester = {
   name: string;
   start_date: string; // YYYY-MM-DD
   deadline: string | null; // YYYY-MM-DD or null
+  language?: string | null; // null = applies to all languages
+  major?: string | null;    // null = applies to all majors
 };
+
+function toNullableString(v: unknown): string | null {
+  if (typeof v !== 'string') return null;
+  const t = v.trim();
+  return t === '' ? null : t;
+}
 
 export function parseSemestersJson(raw: unknown): Semester[] {
   if (!Array.isArray(raw)) return [];
-  return raw.filter(
-    (s): s is Semester =>
-      typeof s === 'object' &&
-      s !== null &&
-      typeof (s as Semester).name === 'string' &&
-      /^\d{4}-\d{2}-\d{2}$/.test((s as Semester).start_date) &&
-      ((s as Semester).deadline === null ||
-        /^\d{4}-\d{2}-\d{2}$/.test((s as Semester).deadline as string))
-  );
+  return raw
+    .filter(
+      (s) =>
+        typeof s === 'object' &&
+        s !== null &&
+        typeof (s as Record<string, unknown>).name === 'string' &&
+        /^\d{4}-\d{2}-\d{2}$/.test((s as Record<string, unknown>).start_date as string) &&
+        ((s as Record<string, unknown>).deadline === null ||
+          /^\d{4}-\d{2}-\d{2}$/.test((s as Record<string, unknown>).deadline as string))
+    )
+    .map((s) => {
+      const r = s as Record<string, unknown>;
+      return {
+        name: r.name as string,
+        start_date: r.start_date as string,
+        deadline: typeof r.deadline === 'string' ? r.deadline : null,
+        language: toNullableString(r.language),
+        major: toNullableString(r.major),
+      };
+    });
 }
 
 export function getNextDeadline(semesters: Semester[]): string | null {
