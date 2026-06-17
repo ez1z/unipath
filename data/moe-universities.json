@@ -1,0 +1,7902 @@
+[
+  {
+    "name": "Massachusetts Institute of Technology (MIT)",
+    "country": "United States of America"
+  },
+  {
+    "name": "Imperial College London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Stanford University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Oxford",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Harvard University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Cambridge",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "ETH Zurich (Swiss Federal Institute of Technology)",
+    "country": "Switzerland"
+  },
+  {
+    "name": "National University of Singapore (NUS)",
+    "country": "Singapore"
+  },
+  {
+    "name": "UCL (University College London)",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "California Institute of Technology (Caltech)",
+    "country": "United States of America"
+  },
+  {
+    "name": "The University of Hong Kong",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "Nanyang Technological University, Singapore (NTU Singapore)",
+    "country": "Singapore"
+  },
+  {
+    "name": "University of Chicago",
+    "country": "United States of America"
+  },
+  {
+    "name": "Peking University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Pennsylvania",
+    "country": "United States of America"
+  },
+  {
+    "name": "Cornell University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Tsinghua University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of California, Berkeley (UCB)",
+    "country": "United States of America"
+  },
+  {
+    "name": "The University of Melbourne",
+    "country": "Australia"
+  },
+  {
+    "name": "The University of New South Wales",
+    "country": "Australia"
+  },
+  {
+    "name": "Yale University",
+    "country": "United States of America"
+  },
+  {
+    "name": "École Polytechnique Fédérale de Lausanne",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Technical University of Munich",
+    "country": "Germany"
+  },
+  {
+    "name": "Johns Hopkins University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Princeton University",
+    "country": "United States of America"
+  },
+  {
+    "name": "The University of Sydney",
+    "country": "Australia"
+  },
+  {
+    "name": "McGill University",
+    "country": "Canada"
+  },
+  {
+    "name": "PSL University",
+    "country": "France"
+  },
+  {
+    "name": "University of Toronto",
+    "country": "Canada"
+  },
+  {
+    "name": "Fudan University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "King's College London (KCL)",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Australian National University",
+    "country": "Australia"
+  },
+  {
+    "name": "The Chinese University of Hong Kong",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "University of Edinburgh",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "The University of Manchester",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Monash University",
+    "country": "Australia"
+  },
+  {
+    "name": "The University of Tokyo",
+    "country": "Japan"
+  },
+  {
+    "name": "Columbia University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Seoul National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "University of British Columbia",
+    "country": "Canada"
+  },
+  {
+    "name": "Institut Polytechnique de Paris",
+    "country": "France"
+  },
+  {
+    "name": "Northwestern University",
+    "country": "United States of America"
+  },
+  {
+    "name": "The University of Queensland",
+    "country": "Australia"
+  },
+  {
+    "name": "The Hong Kong University of Science and Technology",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "University of Michigan-Ann Arbor",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of California, Los Angeles (UCLA)",
+    "country": "United States of America"
+  },
+  {
+    "name": "Delft University of Technology",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Shanghai Jiao Tong University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Zhejiang University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Yonsei University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "University of Bristol",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Carnegie Mellon University",
+    "country": "United States of America"
+  },
+  {
+    "name": "The University of Amsterdam",
+    "country": "Netherlands"
+  },
+  {
+    "name": "The Hong Kong Polytechnic University",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "New York University (NYU)",
+    "country": "United States of America"
+  },
+  {
+    "name": "London School of Economics and Political Science (LSE)",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Kyoto University",
+    "country": "Japan"
+  },
+  {
+    "name": "Ludwig-Maximilians-Universität München",
+    "country": "Germany"
+  },
+  {
+    "name": "Universiti Malaya (UM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "KU Leuven",
+    "country": "Belgium"
+  },
+  {
+    "name": "Korea University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Duke University",
+    "country": "United States of America"
+  },
+  {
+    "name": "City University of Hong Kong",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "National Taiwan University (NTU)",
+    "country": "Taiwan"
+  },
+  {
+    "name": "The University of Auckland",
+    "country": "New Zealand"
+  },
+  {
+    "name": "University of California, San Diego (UCSD)",
+    "country": "United States of America"
+  },
+  {
+    "name": "King Fahd University of Petroleum & Minerals",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "University of Texas at Austin",
+    "country": "United States of America"
+  },
+  {
+    "name": "Brown University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Université Paris-Saclay",
+    "country": "France"
+  },
+  {
+    "name": "University of Illinois at Urbana-Champaign",
+    "country": "United States of America"
+  },
+  {
+    "name": "Lund University",
+    "country": "Sweden"
+  },
+  {
+    "name": "Sorbonne University (merged from Paris IV & UPMC)",
+    "country": "France"
+  },
+  {
+    "name": "The University of Warwick",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Trinity College Dublin, The University of Dublin",
+    "country": "Ireland"
+  },
+  {
+    "name": "University of Birmingham",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "The University of Western Australia",
+    "country": "Australia"
+  },
+  {
+    "name": "KTH Royal Institute of Technology",
+    "country": "Sweden"
+  },
+  {
+    "name": "University of Glasgow",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Ruprecht-Karls-Universität Heidelberg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Washington",
+    "country": "United States of America"
+  },
+  {
+    "name": "Adelaide University",
+    "country": "Australia"
+  },
+  {
+    "name": "Pennsylvania State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Universidad de Buenos Aires",
+    "country": "Argentina"
+  },
+  {
+    "name": "Tokyo Institute of Technology",
+    "country": "Japan"
+  },
+  {
+    "name": "University of Leeds",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Southampton",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Boston University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Freie Universität Berlin",
+    "country": "Germany"
+  },
+  {
+    "name": "Purdue University",
+    "country": "United States of America"
+  },
+  {
+    "name": "The University of Osaka",
+    "country": "Japan"
+  },
+  {
+    "name": "The University of Sheffield",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Uppsala University",
+    "country": "Sweden"
+  },
+  {
+    "name": "Durham University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Alberta",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Technology Sydney",
+    "country": "Australia"
+  },
+  {
+    "name": "The University of Nottingham",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Karlsruhe Institute of Technology (KIT)",
+    "country": "Germany"
+  },
+  {
+    "name": "Politecnico di Milano",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Zurich (UZH)",
+    "country": "Switzerland"
+  },
+  {
+    "name": "University of Copenhagen",
+    "country": "Denmark"
+  },
+  {
+    "name": "Pohang University of Science And Technology (POSTECH)",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Nanjing University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Utrecht University",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Lomonosov Moscow State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Rheinisch-Westfälische Technische Hochschule Aachen",
+    "country": "Germany"
+  },
+  {
+    "name": "Technical University of Denmark",
+    "country": "Denmark"
+  },
+  {
+    "name": "Universidade de São Paulo (USP)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Tohoku University",
+    "country": "Japan"
+  },
+  {
+    "name": "Queen Mary University of London (QMUL)",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Wisconsin-Madison",
+    "country": "United States of America"
+  },
+  {
+    "name": "Qatar University",
+    "country": "Qatar"
+  },
+  {
+    "name": "University of St Andrews",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Aalto University",
+    "country": "Finland"
+  },
+  {
+    "name": "University of California, Davis",
+    "country": "United States of America"
+  },
+  {
+    "name": "Pontificia Universidad Católica de Chile",
+    "country": "Chile"
+  },
+  {
+    "name": "University of Helsinki",
+    "country": "Finland"
+  },
+  {
+    "name": "University College Dublin",
+    "country": "Ireland"
+  },
+  {
+    "name": "Leiden University",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Rice University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Oslo",
+    "country": "Norway"
+  },
+  {
+    "name": "University of Waterloo",
+    "country": "Canada"
+  },
+  {
+    "name": "Georgia Institute of Technology",
+    "country": "United States of America"
+  },
+  {
+    "name": "Indian Institute of Technology Delhi (IITD)",
+    "country": "India"
+  },
+  {
+    "name": "RMIT University",
+    "country": "Australia"
+  },
+  {
+    "name": "Sungkyunkwan University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Universiti Kebangsaan Malaysia (UKM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Sapienza University of Rome",
+    "country": "Italy"
+  },
+  {
+    "name": "Indian Institute of Technology Bombay (IITB)",
+    "country": "India"
+  },
+  {
+    "name": "Humboldt-Universität zu Berlin",
+    "country": "Germany"
+  },
+  {
+    "name": "Aarhus University",
+    "country": "Denmark"
+  },
+  {
+    "name": "University of Bath",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Science and Technology of China",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Universiti Putra Malaysia (UPM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Universiti Sains Malaysia (USM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Universidad Nacional Autónoma de México (UNAM)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Newcastle University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Alma Mater Studiorum - University of Bologna",
+    "country": "Italy"
+  },
+  {
+    "name": "Macquarie University",
+    "country": "Australia"
+  },
+  {
+    "name": "Eindhoven University of Technology",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Erasmus University Rotterdam",
+    "country": "Netherlands"
+  },
+  {
+    "name": "University of North Carolina, Chapel Hill",
+    "country": "United States of America"
+  },
+  {
+    "name": "King Saud University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Texas A&M University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Technische Universität Berlin",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Southern California",
+    "country": "United States of America"
+  },
+  {
+    "name": "Stockholm University",
+    "country": "Sweden"
+  },
+  {
+    "name": "University of Groningen",
+    "country": "Netherlands"
+  },
+  {
+    "name": "University of Liverpool",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Cape Town",
+    "country": "South Africa"
+  },
+  {
+    "name": "Western University",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Vienna",
+    "country": "Austria"
+  },
+  {
+    "name": "Universiti Teknologi Malaysia (UTM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Wageningen University & Research",
+    "country": "Netherlands"
+  },
+  {
+    "name": "University of Exeter",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Geneva",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Lancaster University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Basel",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Hanyang University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "University of Barcelona",
+    "country": "Spain"
+  },
+  {
+    "name": "Michigan State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Ghent University",
+    "country": "Belgium"
+  },
+  {
+    "name": "King Abdul Aziz University (KAU)",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Nagoya University",
+    "country": "Japan"
+  },
+  {
+    "name": "Chalmers University of Technology",
+    "country": "Sweden"
+  },
+  {
+    "name": "Al-Farabi Kazakh National University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Washington University in St. Louis",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Montreal",
+    "country": "Canada"
+  },
+  {
+    "name": "University of York",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Hokkaido University",
+    "country": "Japan"
+  },
+  {
+    "name": "Kyushu University",
+    "country": "Japan"
+  },
+  {
+    "name": "Universitat Autónoma de Barcelona",
+    "country": "Spain"
+  },
+  {
+    "name": "Arizona State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "McMaster University",
+    "country": "Canada"
+  },
+  {
+    "name": "Universidad de Chile",
+    "country": "Chile"
+  },
+  {
+    "name": "National Tsing Hua University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Khalifa University of Science and Technology",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Tongji University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of California, Santa Barbara (UCSB)",
+    "country": "United States of America"
+  },
+  {
+    "name": "Indian Institute of Technology Madras (IITM)",
+    "country": "India"
+  },
+  {
+    "name": "Cardiff University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Emory University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Curtin University",
+    "country": "Australia"
+  },
+  {
+    "name": "University of Bern",
+    "country": "Switzerland"
+  },
+  {
+    "name": "University of Wollongong",
+    "country": "Australia"
+  },
+  {
+    "name": "Wuhan University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Tecnológico de Monterrey (ITESM)",
+    "country": "Mexico"
+  },
+  {
+    "name": "University Complutense Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "UNIVERSITAS INDONESIA",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Ohio State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Queen's University, Ontario",
+    "country": "Canada"
+  },
+  {
+    "name": "Université Catholique de Louvain (UCL)",
+    "country": "Belgium"
+  },
+  {
+    "name": "Universität Hamburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Reading",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Vrije Universiteit Amsterdam",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Waseda University",
+    "country": "Japan"
+  },
+  {
+    "name": "University of Otago",
+    "country": "New Zealand"
+  },
+  {
+    "name": "Vienna University of Technology",
+    "country": "Austria"
+  },
+  {
+    "name": "National Yang Ming Chiao Tung University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Queen's University Belfast",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Universität Freiburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Gothenburg",
+    "country": "Sweden"
+  },
+  {
+    "name": "National Cheng Kung University (NCKU)",
+    "country": "Taiwan"
+  },
+  {
+    "name": "University of Twente",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Ecole Normale Supérieure de Lyon",
+    "country": "France"
+  },
+  {
+    "name": "Universidad Autónoma de Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "Deakin University",
+    "country": "Australia"
+  },
+  {
+    "name": "Rheinische Friedrich-Wilhelms-Universität Bonn",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Maryland, College Park",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Minnesota (System)",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Calgary",
+    "country": "Canada"
+  },
+  {
+    "name": "Universidad de Los Andes Colombia",
+    "country": "Colombia"
+  },
+  {
+    "name": "University of Florida",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Lausanne",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Eberhard Karls Universität Tübingen",
+    "country": "Germany"
+  },
+  {
+    "name": "Indian Institute of Technology Kharagpur (IITKGP)",
+    "country": "India"
+  },
+  {
+    "name": "Keio University",
+    "country": "Japan"
+  },
+  {
+    "name": "Technische Universität Dresden",
+    "country": "Germany"
+  },
+  {
+    "name": "Indian Institute of Science (IISc) Bangalore",
+    "country": "India"
+  },
+  {
+    "name": "University of Ottawa",
+    "country": "Canada"
+  },
+  {
+    "name": "Chulalongkorn University",
+    "country": "Thailand"
+  },
+  {
+    "name": "Indian Institute of Technology Kanpur (IITK)",
+    "country": "India"
+  },
+  {
+    "name": "Tel Aviv University",
+    "country": "Israel"
+  },
+  {
+    "name": "Universitas Gadjah Mada",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Loughborough University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Queensland University of Technology",
+    "country": "Australia"
+  },
+  {
+    "name": "The University of Newcastle",
+    "country": "Australia"
+  },
+  {
+    "name": "Université Libre de Bruxelles (ULB)",
+    "country": "Belgium"
+  },
+  {
+    "name": "United Arab Emirates University",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Massey University",
+    "country": "New Zealand"
+  },
+  {
+    "name": "University of Lisbon",
+    "country": "Portugal"
+  },
+  {
+    "name": "Universität Erlangen-Nürnberg",
+    "country": "Germany"
+  },
+  {
+    "name": "La Trobe University",
+    "country": "Australia"
+  },
+  {
+    "name": "Universidade Estadual de Campinas (Unicamp)",
+    "country": "Brazil"
+  },
+  {
+    "name": "University of Padova",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Rochester",
+    "country": "United States of America"
+  },
+  {
+    "name": "American University of Beirut (AUB)",
+    "country": "Lebanon"
+  },
+  {
+    "name": "University of Porto",
+    "country": "Portugal"
+  },
+  {
+    "name": "Maastricht University",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Hebrew University of Jerusalem",
+    "country": "Israel"
+  },
+  {
+    "name": "Victoria University of Wellington",
+    "country": "New Zealand"
+  },
+  {
+    "name": "Politecnico di Torino",
+    "country": "Italy"
+  },
+  {
+    "name": "Georg-August-Universität Göttingen",
+    "country": "Germany"
+  },
+  {
+    "name": "Hamad Bin Khalifa University",
+    "country": "Qatar"
+  },
+  {
+    "name": "Hong Kong Baptist University",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "University College Cork",
+    "country": "Ireland"
+  },
+  {
+    "name": "Beijing Normal University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Dartmouth College",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Massachusetts, Amherst",
+    "country": "United States of America"
+  },
+  {
+    "name": "Vanderbilt University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Universiti Teknologi Petronas (UTP)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Strathclyde",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Taylor's University (Malaysia)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Technische Universität Darmstadt",
+    "country": "Germany"
+  },
+  {
+    "name": "Bandung Institute of Technology (ITB)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Harbin Institute of Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Tianjin University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Université Paris 1 Panthéon-Sorbonne",
+    "country": "France"
+  },
+  {
+    "name": "Beijing Institute of Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Universidad Nacional de Colombia",
+    "country": "Colombia"
+  },
+  {
+    "name": "University of Canterbury",
+    "country": "New Zealand"
+  },
+  {
+    "name": "University of Aberdeen",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Navarra",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Surrey",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Charles University",
+    "country": "Czechia"
+  },
+  {
+    "name": "Universitat Pompeu Fabra",
+    "country": "Spain"
+  },
+  {
+    "name": "Norwegian University of Science And Technology",
+    "country": "Norway"
+  },
+  {
+    "name": "Griffith University",
+    "country": "Australia"
+  },
+  {
+    "name": "Middle East Technical University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "UCSI University",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Warsaw",
+    "country": "Poland"
+  },
+  {
+    "name": "American University of Sharjah (AUS)",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "North Carolina State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Universität zu Köln",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Virginia",
+    "country": "United States of America"
+  },
+  {
+    "name": "Sun Yat-sen University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Milan",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Sussex",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Radboud University Nijmegen",
+    "country": "Netherlands"
+  },
+  {
+    "name": "University of Antwerp",
+    "country": "Belgium"
+  },
+  {
+    "name": "University of Pittsburgh",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Waikato",
+    "country": "New Zealand"
+  },
+  {
+    "name": "Dalhousie University",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Galway / Ollscoil na Gaillimhe",
+    "country": "Ireland"
+  },
+  {
+    "name": "Georgetown University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Macau",
+    "country": "Macao SAR, China"
+  },
+  {
+    "name": "Heriot-Watt University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Universitas Airlangga",
+    "country": "Indonesia"
+  },
+  {
+    "name": "University of Arizona",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Bergen",
+    "country": "Norway"
+  },
+  {
+    "name": "University of The Witwatersrand",
+    "country": "South Africa"
+  },
+  {
+    "name": "Swansea University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of California, Irvine",
+    "country": "United States of America"
+  },
+  {
+    "name": "Case Western Reserve University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Swinburne University of Technology",
+    "country": "Australia"
+  },
+  {
+    "name": "University of Notre Dame",
+    "country": "United States of America"
+  },
+  {
+    "name": "Vrije Universiteit Brussel (VUB)",
+    "country": "Belgium"
+  },
+  {
+    "name": "Istanbul Technical University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "University of Colorado Boulder",
+    "country": "United States of America"
+  },
+  {
+    "name": "Université Paris Cité",
+    "country": "France"
+  },
+  {
+    "name": "Universidad Carlos III de Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "Stellenbosch University",
+    "country": "South Africa"
+  },
+  {
+    "name": "Jagiellonian University",
+    "country": "Poland"
+  },
+  {
+    "name": "University of Southern Denmark",
+    "country": "Denmark"
+  },
+  {
+    "name": "Xi'an Jiaotong University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Aalborg University",
+    "country": "Denmark"
+  },
+  {
+    "name": "Indiana University Bloomington",
+    "country": "United States of America"
+  },
+  {
+    "name": "Simon Fraser University",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Johannesburg",
+    "country": "South Africa"
+  },
+  {
+    "name": "City St George’s, University of London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Linköping University",
+    "country": "Sweden"
+  },
+  {
+    "name": "Ulsan National Institute of Science and Technology",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Universität Stuttgart",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Miami",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Tasmania",
+    "country": "Australia"
+  },
+  {
+    "name": "Goethe Universität Frankfurt am Main",
+    "country": "Germany"
+  },
+  {
+    "name": "L.N. Gumilyov Eurasian National University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Universidade Federal do Rio de Janeiro",
+    "country": "Brazil"
+  },
+  {
+    "name": "Huazhong University of Science and Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Bauman Moscow State Technical University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Université Grenoble Alpes",
+    "country": "France"
+  },
+  {
+    "name": "University of Tehran",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "Koc University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Sichuan University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Jordan",
+    "country": "Jordan"
+  },
+  {
+    "name": "University of Leicester",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Universidade Nova de Lisboa",
+    "country": "Portugal"
+  },
+  {
+    "name": "Rutgers University – New Brunswick",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Delhi",
+    "country": "India"
+  },
+  {
+    "name": "University of Sharjah",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Kyung Hee University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Satbayev University (previously Kazakh Technical University named after K.I. Satpaev)",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "York University",
+    "country": "Canada"
+  },
+  {
+    "name": "Indian Institute of Technology Guwahati (IITG)",
+    "country": "India"
+  },
+  {
+    "name": "Sultan Qaboos University",
+    "country": "Oman"
+  },
+  {
+    "name": "Tufts University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Universidad Politécnica de Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Illinois Chicago (UIC)",
+    "country": "United States of America"
+  },
+  {
+    "name": "Indian Institute of Technology Roorkee (IITR)",
+    "country": "India"
+  },
+  {
+    "name": "Shandong University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Xiamen University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Oulu",
+    "country": "Finland"
+  },
+  {
+    "name": "Southern University of Science and Technology (SUSTech)",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Pisa",
+    "country": "Italy"
+  },
+  {
+    "name": "National Taiwan University of Science and Technology (Taiwan Tech)",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Pontificia Universidad Católica del Perú (PUCP)",
+    "country": "Peru"
+  },
+  {
+    "name": "Cairo University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Tilburg University",
+    "country": "Netherlands"
+  },
+  {
+    "name": "University of Coimbra",
+    "country": "Portugal"
+  },
+  {
+    "name": "Technion - Israel Institute of Technology",
+    "country": "Israel"
+  },
+  {
+    "name": "Universität Innsbruck",
+    "country": "Austria"
+  },
+  {
+    "name": "University of Münster",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Tsukuba",
+    "country": "Japan"
+  },
+  {
+    "name": "Quaid-i-azam University",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Nankai University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "National Technical University of Athens",
+    "country": "Greece"
+  },
+  {
+    "name": "Università degli Studi di Roma - Tor Vergata",
+    "country": "Italy"
+  },
+  {
+    "name": "George Washington University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Mahidol University",
+    "country": "Thailand"
+  },
+  {
+    "name": "University of Victoria",
+    "country": "Canada"
+  },
+  {
+    "name": "Virginia Polytechnic Institute (Virginia Tech)",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Chinese Academy of Sciences (UCAS)",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Pretoria",
+    "country": "South Africa"
+  },
+  {
+    "name": "University of Tartu",
+    "country": "Estonia"
+  },
+  {
+    "name": "University of the Philippines",
+    "country": "Philippines"
+  },
+  {
+    "name": "University of Turku",
+    "country": "Finland"
+  },
+  {
+    "name": "RUDN University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Sciences Po Paris",
+    "country": "France"
+  },
+  {
+    "name": "Universiti Brunei Darussalam (UBD)",
+    "country": "Brunei Darussalam"
+  },
+  {
+    "name": "Daegu Gyeongbuk Institute of Science and Technology (DGIST)",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Bogazici University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "National University of Sciences And Technology (NUST) Islamabad",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Pontificia Universidad Javeriana",
+    "country": "Colombia"
+  },
+  {
+    "name": "Oxford Brookes University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Saint Petersburg State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Sharif University of Technology",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "South China University of Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Saskatchewan",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Liege",
+    "country": "Belgium"
+  },
+  {
+    "name": "University of Naples - Federico II",
+    "country": "Italy"
+  },
+  {
+    "name": "The American University in Cairo",
+    "country": "Egypt"
+  },
+  {
+    "name": "University of East Anglia (UEA)",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Luxembourg",
+    "country": "Luxembourg"
+  },
+  {
+    "name": "Northeastern University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Brunel University of London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Gwangju Institute of Science and Technology (GIST)",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Flinders University",
+    "country": "Australia"
+  },
+  {
+    "name": "Beihang University (former BUAA)",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Birkbeck College, University of London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "National and Kapodistrian University of Athens",
+    "country": "Greece"
+  },
+  {
+    "name": "Abu Dhabi University",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Sejong University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Southeast University, China",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Universitat Politècnica de Catalunya",
+    "country": "Spain"
+  },
+  {
+    "name": "Aston University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Ruhr-Universität Bochum",
+    "country": "Germany"
+  },
+  {
+    "name": "Lappeenranta-Lahti University of Technology LUT",
+    "country": "Finland"
+  },
+  {
+    "name": "University of Kent",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "IPB University (aka Bogor Agricultural University)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Western Sydney University",
+    "country": "Australia"
+  },
+  {
+    "name": "Umeå University",
+    "country": "Sweden"
+  },
+  {
+    "name": "University of Granada",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Limerick",
+    "country": "Ireland"
+  },
+  {
+    "name": "Sabanci University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "University of Florence",
+    "country": "Italy"
+  },
+  {
+    "name": "Institut National des Sciences Appliquées de Lyon (INSA)",
+    "country": "France"
+  },
+  {
+    "name": "Lincoln University",
+    "country": "New Zealand"
+  },
+  {
+    "name": "University of Turin",
+    "country": "Italy"
+  },
+  {
+    "name": "Università  Cattolica del Sacro Cuore",
+    "country": "Italy"
+  },
+  {
+    "name": "Auckland University of Technology",
+    "country": "New Zealand"
+  },
+  {
+    "name": "Dublin City University",
+    "country": "Ireland"
+  },
+  {
+    "name": "Sunway University",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University at Buffalo SUNY",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Southern Queensland",
+    "country": "Australia"
+  },
+  {
+    "name": "Bilkent University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Czech Technical University In Prague",
+    "country": "Czechia"
+  },
+  {
+    "name": "Julius-Maximilians-Universität Würzburg",
+    "country": "Germany"
+  },
+  {
+    "name": "Universität Mannheim",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Aveiro",
+    "country": "Portugal"
+  },
+  {
+    "name": "National Taipei University of Technology",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Université de Strasbourg",
+    "country": "France"
+  },
+  {
+    "name": "Universitat Politecnica de Valencia",
+    "country": "Spain"
+  },
+  {
+    "name": "Murdoch University",
+    "country": "Australia"
+  },
+  {
+    "name": "Tampere University",
+    "country": "Finland"
+  },
+  {
+    "name": "Università  degli Studi di Pavia",
+    "country": "Italy"
+  },
+  {
+    "name": "Washington State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Graz University of Technology",
+    "country": "Austria"
+  },
+  {
+    "name": "Aix-Marseille University",
+    "country": "France"
+  },
+  {
+    "name": "University of Dundee",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Masaryk University",
+    "country": "Czechia"
+  },
+  {
+    "name": "Universitat de Valencia",
+    "country": "Spain"
+  },
+  {
+    "name": "Université de Montpellier",
+    "country": "France"
+  },
+  {
+    "name": "East China Normal University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Leibniz Universität Hannover",
+    "country": "Germany"
+  },
+  {
+    "name": "National Taiwan Normal University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Prince Mohammad Bin Fahd University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Universitat Ramon Llull",
+    "country": "Spain"
+  },
+  {
+    "name": "IE University",
+    "country": "Spain"
+  },
+  {
+    "name": "National Sun Yat-sen University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Ajman University",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "James Cook University",
+    "country": "Australia"
+  },
+  {
+    "name": "Macau University of Science and Technology",
+    "country": "Macao SAR, China"
+  },
+  {
+    "name": "National Research University Higher School of Economics (HSE, Moscow)",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Universität Konstanz",
+    "country": "Germany"
+  },
+  {
+    "name": "University of California, Riverside",
+    "country": "United States of America"
+  },
+  {
+    "name": "Vilnius University",
+    "country": "Lithuania"
+  },
+  {
+    "name": "Belarusian State University",
+    "country": "Belarus"
+  },
+  {
+    "name": "Universität Bayreuth",
+    "country": "Germany"
+  },
+  {
+    "name": "Iowa State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Kazan Federal University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Universidade Estadual Paulista \"Júlio de Mesquita Filho\" (UNESP)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Johannes Gutenberg Universität Mainz",
+    "country": "Germany"
+  },
+  {
+    "name": "Shenzhen University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Stony Brook University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Cyprus",
+    "country": "Cyprus"
+  },
+  {
+    "name": "Amirkabir University of Technology",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "University of Essex",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Colorado State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Universidad Nacional de La Plata",
+    "country": "Argentina"
+  },
+  {
+    "name": "University of California, Santa Cruz",
+    "country": "United States of America"
+  },
+  {
+    "name": "Jordan University of Science & Technology",
+    "country": "Jordan"
+  },
+  {
+    "name": "Novosibirsk State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Royal Holloway University of London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Università Vita-Salute San Raffaele",
+    "country": "Italy"
+  },
+  {
+    "name": "Anna University",
+    "country": "India"
+  },
+  {
+    "name": "Concordia University",
+    "country": "Canada"
+  },
+  {
+    "name": "Shanghai University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Kansas",
+    "country": "United States of America"
+  },
+  {
+    "name": "Ben Gurion University of The Negev",
+    "country": "Israel"
+  },
+  {
+    "name": "Laval University",
+    "country": "Canada"
+  },
+  {
+    "name": "Tashkent Institute of Irrigation and Agricultural Mechanization Engineers - National Research University (TIIAME-NRU)",
+    "country": "Uzbekistan"
+  },
+  {
+    "name": "Universidad de Sevilla",
+    "country": "Spain"
+  },
+  {
+    "name": "Jilin University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Johannes Kepler University Linz",
+    "country": "Austria"
+  },
+  {
+    "name": "Pusan National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Università della Svizzera Italiana",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Moscow Institute of Physics and Technology State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Universität Potsdam",
+    "country": "Germany"
+  },
+  {
+    "name": "Chung-Ang University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Hiroshima University",
+    "country": "Japan"
+  },
+  {
+    "name": "University of Science and Technology Beijing",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Dalian University of Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Duy Tan University",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Kobe University",
+    "country": "Japan"
+  },
+  {
+    "name": "Aristotle University of Thessaloniki",
+    "country": "Greece"
+  },
+  {
+    "name": "University of Trento",
+    "country": "Italy"
+  },
+  {
+    "name": "Edith Cowan University",
+    "country": "Australia"
+  },
+  {
+    "name": "Technische Universität Bergakademie Freiberg",
+    "country": "Germany"
+  },
+  {
+    "name": "Warsaw University of Technology",
+    "country": "Poland"
+  },
+  {
+    "name": "Universidad de Santiago de Chile - USACH",
+    "country": "Chile"
+  },
+  {
+    "name": "Central South University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Imam Abdulrahman Bin Faisal University (formerly University of Dammam)",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Universiti Utara Malaysia (UUM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Université de Bordeaux",
+    "country": "France"
+  },
+  {
+    "name": "University of Canberra",
+    "country": "Australia"
+  },
+  {
+    "name": "Iran University of Science and Technology",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "Justus-Liebig-Universität Gießen",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Jyväskylä",
+    "country": "Finland"
+  },
+  {
+    "name": "Central Queensland University Australia (CQUniversity)",
+    "country": "Australia"
+  },
+  {
+    "name": "Northwestern Polytechnical University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Tomsk State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Universidad de Costa Rica",
+    "country": "Costa Rica"
+  },
+  {
+    "name": "Shoolini University of Biotechnology and Management Sciences",
+    "country": "India"
+  },
+  {
+    "name": "China Agricultural University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Chongqing University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Ewha Womans University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Hunan University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Guelph",
+    "country": "Canada"
+  },
+  {
+    "name": "China Medical University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Institut Teknologi Sepuluh Nopember (ITS)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "INTI International University",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Ateneo de Manila University",
+    "country": "Philippines"
+  },
+  {
+    "name": "Singapore Management University",
+    "country": "Singapore"
+  },
+  {
+    "name": "SOAS University of London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Bradford",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Lebanese University",
+    "country": "Lebanon"
+  },
+  {
+    "name": "Universitas Padjadjaran (UNPAD)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Pontificia Universidad Católica Argentina Santa María de los Buenos Aires - UCA",
+    "country": "Argentina"
+  },
+  {
+    "name": "University of Stirling",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Kyungpook National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Singapore University of Technology and Design",
+    "country": "Singapore"
+  },
+  {
+    "name": "Universidad Austral - Argentina",
+    "country": "Argentina"
+  },
+  {
+    "name": "University of Electronic Science and Technology of China",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Ural Federal University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "University of Huddersfield",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "The University of Georgia",
+    "country": "United States of America"
+  },
+  {
+    "name": "Boston College",
+    "country": "United States of America"
+  },
+  {
+    "name": "Chiang Mai University",
+    "country": "Thailand"
+  },
+  {
+    "name": "University of Hull",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Salamanca",
+    "country": "Spain"
+  },
+  {
+    "name": "The Education University of Hong Kong",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "Universität Bremen",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Genoa",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Iowa",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Connecticut",
+    "country": "United States of America"
+  },
+  {
+    "name": "King Khalid University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Lebanese American University",
+    "country": "Lebanon"
+  },
+  {
+    "name": "Prince Sultan University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Universität Leipzig",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Ljubljana",
+    "country": "Slovenia"
+  },
+  {
+    "name": "Jinan University (China)",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Utah",
+    "country": "United States of America"
+  },
+  {
+    "name": "Ain Shams University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Universiti Teknologi MARA - UiTM",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Milano-Bicocca",
+    "country": "Italy"
+  },
+  {
+    "name": "University of the Punjab",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Universität Ulm",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Hawaii at Mañoa",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Windsor",
+    "country": "Canada"
+  },
+  {
+    "name": "Florida State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Northumbria University at Newcastle",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Thammasat University",
+    "country": "Thailand"
+  },
+  {
+    "name": "Universiti Tenaga Nasional (UNITEN)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Hitotsubashi University",
+    "country": "Japan"
+  },
+  {
+    "name": "University of Delaware",
+    "country": "United States of America"
+  },
+  {
+    "name": "Lahore University of Management Sciences (LUMS)",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Indian Institute of Technology Indore",
+    "country": "India"
+  },
+  {
+    "name": "University of Houston",
+    "country": "United States of America"
+  },
+  {
+    "name": "Al Ain University",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Coventry University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Jawaharlal Nehru University",
+    "country": "India"
+  },
+  {
+    "name": "Sogang University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "University of Kwazulu-Natal",
+    "country": "South Africa"
+  },
+  {
+    "name": "Ajou University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "American University of the Middle East",
+    "country": "Kuwait"
+  },
+  {
+    "name": "University of Debrecen",
+    "country": "Hungary"
+  },
+  {
+    "name": "Bangor University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Indian Institute of Technology BHU Varanasi (IIT BHU Varanasi)",
+    "country": "India"
+  },
+  {
+    "name": "Renmin (People’s) University of China",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Savitribai Phule Pune University",
+    "country": "India"
+  },
+  {
+    "name": "University of Minho",
+    "country": "Portugal"
+  },
+  {
+    "name": "Colorado School of Mines",
+    "country": "United States of America"
+  },
+  {
+    "name": "Hacettepe University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Isfahan University of Technology",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "Pontificia Universidade Católica do Rio de Janeiro (PUC - Rio)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Brno University of Technology",
+    "country": "Czechia"
+  },
+  {
+    "name": "Chandigarh University",
+    "country": "India"
+  },
+  {
+    "name": "Universität Jena",
+    "country": "Germany"
+  },
+  {
+    "name": "Universidad Adolfo Ibáñez",
+    "country": "Chile"
+  },
+  {
+    "name": "Universiti Teknologi Brunei",
+    "country": "Brunei Darussalam"
+  },
+  {
+    "name": "University of Tabriz",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "Universidad Pontificia Comillas",
+    "country": "Spain"
+  },
+  {
+    "name": "Florida International University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Iceland",
+    "country": "Iceland"
+  },
+  {
+    "name": "Charles Darwin University",
+    "country": "Australia"
+  },
+  {
+    "name": "Eotvos Lorand University",
+    "country": "Hungary"
+  },
+  {
+    "name": "University of Dhaka",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "American University",
+    "country": "United States of America"
+  },
+  {
+    "name": "National Central University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Université Claude Bernard Lyon 1",
+    "country": "France"
+  },
+  {
+    "name": "Université Paul Sabatier Toulouse III",
+    "country": "France"
+  },
+  {
+    "name": "American University of Ras Al Khaimah ( AURAK )",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Bond University",
+    "country": "Australia"
+  },
+  {
+    "name": "Illinois Institute of Technology",
+    "country": "United States of America"
+  },
+  {
+    "name": "National Research Nuclear University MEPhI (Moscow Engineering Physics Institute)",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Universidade Federal de Minas Gerais",
+    "country": "Brazil"
+  },
+  {
+    "name": "Zayed University",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Asia Pacific University of Technology and Innovation (APU) Malaysia",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Hasselt University",
+    "country": "Belgium"
+  },
+  {
+    "name": "Management and Science University - MSU Malaysia",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Taipei Medical University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Tulane University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Szeged",
+    "country": "Hungary"
+  },
+  {
+    "name": "University of Texas at Dallas",
+    "country": "United States of America"
+  },
+  {
+    "name": "Canadian University of Dubai",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "National Chengchi University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "University of Eastern Finland",
+    "country": "Finland"
+  },
+  {
+    "name": "University of Siena",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Tennessee",
+    "country": "United States of America"
+  },
+  {
+    "name": "Nottingham Trent University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Peter the Great St.Petersburg Polytechnic University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Ulster",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Applied Science University - Bahrain",
+    "country": "Bahrain"
+  },
+  {
+    "name": "City University of New York",
+    "country": "United States of America"
+  },
+  {
+    "name": "International Islamic University Malaysia (IIUM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Universidad de Concepción",
+    "country": "Chile"
+  },
+  {
+    "name": "University of Plymouth",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Christian-Albrechts-Universität zu Kiel",
+    "country": "Germany"
+  },
+  {
+    "name": "Dongguk University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Saint Joseph University of Beirut (USJ)",
+    "country": "Lebanon"
+  },
+  {
+    "name": "Zhengzhou University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Umm Al-Qura University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "University of New Brunswick",
+    "country": "Canada"
+  },
+  {
+    "name": "Diponegoro University",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Oregon State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Universidad del Pais Vasco",
+    "country": "Spain"
+  },
+  {
+    "name": "Yeshiva University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Istanbul University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Kazakh National Pedagogical University Abai",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Missouri University of Science and Technology",
+    "country": "United States of America"
+  },
+  {
+    "name": "National Chung Hsing University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Universidade de Santiago de Compostela",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Crete",
+    "country": "Greece"
+  },
+  {
+    "name": "University of South Carolina",
+    "country": "United States of America"
+  },
+  {
+    "name": "Tallinn University of Technology",
+    "country": "Estonia"
+  },
+  {
+    "name": "Universität des Saarlandes",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Portsmouth",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Lincoln University College, Malaysia",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Southern Cross University",
+    "country": "Australia"
+  },
+  {
+    "name": "Universidad de Zaragoza",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Chemistry and Technology, Prague",
+    "country": "Czechia"
+  },
+  {
+    "name": "University of Fribourg",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Abo Akademi University",
+    "country": "Finland"
+  },
+  {
+    "name": "Inha University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Libera Universita' di Bolzano",
+    "country": "Italy"
+  },
+  {
+    "name": "Manchester Metropolitan University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Manitoba",
+    "country": "Canada"
+  },
+  {
+    "name": "King Faisal University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "University of Tromso, The Arctic University of Norway",
+    "country": "Norway"
+  },
+  {
+    "name": "MGIMO University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Paris Lodron University of Salzburg",
+    "country": "Austria"
+  },
+  {
+    "name": "Universidad de la República (UdelaR)",
+    "country": "Uruguay"
+  },
+  {
+    "name": "University of Brescia",
+    "country": "Italy"
+  },
+  {
+    "name": "China University of Mining and Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "De La Salle University",
+    "country": "Philippines"
+  },
+  {
+    "name": "Konkuk University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Université de Lille",
+    "country": "France"
+  },
+  {
+    "name": "University of Agriculture, Faisalabad",
+    "country": "Pakistan"
+  },
+  {
+    "name": "University of South Florida",
+    "country": "United States of America"
+  },
+  {
+    "name": "Bar-Ilan University",
+    "country": "Israel"
+  },
+  {
+    "name": "Ca' Foscari University of Venice",
+    "country": "Italy"
+  },
+  {
+    "name": "Kingston University, London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Memorial University of Newfoundland",
+    "country": "Canada"
+  },
+  {
+    "name": "COMSATS University Islamabad",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Indian Institute of Technology Hyderabad (IITH)",
+    "country": "India"
+  },
+  {
+    "name": "University of Mumbai",
+    "country": "India"
+  },
+  {
+    "name": "University of Oklahoma",
+    "country": "United States of America"
+  },
+  {
+    "name": "Birla Institute of Technology and Science",
+    "country": "India"
+  },
+  {
+    "name": "Chang Gung University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Karl-Franzens-Universität Graz",
+    "country": "Austria"
+  },
+  {
+    "name": "Lehigh University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Palacký University in Olomouc",
+    "country": "Czechia"
+  },
+  {
+    "name": "East China University of Science and Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Stevens Institute of Technology",
+    "country": "United States of America"
+  },
+  {
+    "name": "Technische Universität Dortmund",
+    "country": "Germany"
+  },
+  {
+    "name": "Beirut Arab University",
+    "country": "Lebanon"
+  },
+  {
+    "name": "Jadavpur University",
+    "country": "India"
+  },
+  {
+    "name": "American University in Dubai",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "University of Haifa",
+    "country": "Israel"
+  },
+  {
+    "name": "HUFS - Hankuk (Korea) University of Foreign Studies",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Nanjing University of Aeronautics and Astronautics",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Ritsumeikan University",
+    "country": "Japan"
+  },
+  {
+    "name": "University of Brawijaya",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Comenius University Bratislava",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Ton Duc Thang University",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "China University of Petroleum",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Cyprus University of Technology",
+    "country": "Cyprus"
+  },
+  {
+    "name": "Baku State University",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Tomsk Polytechnic University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Université Côte d’Azur",
+    "country": "France"
+  },
+  {
+    "name": "Eastern Mediterranean University",
+    "country": "Northern Cyprus"
+  },
+  {
+    "name": "Universidade Federal do Rio Grande Do Sul",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universität Regensburg",
+    "country": "Germany"
+  },
+  {
+    "name": "Vellore Institute of Technology (VIT), Vellore, India",
+    "country": "India"
+  },
+  {
+    "name": "Rensselaer Polytechnic Institute",
+    "country": "United States of America"
+  },
+  {
+    "name": "Symbiosis International (Deemed University)",
+    "country": "India"
+  },
+  {
+    "name": "TUHH Hamburg University of Technology",
+    "country": "Germany"
+  },
+  {
+    "name": "Ankara Üniversitesi",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Beijing University of Chemical Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Kazakh National Agrarian University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Tokyo Medical and Dental University",
+    "country": "Japan"
+  },
+  {
+    "name": "Universidad de Alcalá",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Klagenfurt",
+    "country": "Austria"
+  },
+  {
+    "name": "University of Missouri, Columbia",
+    "country": "United States of America"
+  },
+  {
+    "name": "Jeonbuk National University (formerly known as Chonbuk National University)",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Kasetsart University",
+    "country": "Thailand"
+  },
+  {
+    "name": "Lingnan University, Hong Kong",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "Nanjing University of Science and Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Shiraz University",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "Universidad Panamericana (UP)",
+    "country": "Mexico"
+  },
+  {
+    "name": "University of Central Florida",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Zagreb",
+    "country": "Croatia"
+  },
+  {
+    "name": "Asia University Taiwan",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Budapest University of Technology and Economics",
+    "country": "Hungary"
+  },
+  {
+    "name": "Drexel University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Goldsmiths, University of London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "ISCTE - Instituto Universitario de Lisboa",
+    "country": "Portugal"
+  },
+  {
+    "name": "ITMO University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Technische Universität Braunschweig",
+    "country": "Germany"
+  },
+  {
+    "name": "Toronto Metropolitan University (formerly Ryerson University)",
+    "country": "Canada"
+  },
+  {
+    "name": "Universität Hohenheim",
+    "country": "Germany"
+  },
+  {
+    "name": "Université de Rennes 1",
+    "country": "France"
+  },
+  {
+    "name": "University of Nebraska - Lincoln",
+    "country": "United States of America"
+  },
+  {
+    "name": "National University of Science and Technology MISiS",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "National University of Uzbekistan",
+    "country": "Uzbekistan"
+  },
+  {
+    "name": "Pakistan Institute of Engineering and Applied Sciences (PIEAS)",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Prince Sattam Bin Abdulaziz University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Taras Shevchenko National University of Kyiv",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Temple University",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Cincinnati",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Patras",
+    "country": "Greece"
+  },
+  {
+    "name": "UWE Bristol (University of the West of England)",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Auezov South Kazakhstan State University (SKSU)",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Far Eastern Federal University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "National Institute of Technology Tiruchirappalli",
+    "country": "India"
+  },
+  {
+    "name": "Princess Nourah bint Abdulrahman University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "SEGi University",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Sofia University \"St. Kliment Ohridski\"",
+    "country": "Bulgaria"
+  },
+  {
+    "name": "Texas Tech University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Universidad Central de Venezuela - UCV",
+    "country": "Venezuela (Bolivarian Republic of)"
+  },
+  {
+    "name": "Université de Tunis El Manar",
+    "country": "Tunisia"
+  },
+  {
+    "name": "Yildiz Technical University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Aberystwyth University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Adam Mickiewicz University",
+    "country": "Poland"
+  },
+  {
+    "name": "Brandeis University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Kaunas University of Technology",
+    "country": "Lithuania"
+  },
+  {
+    "name": "Plekhanov Russian University of Economics",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Shahid Beheshti University (SBU)",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "Syracuse University",
+    "country": "United States of America"
+  },
+  {
+    "name": "The Catholic University of Korea",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "University of Baghdad",
+    "country": "Iraq"
+  },
+  {
+    "name": "University of Malta",
+    "country": "Malta"
+  },
+  {
+    "name": "University of Messina",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Pecs",
+    "country": "Hungary"
+  },
+  {
+    "name": "Victoria University",
+    "country": "Australia"
+  },
+  {
+    "name": "Vytautas Magnus University",
+    "country": "Lithuania"
+  },
+  {
+    "name": "Martin-Luther-Universität Halle-Wittenberg",
+    "country": "Germany"
+  },
+  {
+    "name": "Université de Lorraine",
+    "country": "France"
+  },
+  {
+    "name": "University of New Mexico",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Oregon",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Trieste",
+    "country": "Italy"
+  },
+  {
+    "name": "Al-Ahliyya Amman University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Babes-Bolyai University",
+    "country": "Romania"
+  },
+  {
+    "name": "Bangladesh University of Engineering and Technology",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Czech University of Life Sciences in Prague",
+    "country": "Czechia"
+  },
+  {
+    "name": "Government College University, Faisalabad",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Jamia Millia Islamia, New Delhi",
+    "country": "India"
+  },
+  {
+    "name": "Khoja Akhmet Yassawi International Kazakh-Turkish University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Kaohsiung Medical University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "New Jersey Institute of Technology (NJIT)",
+    "country": "United States of America"
+  },
+  {
+    "name": "Riga Technical University",
+    "country": "Latvia"
+  },
+  {
+    "name": "University of Belgrade",
+    "country": "Serbia"
+  },
+  {
+    "name": "University of Bucharest",
+    "country": "Romania"
+  },
+  {
+    "name": "University of Nizwa",
+    "country": "Oman"
+  },
+  {
+    "name": "Vietnam National University, Hanoi",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Holy Spirit University of Kaslik",
+    "country": "Lebanon"
+  },
+  {
+    "name": "Philipps-Universität Marburg",
+    "country": "Germany"
+  },
+  {
+    "name": "Rovira i Virgili University",
+    "country": "Spain"
+  },
+  {
+    "name": "Rutgers University - Newark",
+    "country": "United States of America"
+  },
+  {
+    "name": "Thapar Institute of Engineering & Technology",
+    "country": "India"
+  },
+  {
+    "name": "Universidad de Palermo",
+    "country": "Argentina"
+  },
+  {
+    "name": "University of Calcutta",
+    "country": "India"
+  },
+  {
+    "name": "University of Maynooth",
+    "country": "Ireland"
+  },
+  {
+    "name": "Alexandria University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Carleton University",
+    "country": "Canada"
+  },
+  {
+    "name": "Georgia State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Hong Kong Metropolitan University",
+    "country": "Hong Kong SAR, China"
+  },
+  {
+    "name": "Kuwait University",
+    "country": "Kuwait"
+  },
+  {
+    "name": "Technological University of Dublin",
+    "country": "Ireland"
+  },
+  {
+    "name": "Universidad de Alicante",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad de Antioquia",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad del Rosario",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidade Católica Portuguesa, UCP",
+    "country": "Portugal"
+  },
+  {
+    "name": "University of Kentucky",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Mons",
+    "country": "Belgium"
+  },
+  {
+    "name": "V.N. Karazin Kharkiv National University",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Wayne State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Applied Science Private University - Jordan",
+    "country": "Jordan"
+  },
+  {
+    "name": "Beijing University of Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Chiba University",
+    "country": "Japan"
+  },
+  {
+    "name": "Lanzhou University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Norwegian University of Life Sciences (UMB)",
+    "country": "Norway"
+  },
+  {
+    "name": "Pontificia Universidad Católica de Valparaíso",
+    "country": "Chile"
+  },
+  {
+    "name": "Universiti Tunku Abdul Rahman (UTAR)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Wake Forest University",
+    "country": "United States of America"
+  },
+  {
+    "name": "AGH University of Krakow",
+    "country": "Poland"
+  },
+  {
+    "name": "Ahlia University",
+    "country": "Bahrain"
+  },
+  {
+    "name": "Alfaisal University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Azerbaijan State University of Economics",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Bournemouth University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "De Montfort University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Donghua University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Gdansk University of Technology",
+    "country": "Poland"
+  },
+  {
+    "name": "German Jordanian University",
+    "country": "Jordan"
+  },
+  {
+    "name": "IIT Gandhinagar",
+    "country": "India"
+  },
+  {
+    "name": "Instituto Tecnológico Autonomo de México (ITAM)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Keele University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Middlesex University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "National Technical University of Ukraine \"Igor Sikorsky Kyiv Polytechnic Institute\"",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Northwest Agriculture and Forestry University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Ocean University of China",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Perugia University",
+    "country": "Italy"
+  },
+  {
+    "name": "Politecnico di Bari",
+    "country": "Italy"
+  },
+  {
+    "name": "Qassim University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Soochow University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "The New School, New York City and Paris",
+    "country": "United States of America"
+  },
+  {
+    "name": "Tokyo University of Science (RIKADAI)",
+    "country": "Japan"
+  },
+  {
+    "name": "Universidad de la Habana",
+    "country": "Cuba"
+  },
+  {
+    "name": "Universidad de Montevideo",
+    "country": "Uruguay"
+  },
+  {
+    "name": "Universidad de San Francisco de Quito",
+    "country": "Ecuador"
+  },
+  {
+    "name": "Universidade de Brasilia (UnB)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal de Santa Catarina",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal de São Paulo (UNIFESP)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universita' degli studi di Salerno",
+    "country": "Italy"
+  },
+  {
+    "name": "Universita' Politecnica delle Marche - UNIVPM",
+    "country": "Italy"
+  },
+  {
+    "name": "Università  degli Studi di Palermo",
+    "country": "Italy"
+  },
+  {
+    "name": "Universität Duisburg-Essen",
+    "country": "Germany"
+  },
+  {
+    "name": "Universiti Malaysia Terengganu (UMT)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Bari",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Brighton",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Engineering & Technology (UET) Lahore",
+    "country": "Pakistan"
+  },
+  {
+    "name": "University of Greenwich",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Hyderabad",
+    "country": "India"
+  },
+  {
+    "name": "University of Latvia",
+    "country": "Latvia"
+  },
+  {
+    "name": "University of Lincoln",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Maryland, Baltimore",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Maryland, Baltimore County",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Modena and Reggio Emilia",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Namur",
+    "country": "Belgium"
+  },
+  {
+    "name": "University of Ulsan",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "University of Westminster",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Wroclaw",
+    "country": "Poland"
+  },
+  {
+    "name": "Vietnam National University - Ho Chi Minh City (VNU-HCM)",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Zurich University of Applied Sciences (ZHAW)",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Addis Ababa University",
+    "country": "Ethiopia"
+  },
+  {
+    "name": "Altai State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Auburn University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Australian Catholic University",
+    "country": "Australia"
+  },
+  {
+    "name": "Azerbaijan State Oil and Industry University",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Azerbaijan Technical University",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Beijing Jiaotong University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Belarusian National Technical University",
+    "country": "Belarus"
+  },
+  {
+    "name": "BINUS UNIVERSITY (Bina Nusantara University)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Catania University",
+    "country": "Italy"
+  },
+  {
+    "name": "China University of Geosciences",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Chungnam National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Dhofar University",
+    "country": "Oman"
+  },
+  {
+    "name": "Edinburgh Napier University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Effat University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "European University of Lefke (EUL)",
+    "country": "Northern Cyprus"
+  },
+  {
+    "name": "I.M. Sechenov First Moscow State Medical University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Imam Muhammad Ibn Saud Islamic University - IMSIU",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Instituto Politécnico Nacional (IPN)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Jiangnan University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Liverpool John Moores University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Louisiana State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Manipal Academy of Higher Education - Manipal University (MAHE)",
+    "country": "India"
+  },
+  {
+    "name": "Mendel University in Brno",
+    "country": "Czechia"
+  },
+  {
+    "name": "Multimedia University (MMU)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Nantes University",
+    "country": "France"
+  },
+  {
+    "name": "O. P. Jindal Global University (JGU)",
+    "country": "India"
+  },
+  {
+    "name": "Oklahoma State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Prince of Songkla University",
+    "country": "Thailand"
+  },
+  {
+    "name": "Tokyo University of Agriculture and Technology",
+    "country": "Japan"
+  },
+  {
+    "name": "Universidad Anahuac",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Nacional de Córdoba",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidade de Vigo",
+    "country": "Spain"
+  },
+  {
+    "name": "Universita' degli Studi della Tuscia",
+    "country": "Italy"
+  },
+  {
+    "name": "Universität Düsseldorf",
+    "country": "Germany"
+  },
+  {
+    "name": "Universität Rostock",
+    "country": "Germany"
+  },
+  {
+    "name": "Université de Franche-Comté",
+    "country": "France"
+  },
+  {
+    "name": "Université du Québec",
+    "country": "Canada"
+  },
+  {
+    "name": "Universiti Pendidikan Sultan Idris (UPSI)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Colorado, Denver",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Dubai",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "University of Gdansk",
+    "country": "Poland"
+  },
+  {
+    "name": "University of Ghana",
+    "country": "Ghana"
+  },
+  {
+    "name": "University of Santo Tomas",
+    "country": "Philippines"
+  },
+  {
+    "name": "University of Seoul",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "University of Stavanger",
+    "country": "Norway"
+  },
+  {
+    "name": "Verona University",
+    "country": "Italy"
+  },
+  {
+    "name": "Vilnius Gediminas Technical University",
+    "country": "Lithuania"
+  },
+  {
+    "name": "Worcester Polytechnic Institute",
+    "country": "United States of America"
+  },
+  {
+    "name": "Wroclaw University of Science and Technology (WUST)",
+    "country": "Poland"
+  },
+  {
+    "name": "Yarmouk University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Al Jouf University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "American University of Central Asia",
+    "country": "Kyrgyzstan"
+  },
+  {
+    "name": "Baku Engineering University",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Chonnam National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Colegio de México",
+    "country": "Mexico"
+  },
+  {
+    "name": "Future University in Egypt",
+    "country": "Egypt"
+  },
+  {
+    "name": "Gazi Üniversitesi",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Gulf University for Science and Technology (GUST)",
+    "country": "Kuwait"
+  },
+  {
+    "name": "Huazhong Agricultural University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Kanazawa University",
+    "country": "Japan"
+  },
+  {
+    "name": "Kansas State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Karaganda Buketov University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Khon Kaen University",
+    "country": "Thailand"
+  },
+  {
+    "name": "King Mongkut's University of Technology Thonburi",
+    "country": "Thailand"
+  },
+  {
+    "name": "London South Bank University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Lovely Professional University (LPU)",
+    "country": "India"
+  },
+  {
+    "name": "Macao Polytechnic University",
+    "country": "Macao SAR, China"
+  },
+  {
+    "name": "Michigan Technological University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Nagasaki University",
+    "country": "Japan"
+  },
+  {
+    "name": "Osaka Metropolitan University",
+    "country": "Japan"
+  },
+  {
+    "name": "Panjab University",
+    "country": "India"
+  },
+  {
+    "name": "Princess Sumaya University for Technology",
+    "country": "Jordan"
+  },
+  {
+    "name": "Saveetha Institute of Medical And Technical Sciences (SIMATS)",
+    "country": "India"
+  },
+  {
+    "name": "Taif University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Tallinn University",
+    "country": "Estonia"
+  },
+  {
+    "name": "Tashkent State Technical University",
+    "country": "Uzbekistan"
+  },
+  {
+    "name": "Universidad Católica Andrés Bello - UCAB",
+    "country": "Venezuela (Bolivarian Republic of)"
+  },
+  {
+    "name": "Universidad Católica del Uruguay (UCU)",
+    "country": "Uruguay"
+  },
+  {
+    "name": "Universidad de los Andes Chile",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad de Oviedo",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad de Valladolid",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad Europea de Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad Iberoamericana (UIA)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Università degli Studi Roma Tre",
+    "country": "Italy"
+  },
+  {
+    "name": "Université de Sherbrooke",
+    "country": "Canada"
+  },
+  {
+    "name": "University at Albany SUNY",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Alabama",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Alaska Fairbanks",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Hertfordshire",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Maribor",
+    "country": "Slovenia"
+  },
+  {
+    "name": "University of North Texas",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Peshawar",
+    "country": "Pakistan"
+  },
+  {
+    "name": "University of Petroleum and Energy Studies (UPES)",
+    "country": "India"
+  },
+  {
+    "name": "University of Salford",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of South Africa",
+    "country": "South Africa"
+  },
+  {
+    "name": "Virginia Commonwealth University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Yeungnam University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Abylkas Saginov Karaganda Technical University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Al Nahrain University",
+    "country": "Iraq"
+  },
+  {
+    "name": "Al-Quds University",
+    "country": "Palestine"
+  },
+  {
+    "name": "Amity University",
+    "country": "India"
+  },
+  {
+    "name": "Athens University of Economics And Business",
+    "country": "Greece"
+  },
+  {
+    "name": "Charles Sturt University",
+    "country": "Australia"
+  },
+  {
+    "name": "Clarkson University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Clemson University",
+    "country": "United States of America"
+  },
+  {
+    "name": "CY Cergy Paris University",
+    "country": "France"
+  },
+  {
+    "name": "Escuela Superior Politécnica del Litoral - ESPOL",
+    "country": "Ecuador"
+  },
+  {
+    "name": "Ferdowsi University of Mashhad",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "George Mason University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Guru Gobind Singh Indraprastha University",
+    "country": "India"
+  },
+  {
+    "name": "Hasanuddin University",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Immanuel Kant Baltic Federal University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Indian Institute of Technology Bhubaneswar (IIT BBS)",
+    "country": "India"
+  },
+  {
+    "name": "Ivane Javakhishvili Tbilisi State University",
+    "country": "Georgia"
+  },
+  {
+    "name": "Khazar University",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Kumamoto University",
+    "country": "Japan"
+  },
+  {
+    "name": "Kyrgyz-Turkish Manas University",
+    "country": "Kyrgyzstan"
+  },
+  {
+    "name": "Lodz University",
+    "country": "Poland"
+  },
+  {
+    "name": "Nanjing Agricultural University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Nanjing Normal University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "National Chung Cheng University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "North South University",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "North-West University",
+    "country": "South Africa"
+  },
+  {
+    "name": "Okayama University",
+    "country": "Japan"
+  },
+  {
+    "name": "Rochester Institute of Technology (RIT)",
+    "country": "United States of America"
+  },
+  {
+    "name": "Saint Louis University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Sohar University",
+    "country": "Oman"
+  },
+  {
+    "name": "Sophia University",
+    "country": "Japan"
+  },
+  {
+    "name": "South Ural State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "The Robert Gordon University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Universidad Autónoma Metropolitana (UAM)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad de Belgrano",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad de Córdoba - España",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad de La Sabana",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad EAFIT",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad Espíritu Santo (UEES)",
+    "country": "Ecuador"
+  },
+  {
+    "name": "Universidad Externado de Colombia",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad Nacional Mayor de San Marcos",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad Torcuato Di Tella",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universita' degli Studi di Ferrara",
+    "country": "Italy"
+  },
+  {
+    "name": "Università della Calabria",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Bahrain",
+    "country": "Bahrain"
+  },
+  {
+    "name": "University of Cyberjaya",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Ha'il",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "University of Lahore",
+    "country": "Pakistan"
+  },
+  {
+    "name": "University of Massachusetts - Boston",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of the Western Cape",
+    "country": "South Africa"
+  },
+  {
+    "name": "Wuhan University of Technology",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Adamson University",
+    "country": "Philippines"
+  },
+  {
+    "name": "Aga Khan University",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Al Azhar University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Alexandru Ioan Cuza University",
+    "country": "Romania"
+  },
+  {
+    "name": "Aligarh Muslim University (AMU), Aligarh",
+    "country": "India"
+  },
+  {
+    "name": "Almaty Technological University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Amrita Vishwa Vidyapeetham",
+    "country": "India"
+  },
+  {
+    "name": "An-Najah National University",
+    "country": "Palestine"
+  },
+  {
+    "name": "Arab Academy for Science, Technology and Maritime Transport",
+    "country": "Egypt"
+  },
+  {
+    "name": "Asfendiyarov Kazakh National Medical University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Assiut University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Azerbaijan University of Architecture and Construction",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Banaras Hindu University",
+    "country": "India"
+  },
+  {
+    "name": "Baylor University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Beijing University of Posts and Telecommunications",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Binghamton University SUNY",
+    "country": "United States of America"
+  },
+  {
+    "name": "Birmingham City University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Brigham Young University",
+    "country": "United States of America"
+  },
+  {
+    "name": "CEU University",
+    "country": "Spain"
+  },
+  {
+    "name": "Chung Yuan Christian University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Chungbuk National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Clark University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Cracow University of Technology of Tadeusz Kościuszko",
+    "country": "Poland"
+  },
+  {
+    "name": "D. Serikbayev East Kazakhstan Technical University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Daffodil International University",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Dankook University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Ege Üniversitesi",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Financial University under the Government of the Russian Federation",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Florida Atlantic University - Boca Raton",
+    "country": "United States of America"
+  },
+  {
+    "name": "Fordham University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Gebze Technical University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Georgian Technical University",
+    "country": "Georgia"
+  },
+  {
+    "name": "German University of Technology in Oman  (GUTECH)",
+    "country": "Oman"
+  },
+  {
+    "name": "Gifu University",
+    "country": "Japan"
+  },
+  {
+    "name": "Glasgow Caledonian University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Hallym University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Harbin Engineering University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Hohai University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Howard University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Islamic University of Lebanon",
+    "country": "Lebanon"
+  },
+  {
+    "name": "IU Indianapolis",
+    "country": "United States of America"
+  },
+  {
+    "name": "Kalinga Institute of Industrial Technology",
+    "country": "India"
+  },
+  {
+    "name": "Kangwon National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Kazakh-British Technical University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Kent State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Kookmin University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Kyrgyz Russian Slavic University",
+    "country": "Kyrgyzstan"
+  },
+  {
+    "name": "Kyushu Institute of Technology",
+    "country": "Japan"
+  },
+  {
+    "name": "Leeds Beckett University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Lobachevsky State University of Nizhni Novgorod",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Lodz University of Technology",
+    "country": "Poland"
+  },
+  {
+    "name": "London Metropolitan University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Loyola University Chicago",
+    "country": "United States of America"
+  },
+  {
+    "name": "Makerere University",
+    "country": "Uganda"
+  },
+  {
+    "name": "Mansoura University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Marmara University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "MATE Hungarian University of Agriculture and Life Sciences",
+    "country": "Hungary"
+  },
+  {
+    "name": "Middle East University Jordan",
+    "country": "Jordan"
+  },
+  {
+    "name": "Mississippi State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Mustansiriyah University",
+    "country": "Iraq"
+  },
+  {
+    "name": "Mutah University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Mykolas Romeris University",
+    "country": "Lithuania"
+  },
+  {
+    "name": "Narxoz University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "National Research Saratov State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "National Technical University \"Kharkiv Polytechnic Institute\"",
+    "country": "Ukraine"
+  },
+  {
+    "name": "National University Lviv Polytechnic",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Nicolaus Copernicus University",
+    "country": "Poland"
+  },
+  {
+    "name": "Niigata University",
+    "country": "Japan"
+  },
+  {
+    "name": "Northern Arizona University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Northern Borders University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Notre Dame University-Louaize (NDU)",
+    "country": "Lebanon"
+  },
+  {
+    "name": "Obuda University",
+    "country": "Hungary"
+  },
+  {
+    "name": "Ohio University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Pavol Josef Safarik University",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Pontificia Universidad Catolica del Ecuador",
+    "country": "Ecuador"
+  },
+  {
+    "name": "Pontificia Universidade Católica de São Paulo (PUC -SP)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Poznan University of Life Sciences",
+    "country": "Poland"
+  },
+  {
+    "name": "Poznan University of Technology",
+    "country": "Poland"
+  },
+  {
+    "name": "Rhodes University",
+    "country": "South Africa"
+  },
+  {
+    "name": "Riga Stradins University",
+    "country": "Latvia"
+  },
+  {
+    "name": "Ritsumeikan Asia Pacific University",
+    "country": "Japan"
+  },
+  {
+    "name": "Saint-Petersburg Mining University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Samarkand State University",
+    "country": "Uzbekistan"
+  },
+  {
+    "name": "San Diego State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Sebelas Maret University",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Seoul National University of Science and Technology",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Sheffield Hallam University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Siberian Federal University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Silesian University of Technology in Gliwice",
+    "country": "Poland"
+  },
+  {
+    "name": "Slovak University of Technology in Bratislava",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Soonchunhyang University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Southern Federal University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Southern Methodist University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Southwest University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "SRM Institute of Science and Technology (f.k.a SRM University)",
+    "country": "India"
+  },
+  {
+    "name": "Sumgait State University",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Sumy State University",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Sungshin Women's University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Széchenyi István University",
+    "country": "Hungary"
+  },
+  {
+    "name": "Tashkent State University of Economics",
+    "country": "Uzbekistan"
+  },
+  {
+    "name": "Technical University of Kosice",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Technical University of Ostrava",
+    "country": "Czechia"
+  },
+  {
+    "name": "Telkom University (aka Telkom Institute of Technology)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "The City College of New York",
+    "country": "United States of America"
+  },
+  {
+    "name": "The Federal University of Sao Carlos, UFSCar",
+    "country": "Brazil"
+  },
+  {
+    "name": "The Hashemite University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Tokyo Metropolitan University",
+    "country": "Japan"
+  },
+  {
+    "name": "Universidad Andrés Bello - UNAB",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad Argentina de la Empresa -UADE",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad Austral de Chile",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad de Castilla-La Mancha",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad de Guadalajara (UDG)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad de las Américas Puebla (UDLAP)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad de León",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad de Puerto Rico",
+    "country": "Puerto Rico"
+  },
+  {
+    "name": "Universidad de San Andrés",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad de Talca",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad del Valle",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad Diego Portales",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad ICESI",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad Nacional de Rosario",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad ORT Uruguay",
+    "country": "Uruguay"
+  },
+  {
+    "name": "Universidad Peruana Cayetano Heredia",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad Pontificia Bolivariana",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad Rey Juan Carlos",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad Simón Bolívar Venezuela",
+    "country": "Venezuela (Bolivarian Republic of)"
+  },
+  {
+    "name": "Universidad Técnica Federico Santa María",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidade da Coruña",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidade Federal do Paraná (UFPR)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universita' degli Studi di Napoli \"Parthenope\"",
+    "country": "Italy"
+  },
+  {
+    "name": "Università degli Studi di Udine",
+    "country": "Italy"
+  },
+  {
+    "name": "Universita degli Studi \"G. D'Annunzio\" Chieti-Pescara",
+    "country": "Italy"
+  },
+  {
+    "name": "Universitas Sumatera Utara",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universität Bielefeld",
+    "country": "Germany"
+  },
+  {
+    "name": "Universitat de Lleida",
+    "country": "Spain"
+  },
+  {
+    "name": "Universitat Jaume I",
+    "country": "Spain"
+  },
+  {
+    "name": "Université de Bretagne Occidentale (UBO)",
+    "country": "France"
+  },
+  {
+    "name": "Université de Sfax",
+    "country": "Tunisia"
+  },
+  {
+    "name": "Université Lumière Lyon 2",
+    "country": "France"
+  },
+  {
+    "name": "Université Paris 2 Panthéon-Assas",
+    "country": "France"
+  },
+  {
+    "name": "Université Sorbonne Paris Nord",
+    "country": "France"
+  },
+  {
+    "name": "Université Toulouse 1, Capitole",
+    "country": "France"
+  },
+  {
+    "name": "Universiti Malaysia Perlis (UniMAP)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Universiti Malaysia Sarawak (UNIMAS)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Universiti Tun Hussein Onn University of Malaysia (UTHM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Alabama, Birmingham",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Anbar",
+    "country": "Iraq"
+  },
+  {
+    "name": "University of Arkansas Fayetteville",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Balamand",
+    "country": "Lebanon"
+  },
+  {
+    "name": "University of Central Lancashire",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Colombo",
+    "country": "Sri Lanka"
+  },
+  {
+    "name": "University of Denver",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Deusto",
+    "country": "Spain"
+  },
+  {
+    "name": "University of East London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Hradec Kralove",
+    "country": "Czechia"
+  },
+  {
+    "name": "University of Ibadan",
+    "country": "Nigeria"
+  },
+  {
+    "name": "University of Idaho",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Ioannina",
+    "country": "Greece"
+  },
+  {
+    "name": "University of Isfahan",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "University of Karachi",
+    "country": "Pakistan"
+  },
+  {
+    "name": "University of Lagos",
+    "country": "Nigeria"
+  },
+  {
+    "name": "University of Louisville",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Malaysia Sabah (UMS)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Mississippi",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Missouri, Kansas City",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Murcia",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Nairobi",
+    "country": "Kenya"
+  },
+  {
+    "name": "University of Nevada - Reno",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of New England",
+    "country": "Australia"
+  },
+  {
+    "name": "University of New Hampshire",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of North Carolina at Charlotte",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Parma",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Regina",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Rhode Island",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Salento",
+    "country": "Italy"
+  },
+  {
+    "name": "University of South Bohemia",
+    "country": "Czechia"
+  },
+  {
+    "name": "University of Tabuk",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "University of Texas Arlington",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Texas at San Antonio",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of the Algarve",
+    "country": "Portugal"
+  },
+  {
+    "name": "University of the Free State",
+    "country": "South Africa"
+  },
+  {
+    "name": "University of Toledo",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Tulsa",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Vermont",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Warmia and Mazury in Olsztyn",
+    "country": "Poland"
+  },
+  {
+    "name": "University of Wolverhampton",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Wyoming",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Zilina",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Utah State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Van Lang University",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Warsaw University of Life Sciences",
+    "country": "Poland"
+  },
+  {
+    "name": "West Virginia University",
+    "country": "United States of America"
+  },
+  {
+    "name": "William & Mary",
+    "country": "United States of America"
+  },
+  {
+    "name": "Xi'an Jiaotong-Liverpool University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Yerevan State University",
+    "country": "Armenia"
+  },
+  {
+    "name": "Yokohama City University",
+    "country": "Japan"
+  },
+  {
+    "name": "Yokohama National University",
+    "country": "Japan"
+  },
+  {
+    "name": "Yuan Ze University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "ADA University",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Ahmadu Bello University, Zaria",
+    "country": "Nigeria"
+  },
+  {
+    "name": "Al Zaytoonah University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Al-Balqa Applied University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Amman Arab University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Ashoka University",
+    "country": "India"
+  },
+  {
+    "name": "Ataturk University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Bahauddin Zakariya University",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Beijing Foreign Studies University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Beijing University of Chinese Medicine",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Benemérita Universidad Autónoma de Puebla",
+    "country": "Mexico"
+  },
+  {
+    "name": "Beni-Suef University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Birzeit university",
+    "country": "Palestine"
+  },
+  {
+    "name": "BRAC University",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "British University in Egypt",
+    "country": "Egypt"
+  },
+  {
+    "name": "Brock University",
+    "country": "Canada"
+  },
+  {
+    "name": "California Polytechnic State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Can Tho University",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Canterbury Christ Church University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Chang Jung Christian University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "China University of Political Science and Law",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Chitkara University",
+    "country": "India"
+  },
+  {
+    "name": "Cukurova University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Damascus University",
+    "country": "Syrian Arab Republic"
+  },
+  {
+    "name": "Delta University for Science & Technology",
+    "country": "Egypt"
+  },
+  {
+    "name": "Dokuz Eylül Üniversitesi",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Doshisha University",
+    "country": "Japan"
+  },
+  {
+    "name": "Erciyes Üniversitesi",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Feng Chia University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Fu Jen Catholic University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Galgotias University",
+    "country": "India"
+  },
+  {
+    "name": "German university in Cairo",
+    "country": "Egypt"
+  },
+  {
+    "name": "Gunma University",
+    "country": "Japan"
+  },
+  {
+    "name": "Hanoi University of Science and Technology",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Helwan University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Industrial University of Ho Chi Minh City",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Institut Teknologi Nasional Bandung (ITENAS Bandung)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Instituto Tecnológico de Santo Domingo (INTEC)",
+    "country": "Dominican Republic"
+  },
+  {
+    "name": "International Christian University",
+    "country": "Japan"
+  },
+  {
+    "name": "International Islamic University Islamabad (IIU)",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Islamic Azad University",
+    "country": "Iran (Islamic Republic of)"
+  },
+  {
+    "name": "Islamic University of Madinah",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Islamic University of Technology",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Istanbul Aydin University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Ivan Franko National University of Lviv",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Izmir Yüksek Teknoloji Enstitüsü (IYTE)",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Jahangirnagar University",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Jeju National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Kagoshima University",
+    "country": "Japan"
+  },
+  {
+    "name": "Kazakh Ablai khan University of International Relations and World Languages",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Kharkiv National University of Radio Electronics",
+    "country": "Ukraine"
+  },
+  {
+    "name": "King Mongkut's Institute of Technology Ladkrabang",
+    "country": "Thailand"
+  },
+  {
+    "name": "King Mongkut's University of Technology North Bangkok",
+    "country": "Thailand"
+  },
+  {
+    "name": "Kwame Nkrumah University of Science and Technology",
+    "country": "Ghana"
+  },
+  {
+    "name": "Kyoto Institute of Technology",
+    "country": "Japan"
+  },
+  {
+    "name": "Kyrgyz National University",
+    "country": "Kyrgyzstan"
+  },
+  {
+    "name": "Kyrgyz State Technical University named after I. Razzakov",
+    "country": "Kyrgyzstan"
+  },
+  {
+    "name": "Latvia University of Life Sciences and Technologies",
+    "country": "Latvia"
+  },
+  {
+    "name": "Marquette University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Meiji University",
+    "country": "Japan"
+  },
+  {
+    "name": "Miami University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Nagoya Institute of Technology (NIT)",
+    "country": "Japan"
+  },
+  {
+    "name": "National Chin-Yi University of Technology",
+    "country": "Taiwan"
+  },
+  {
+    "name": "National Dong Hwa University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "National Research University Moscow Power Engineering Institute (MPEI)",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "National Taiwan Ocean University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "National University of Kyiv-Mohyla Academy (NaUKMA)",
+    "country": "Ukraine"
+  },
+  {
+    "name": "New Mexico State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Novosibirsk State Technical University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Odessa I.I.Mechnikov National University",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Osmania University, Hyderabad",
+    "country": "India"
+  },
+  {
+    "name": "Ozyegin University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Palestine Technical University - Kadoorie",
+    "country": "Palestine"
+  },
+  {
+    "name": "Pondicherry University",
+    "country": "India"
+  },
+  {
+    "name": "Pontificia Universidade Católica do Rio Grande do Sul",
+    "country": "Brazil"
+  },
+  {
+    "name": "Portland State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Pratt Institute",
+    "country": "United States of America"
+  },
+  {
+    "name": "Pukyong National University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Queen Margaret University , Edinburgh",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Riphah International University",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Saint-Petersburg Electrotechnical University LETI",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Saken Seifullin Kazakh Agrotechnical University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Samara National Research University (Samara University)",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Sathyabama Institute of Science and Technology",
+    "country": "India"
+  },
+  {
+    "name": "Seattle University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Selcuk University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Shanghai International Studies University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Shanghai University of Finance and Economics",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Shinshu University",
+    "country": "Japan"
+  },
+  {
+    "name": "Shiv Nadar University",
+    "country": "India"
+  },
+  {
+    "name": "Siksha ‘O’ Anusandhan (Deemed to be University), SOA",
+    "country": "India"
+  },
+  {
+    "name": "Slovak University of Agriculture in Nitra",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Sookmyung Women's University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Suranaree University of Technology",
+    "country": "Thailand"
+  },
+  {
+    "name": "Taibah University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Tamkang University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Tanta University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Tashkent State Transport University",
+    "country": "Uzbekistan"
+  },
+  {
+    "name": "Technical University of Cluj-Napoca",
+    "country": "Romania"
+  },
+  {
+    "name": "Technical University of Liberec",
+    "country": "Czechia"
+  },
+  {
+    "name": "Technische Universität Kaiserslautern",
+    "country": "Germany"
+  },
+  {
+    "name": "Tecnológico de Costa Rica (TEC)",
+    "country": "Costa Rica"
+  },
+  {
+    "name": "The \"Gheorghe Asachi\" Technical University of Iasi",
+    "country": "Romania"
+  },
+  {
+    "name": "The Russian Presidential Academy of National Economy and Public Administration",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "The University of Northampton",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "The University of Notre Dame, Australia",
+    "country": "Australia"
+  },
+  {
+    "name": "Tishk International University",
+    "country": "Iraq"
+  },
+  {
+    "name": "Tokai University",
+    "country": "Japan"
+  },
+  {
+    "name": "Tokushima University",
+    "country": "Japan"
+  },
+  {
+    "name": "Tomas Bata University in Zlin",
+    "country": "Czechia"
+  },
+  {
+    "name": "Transilvania University of Brasov",
+    "country": "Romania"
+  },
+  {
+    "name": "Tunghai University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "UCAM Universidad Católica San Antonio de Murcia",
+    "country": "Spain"
+  },
+  {
+    "name": "Universidad Autónoma Chapingo",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Autónoma de Guadalajara",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Autónoma de Nuevo León (UANL)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Autónoma del Estado de Hidalgo",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Autónoma del Estado de México",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Católica del Norte",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad Central Marta Abreu de Las Villas",
+    "country": "Cuba"
+  },
+  {
+    "name": "Universidad Cientifica del Sur",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad de la Frontera (UFRO)",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad de Las Américas (UDLA) Ecuador",
+    "country": "Ecuador"
+  },
+  {
+    "name": "Universidad de Lima",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad de los Andes Mérida",
+    "country": "Venezuela (Bolivarian Republic of)"
+  },
+  {
+    "name": "Universidad de Monterrey",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad de Valparaíso",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad del Desarrollo",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad del Norte",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad del Valle de Guatemala (UVG)",
+    "country": "Guatemala"
+  },
+  {
+    "name": "Universidad Industrial de Santander",
+    "country": "Colombia"
+  },
+  {
+    "name": "Universidad Jesuita de Guadalajara - ITESO",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Nacional Costa Rica",
+    "country": "Costa Rica"
+  },
+  {
+    "name": "Universidad Nacional de Asunción",
+    "country": "Paraguay"
+  },
+  {
+    "name": "Universidad Nacional de Cuyo",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad Nacional de Ingeniería Peru",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad Nacional de San Luis",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad Nacional del Centro de la Provincia de Buenos Aires",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad Nacional del Litoral",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad Peruana de Ciencias Aplicadas (UPC)",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad Tecnológica de Panamá (UTP)",
+    "country": "Panama"
+  },
+  {
+    "name": "Universidad Tecnológica Nacional (UTN)",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidade do Estado do Rio de Janeiro (UERJ)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal da Bahia",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal de Pernambuco (UFPE)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal de Santa Maria",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal de Viçosa",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal do Ceará (UFC)",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal Fluminense",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Presbiteriana Mackenzie",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universita' degli Studi di Urbino Carlo Bo",
+    "country": "Italy"
+  },
+  {
+    "name": "Universitas Muhammadiyah Yogyakarta (UMY)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universitas Negeri Yogyakarta",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universitas Pendidikan Indonesia",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universitas Trisakti",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universität Siegen",
+    "country": "Germany"
+  },
+  {
+    "name": "Université de Caen Normandie",
+    "country": "France"
+  },
+  {
+    "name": "Université de Limoges",
+    "country": "France"
+  },
+  {
+    "name": "Université de Poitiers",
+    "country": "France"
+  },
+  {
+    "name": "Université de Sousse",
+    "country": "Tunisia"
+  },
+  {
+    "name": "Université de Tunis",
+    "country": "Tunisia"
+  },
+  {
+    "name": "Université Ibn Tofail",
+    "country": "Morocco"
+  },
+  {
+    "name": "Université Jean Moulin Lyon 3",
+    "country": "France"
+  },
+  {
+    "name": "Université Mohammed V de Rabat",
+    "country": "Morocco"
+  },
+  {
+    "name": "Université Paris-Nanterre",
+    "country": "France"
+  },
+  {
+    "name": "Université Paul-Valéry Montpellier 3",
+    "country": "France"
+  },
+  {
+    "name": "Universiti Kuala Lumpur (UniKL)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Universiti Malaysia Kelantan",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Universiti Teknikal Malaysia Melaka (UTeM)",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Babylon",
+    "country": "Iraq"
+  },
+  {
+    "name": "University of Basrah",
+    "country": "Iraq"
+  },
+  {
+    "name": "University of Derby",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of International Business and Economics",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "University of Kerbala",
+    "country": "Iraq"
+  },
+  {
+    "name": "University of Khartoum",
+    "country": "Sudan"
+  },
+  {
+    "name": "University of Kufa",
+    "country": "Iraq"
+  },
+  {
+    "name": "University of Management and Technology (UMT), Pakistan",
+    "country": "Pakistan"
+  },
+  {
+    "name": "University of Memphis",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Miskolc",
+    "country": "Hungary"
+  },
+  {
+    "name": "University of Mosul",
+    "country": "Iraq"
+  },
+  {
+    "name": "University of North Carolina at Greensboro",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Novi Sad",
+    "country": "Serbia"
+  },
+  {
+    "name": "University of Ostrava",
+    "country": "Czechia"
+  },
+  {
+    "name": "University of Pannonia",
+    "country": "Hungary"
+  },
+  {
+    "name": "University of Pardubice",
+    "country": "Czechia"
+  },
+  {
+    "name": "University of Peradeniya",
+    "country": "Sri Lanka"
+  },
+  {
+    "name": "University of Petra",
+    "country": "Jordan"
+  },
+  {
+    "name": "University of Primorska",
+    "country": "Slovenia"
+  },
+  {
+    "name": "University of Rajshahi",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "University of Rijeka",
+    "country": "Croatia"
+  },
+  {
+    "name": "University of San Diego",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of San Francisco",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Sarajevo",
+    "country": "Bosnia and Herzegovina"
+  },
+  {
+    "name": "University of Silesia in Katowice",
+    "country": "Poland"
+  },
+  {
+    "name": "University of South Alabama (USA)",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Split",
+    "country": "Croatia"
+  },
+  {
+    "name": "University of Texas El Paso",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Tyumen",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "University of Wisconsin Milwaukee",
+    "country": "United States of America"
+  },
+  {
+    "name": "University POLITEHNICA of Bucharest",
+    "country": "Romania"
+  },
+  {
+    "name": "University Toulouse – Jean Jaurès",
+    "country": "France"
+  },
+  {
+    "name": "West University of Timisoara",
+    "country": "Romania"
+  },
+  {
+    "name": "Western Michigan University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Yessenov University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Zagazig University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Zarqa University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Akdeniz Üniversitesi",
+    "country": "Türkiye"
+  },
+  {
+    "name": "American International University-Bangladesh (AIUB)",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Anadolu University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Aoyama Gakuin University",
+    "country": "Japan"
+  },
+  {
+    "name": "Aswan University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Atma Jaya Catholic University Indonesia",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Belarusian State University of Informatics and Radioelectronics",
+    "country": "Belarus"
+  },
+  {
+    "name": "Belgorod State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Benha University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Central Michigan University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Chaoyang University of Technology",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Chittagong University of Engineering and Technology",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "CHRIST (Deemed to be University), Bengaluru",
+    "country": "India"
+  },
+  {
+    "name": "Cleveland State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "East West University",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Escuela Politécnica Nacional",
+    "country": "Ecuador"
+  },
+  {
+    "name": "Harper Adams University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Herzen State Pedagogical University of Russia",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Hongik University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Hue University",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "Independent University,Bangladesh",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Indian Institute of Information Technology - Allahabad",
+    "country": "India"
+  },
+  {
+    "name": "Islamic University of Indonesia (Universitas Islam Indonesia)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Istanbul Bilgi Üniversitesi",
+    "country": "Türkiye"
+  },
+  {
+    "name": "Jadara University",
+    "country": "Jordan"
+  },
+  {
+    "name": "Jamia Hamdard, New Delhi",
+    "country": "India"
+  },
+  {
+    "name": "Kazan National Research Technological University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Khulna University",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Khulna University of Engineering and Technology",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Kindai University (previously Kinki University)",
+    "country": "Japan"
+  },
+  {
+    "name": "Lublin University of Technology",
+    "country": "Poland"
+  },
+  {
+    "name": "M. Kozybayev North Kazakhstan University",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Mahasarakham University",
+    "country": "Thailand"
+  },
+  {
+    "name": "Manav Rachna International Institute of Research and Studies (MRIIRS)",
+    "country": "India"
+  },
+  {
+    "name": "Mapua University",
+    "country": "Philippines"
+  },
+  {
+    "name": "Mendeleev University of Chemical Technology of Russia",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Naresuan University",
+    "country": "Thailand"
+  },
+  {
+    "name": "National Taipei University",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Nile University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Pavlodar State University named after Toraighyrov",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Perm State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Petra Christian University",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Pontificia Universidad Catolica Madre y Maestra (PUCMM)",
+    "country": "Dominican Republic"
+  },
+  {
+    "name": "Rajshahi University of Engineering and Technology",
+    "country": "Bangladesh"
+  },
+  {
+    "name": "Rikkyo University",
+    "country": "Japan"
+  },
+  {
+    "name": "Sakarya University",
+    "country": "Türkiye"
+  },
+  {
+    "name": "San Francisco State University",
+    "country": "United States of America"
+  },
+  {
+    "name": "Shakarim University of the City of Semey, Kazakhstan",
+    "country": "Kazakhstan"
+  },
+  {
+    "name": "Shanghai Normal University",
+    "country": "China (Mainland)"
+  },
+  {
+    "name": "Silpakorn University",
+    "country": "Thailand"
+  },
+  {
+    "name": "Soka University",
+    "country": "Japan"
+  },
+  {
+    "name": "Soongsil University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "State University Malang (Universitas Negeri Malang)",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Stefan cel Mare University of Suceava",
+    "country": "Romania"
+  },
+  {
+    "name": "Suez Canal University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Tashkent University of Information Technologies",
+    "country": "Uzbekistan"
+  },
+  {
+    "name": "The Islamia University of Bahawalpur,Pakistan",
+    "country": "Pakistan"
+  },
+  {
+    "name": "Tongmyong University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Universidad Autónoma de Baja California",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Autónoma de Chile",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad Católica de Temuco",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad de Cuenca",
+    "country": "Ecuador"
+  },
+  {
+    "name": "Universidad de Guanajuato",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad de Panama",
+    "country": "Panama"
+  },
+  {
+    "name": "Universidad de Piura",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad de Tarapaca",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad del Bio-Bio",
+    "country": "Chile"
+  },
+  {
+    "name": "Universidad del Zulia",
+    "country": "Venezuela (Bolivarian Republic of)"
+  },
+  {
+    "name": "Universidad La Salle (ULSA)",
+    "country": "Mexico"
+  },
+  {
+    "name": "Universidad Latinoamericana de Ciencia y Tecnología Costa Rica (ULACIT)",
+    "country": "Costa Rica"
+  },
+  {
+    "name": "Universidad Metropolitana",
+    "country": "Venezuela (Bolivarian Republic of)"
+  },
+  {
+    "name": "Universidad Nacional Agraria la Molina",
+    "country": "Peru"
+  },
+  {
+    "name": "Universidad Nacional de San Martín (UNSAM)",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad Nacional del Sur",
+    "country": "Argentina"
+  },
+  {
+    "name": "Universidad Tecnológica Centroamericana (UNITEC) - Honduras",
+    "country": "Honduras"
+  },
+  {
+    "name": "Universidade Federal de Uberlândia",
+    "country": "Brazil"
+  },
+  {
+    "name": "Universidade Federal do Rio Grande Do Norte",
+    "country": "Brazil"
+  },
+  {
+    "name": "Università degli studi di Bergamo",
+    "country": "Italy"
+  },
+  {
+    "name": "Universitas Andalas",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universitas Negeri Padang",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universitas Syiah Kuala",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Universiti Sultan Zainal Abidin",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Da Nang",
+    "country": "Viet Nam"
+  },
+  {
+    "name": "University of Hawaii at Hilo",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Missouri Saint Louis",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Moratuwa",
+    "country": "Sri Lanka"
+  },
+  {
+    "name": "University of Oradea",
+    "country": "Romania"
+  },
+  {
+    "name": "University of Sri Jayewardenepura",
+    "country": "Sri Lanka"
+  },
+  {
+    "name": "University of the Pacific",
+    "country": "United States of America"
+  },
+  {
+    "name": "University of Tripoli",
+    "country": "Libya"
+  },
+  {
+    "name": "University of West Bohemia",
+    "country": "Czechia"
+  },
+  {
+    "name": "Voronezh State University",
+    "country": "Russian Federation"
+  },
+  {
+    "name": "Walailak University",
+    "country": "Thailand"
+  },
+  {
+    "name": "Yamaguchi University",
+    "country": "Japan"
+  },
+  {
+    "name": "Youngsan University",
+    "country": "Republic of Korea"
+  },
+  {
+    "name": "Paris-Saclay University",
+    "country": "France"
+  },
+  {
+    "name": "University College London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of California, San Francisco",
+    "country": "United States"
+  },
+  {
+    "name": "Rockefeller University",
+    "country": "United States"
+  },
+  {
+    "name": "University of Michigan, Ann Arbor",
+    "country": "United States"
+  },
+  {
+    "name": "University of Wisconsin, Madison",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Edinburgh",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of North Carolina at Chapel Hill",
+    "country": "United States"
+  },
+  {
+    "name": "University of Munich",
+    "country": "Germany"
+  },
+  {
+    "name": "Swiss Federal Institute of Technology Lausanne",
+    "country": "Switzerland"
+  },
+  {
+    "name": "The University of Texas at Austin",
+    "country": "United States"
+  },
+  {
+    "name": "Karolinska Institute",
+    "country": "Sweden"
+  },
+  {
+    "name": "Heidelberg University",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Minnesota, Twin Cities",
+    "country": "United States"
+  },
+  {
+    "name": "University of Illinois Urbana, Champaign",
+    "country": "United States"
+  },
+  {
+    "name": "University of Texas Southwestern Medical Center",
+    "country": "United States"
+  },
+  {
+    "name": "University of Bonn",
+    "country": "Germany"
+  },
+  {
+    "name": "Weizmann Institute of Science",
+    "country": "Israel"
+  },
+  {
+    "name": "University of Sydney",
+    "country": "Australia"
+  },
+  {
+    "name": "Ohio State University, Columbus",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Texas MD Anderson Cancer Center",
+    "country": "United States"
+  },
+  {
+    "name": "Nanyang Technological University",
+    "country": "Singapore"
+  },
+  {
+    "name": "The Hebrew University of Jerusalem",
+    "country": "Israel"
+  },
+  {
+    "name": "Technion-Israel Institute of Technology",
+    "country": "Israel"
+  },
+  {
+    "name": "Icahn School of Medicine at Mount Sinai",
+    "country": "United States"
+  },
+  {
+    "name": "Institute of Science Tokyo",
+    "country": "Japan"
+  },
+  {
+    "name": "Mayo Clinic College of Medicine and Science, Minnesota",
+    "country": "United States"
+  },
+  {
+    "name": "Moscow State University",
+    "country": "Russia"
+  },
+  {
+    "name": "Pennsylvania State University, University Park",
+    "country": "United States"
+  },
+  {
+    "name": "Purdue University, West Lafayette",
+    "country": "United States"
+  },
+  {
+    "name": "Southeast University",
+    "country": "China"
+  },
+  {
+    "name": "The Australian National University",
+    "country": "Australia"
+  },
+  {
+    "name": "University of Amsterdam",
+    "country": "Netherlands"
+  },
+  {
+    "name": "University of Freiburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Nottingham",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Sao Paulo",
+    "country": "Brazil"
+  },
+  {
+    "name": "University of Strasbourg",
+    "country": "France"
+  },
+  {
+    "name": "Aix Marseille University",
+    "country": "France"
+  },
+  {
+    "name": "Goethe University Frankfurt",
+    "country": "Germany"
+  },
+  {
+    "name": "NTNU - Norwegian University of Science and Technology",
+    "country": "Norway"
+  },
+  {
+    "name": "Peking Union Medical College",
+    "country": "China"
+  },
+  {
+    "name": "Rutgers, The State University of New Jersey - New Brunswick",
+    "country": "United States"
+  },
+  {
+    "name": "The London School of Economics and Political Science",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "The University of Adelaide",
+    "country": "Australia"
+  },
+  {
+    "name": "The University of Calgary",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Cologne",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Goettingen",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Mainz",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Massachusetts Chan Medical School",
+    "country": "United States"
+  },
+  {
+    "name": "University of Montpellier",
+    "country": "France"
+  },
+  {
+    "name": "University of Muenster",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Padua",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Tuebingen",
+    "country": "Germany"
+  },
+  {
+    "name": "Baylor College of Medicine",
+    "country": "United States"
+  },
+  {
+    "name": "Capital Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Catholic University of Louvain",
+    "country": "Belgium"
+  },
+  {
+    "name": "Claude Bernard University Lyon 1",
+    "country": "France"
+  },
+  {
+    "name": "Dresden University of Technology",
+    "country": "Germany"
+  },
+  {
+    "name": "Heinrich Heine University Duesseldorf",
+    "country": "Germany"
+  },
+  {
+    "name": "Kiel University",
+    "country": "Germany"
+  },
+  {
+    "name": "King Abdullah University of Science and Technology",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Korea Advanced Institute of Science and Technology",
+    "country": "South Korea"
+  },
+  {
+    "name": "London School of Hygiene & Tropical Medicine",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Medical University of Vienna",
+    "country": "Austria"
+  },
+  {
+    "name": "Nanjing Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Nanjing University of Science & Technology",
+    "country": "China"
+  },
+  {
+    "name": "National Autonomous University of Mexico",
+    "country": "Mexico"
+  },
+  {
+    "name": "North Carolina State University at Raleigh",
+    "country": "United States"
+  },
+  {
+    "name": "Northwest A&F University",
+    "country": "China"
+  },
+  {
+    "name": "Oregon Health & Science University",
+    "country": "United States"
+  },
+  {
+    "name": "Osaka University",
+    "country": "Japan"
+  },
+  {
+    "name": "Queen's University",
+    "country": "Canada"
+  },
+  {
+    "name": "Ruhr University Bochum",
+    "country": "Germany"
+  },
+  {
+    "name": "RWTH Aachen University",
+    "country": "Germany"
+  },
+  {
+    "name": "Southern Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Technical University of Berlin",
+    "country": "Germany"
+  },
+  {
+    "name": "The University of Tennessee, Knoxville",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Texas Health Science Center at Houston",
+    "country": "United States"
+  },
+  {
+    "name": "Trinity College Dublin",
+    "country": "Ireland"
+  },
+  {
+    "name": "University of Bologna",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Bordeaux",
+    "country": "France"
+  },
+  {
+    "name": "University of Buenos Aires",
+    "country": "Argentina"
+  },
+  {
+    "name": "University of Colorado at Denver",
+    "country": "United States"
+  },
+  {
+    "name": "University of Erlangen-Nuremberg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Hamburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Innsbruck",
+    "country": "Austria"
+  },
+  {
+    "name": "University of Leipzig",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Lorraine",
+    "country": "France"
+  },
+  {
+    "name": "University of Valencia",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Wuerzburg",
+    "country": "Germany"
+  },
+  {
+    "name": "Virginia Polytechnic Institute and State University",
+    "country": "United States"
+  },
+  {
+    "name": "Albert Einstein College of Medicine",
+    "country": "United States"
+  },
+  {
+    "name": "Anhui University",
+    "country": "China"
+  },
+  {
+    "name": "Autonomous University of Barcelona",
+    "country": "Spain"
+  },
+  {
+    "name": "Autonomous University of Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "Ben-Gurion University of the Negev",
+    "country": "Israel"
+  },
+  {
+    "name": "Complutense University of Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "Ecole Normale Superieure - Lyon",
+    "country": "France"
+  },
+  {
+    "name": "Fujian Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Fuzhou University",
+    "country": "China"
+  },
+  {
+    "name": "Guangdong University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Guangxi University",
+    "country": "China"
+  },
+  {
+    "name": "Guangzhou Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Henan University",
+    "country": "China"
+  },
+  {
+    "name": "Jiangsu University",
+    "country": "China"
+  },
+  {
+    "name": "Kunming University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Linkoping University",
+    "country": "Sweden"
+  },
+  {
+    "name": "Nanchang University",
+    "country": "China"
+  },
+  {
+    "name": "Nanjing Tech University",
+    "country": "China"
+  },
+  {
+    "name": "Nanjing University of Information Science & Technology",
+    "country": "China"
+  },
+  {
+    "name": "Nanjing University of Posts and Telecommunications",
+    "country": "China"
+  },
+  {
+    "name": "Paul Sabatier University (Toulouse 3)",
+    "country": "France"
+  },
+  {
+    "name": "Polytechnic University of Milan",
+    "country": "Italy"
+  },
+  {
+    "name": "Pompeu Fabra University",
+    "country": "Spain"
+  },
+  {
+    "name": "Qingdao University",
+    "country": "China"
+  },
+  {
+    "name": "ShanghaiTech University",
+    "country": "China"
+  },
+  {
+    "name": "South China Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Southwest Jiaotong University",
+    "country": "China"
+  },
+  {
+    "name": "University of Alabama at Birmingham",
+    "country": "United States"
+  },
+  {
+    "name": "University of Duisburg-Essen",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Hawaii at Manoa",
+    "country": "United States"
+  },
+  {
+    "name": "University of Marburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Potsdam",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Shanghai for Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "University of Stuttgart",
+    "country": "Germany"
+  },
+  {
+    "name": "University of the Basque Country",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Ulm",
+    "country": "Germany"
+  },
+  {
+    "name": "Westlake University",
+    "country": "China"
+  },
+  {
+    "name": "Xidian University",
+    "country": "China"
+  },
+  {
+    "name": "Yangzhou University",
+    "country": "China"
+  },
+  {
+    "name": "Yunnan University",
+    "country": "China"
+  },
+  {
+    "name": "Zhejiang University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Anhui Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Catholic University of the Sacred Heart",
+    "country": "Italy"
+  },
+  {
+    "name": "China University of Geosciences Beijing",
+    "country": "China"
+  },
+  {
+    "name": "CUNY Graduate School and University Center",
+    "country": "United States"
+  },
+  {
+    "name": "Fujian Agriculture and Forestry University",
+    "country": "China"
+  },
+  {
+    "name": "Guangzhou University",
+    "country": "China"
+  },
+  {
+    "name": "Guizhou University",
+    "country": "China"
+  },
+  {
+    "name": "Hainan University",
+    "country": "China"
+  },
+  {
+    "name": "Hannover Medical School",
+    "country": "Germany"
+  },
+  {
+    "name": "Hefei University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Indiana University, Indianapolis",
+    "country": "United States"
+  },
+  {
+    "name": "Leibniz University Hannover",
+    "country": "Germany"
+  },
+  {
+    "name": "Louisiana State University, Baton Rouge",
+    "country": "United States"
+  },
+  {
+    "name": "Medical University of Graz",
+    "country": "Austria"
+  },
+  {
+    "name": "Medical University of Innsbruck",
+    "country": "Austria"
+  },
+  {
+    "name": "Nanjing University of Chinese Medicine",
+    "country": "China"
+  },
+  {
+    "name": "National University of Defense Technology",
+    "country": "China"
+  },
+  {
+    "name": "Ningbo University",
+    "country": "China"
+  },
+  {
+    "name": "Okinawa Institute of Science and Technology Graduate University",
+    "country": "Japan"
+  },
+  {
+    "name": "Polytechnic University of Valencia",
+    "country": "Spain"
+  },
+  {
+    "name": "Saarland University",
+    "country": "Germany"
+  },
+  {
+    "name": "Sao Paulo State University",
+    "country": "Brazil"
+  },
+  {
+    "name": "South China Normal University",
+    "country": "China"
+  },
+  {
+    "name": "St Petersburg University",
+    "country": "Russia"
+  },
+  {
+    "name": "Swedish University of Agricultural Sciences",
+    "country": "Sweden"
+  },
+  {
+    "name": "Technical University Darmstadt",
+    "country": "Germany"
+  },
+  {
+    "name": "Tehran University of Medical Sciences",
+    "country": "Iran"
+  },
+  {
+    "name": "The Chinese University of Hong Kong, Shenzhen",
+    "country": "China"
+  },
+  {
+    "name": "The University of Newcastle, Australia",
+    "country": "Australia"
+  },
+  {
+    "name": "The University of Reading",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "The University of Texas at Dallas",
+    "country": "United States"
+  },
+  {
+    "name": "Toulouse Capitole University",
+    "country": "France"
+  },
+  {
+    "name": "Umea University",
+    "country": "Sweden"
+  },
+  {
+    "name": "University of Bayreuth",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Campinas",
+    "country": "Brazil"
+  },
+  {
+    "name": "University of Côte d'Azur",
+    "country": "France"
+  },
+  {
+    "name": "University of Jena",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Konstanz",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Lille",
+    "country": "France"
+  },
+  {
+    "name": "University of Oklahoma, Norman",
+    "country": "United States"
+  },
+  {
+    "name": "University of Pavia",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Regensburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Rennes",
+    "country": "France"
+  },
+  {
+    "name": "University of Rome Tor Vergata",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Seville",
+    "country": "Spain"
+  },
+  {
+    "name": "University of South Australia",
+    "country": "Australia"
+  },
+  {
+    "name": "University of South Carolina, Columbia",
+    "country": "United States"
+  },
+  {
+    "name": "University of Verona",
+    "country": "Italy"
+  },
+  {
+    "name": "Vita-Salute San Raffaele University",
+    "country": "Italy"
+  },
+  {
+    "name": "Wenzhou Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Central China Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Changzhou University",
+    "country": "China"
+  },
+  {
+    "name": "China University of Petroleum, Beijing",
+    "country": "China"
+  },
+  {
+    "name": "Chongqing Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Federal University of Minas Gerais",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Rio de Janeiro",
+    "country": "Brazil"
+  },
+  {
+    "name": "Fujian Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Hangzhou Dianzi University",
+    "country": "China"
+  },
+  {
+    "name": "Hangzhou Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Hebei University",
+    "country": "China"
+  },
+  {
+    "name": "Hebei University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Indian Institute of Science",
+    "country": "India"
+  },
+  {
+    "name": "Jiangsu University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "King Abdulaziz University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Medical College of Wisconsin",
+    "country": "United States"
+  },
+  {
+    "name": "Medical University of South Carolina",
+    "country": "United States"
+  },
+  {
+    "name": "Nanjing Forestry University",
+    "country": "China"
+  },
+  {
+    "name": "National Polytechnic Institute",
+    "country": "Mexico"
+  },
+  {
+    "name": "North China Electric Power University",
+    "country": "China"
+  },
+  {
+    "name": "Northeast Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Northeast Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Pontifical Catholic University of Chile",
+    "country": "Chile"
+  },
+  {
+    "name": "Shaanxi Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Shandong Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Shandong University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Shanxi University",
+    "country": "China"
+  },
+  {
+    "name": "The University of New Mexico, Albuquerque",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Texas Health Science Center at San Antonio",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Texas Medical Branch at Galveston",
+    "country": "United States"
+  },
+  {
+    "name": "Tianjin Medical University",
+    "country": "China"
+  },
+  {
+    "name": "UiT The Arctic University of Norway",
+    "country": "Norway"
+  },
+  {
+    "name": "University at Buffalo, the State University of New York",
+    "country": "United States"
+  },
+  {
+    "name": "University of Arkansas at Fayetteville",
+    "country": "United States"
+  },
+  {
+    "name": "University of Bremen",
+    "country": "Germany"
+  },
+  {
+    "name": "University of California, Merced",
+    "country": "United States"
+  },
+  {
+    "name": "University of Campania Luigi Vanvitelli",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Catania",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Chile",
+    "country": "Chile"
+  },
+  {
+    "name": "University of Galway",
+    "country": "Ireland"
+  },
+  {
+    "name": "University of Giessen",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Halle-Wittenberg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Luebeck",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Maine",
+    "country": "United States"
+  },
+  {
+    "name": "University of Nantes",
+    "country": "France"
+  },
+  {
+    "name": "University of Nevada, Las Vegas",
+    "country": "United States"
+  },
+  {
+    "name": "University of Perugia",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Rostock",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Santiago Compostela",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Zaragoza",
+    "country": "Spain"
+  },
+  {
+    "name": "Vellore Institute of Technology",
+    "country": "India"
+  },
+  {
+    "name": "Wenzhou University",
+    "country": "China"
+  },
+  {
+    "name": "Xi'an University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Yanshan University",
+    "country": "China"
+  },
+  {
+    "name": "Zhejiang Sci-Tech University",
+    "country": "China"
+  },
+  {
+    "name": "Air Force Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Beijing Forestry University",
+    "country": "China"
+  },
+  {
+    "name": "Beijing Technology and Business University",
+    "country": "China"
+  },
+  {
+    "name": "Binghamton University",
+    "country": "United States"
+  },
+  {
+    "name": "Brescia University",
+    "country": "Italy"
+  },
+  {
+    "name": "Brunel University London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Chang'an University",
+    "country": "China"
+  },
+  {
+    "name": "Chengdu University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "China University of Mining and Technology-Beijing",
+    "country": "China"
+  },
+  {
+    "name": "Dalian Maritime University",
+    "country": "China"
+  },
+  {
+    "name": "Federal University of Rio Grande do Sul",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Santa Catarina",
+    "country": "Brazil"
+  },
+  {
+    "name": "Henan University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Homi Bhabha National Institute",
+    "country": "India"
+  },
+  {
+    "name": "Hunan Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Khalifa University",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Lanzhou University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Marche Polytechnic University",
+    "country": "Italy"
+  },
+  {
+    "name": "Moscow Institute of Physics and Technology",
+    "country": "Russia"
+  },
+  {
+    "name": "Nantong University",
+    "country": "China"
+  },
+  {
+    "name": "Naval Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Northeast Forestry University",
+    "country": "China"
+  },
+  {
+    "name": "Polytechnic University of Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "Polytechnic University of Turin",
+    "country": "Italy"
+  },
+  {
+    "name": "Qilu University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Qingdao University of Science & Technology",
+    "country": "China"
+  },
+  {
+    "name": "Rush University",
+    "country": "United States"
+  },
+  {
+    "name": "Semmelweis University",
+    "country": "Hungary"
+  },
+  {
+    "name": "Shandong First Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Shanghai Ocean University",
+    "country": "China"
+  },
+  {
+    "name": "Southwest Petroleum University",
+    "country": "China"
+  },
+  {
+    "name": "Taiyuan University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Technical University of Braunschweig",
+    "country": "Germany"
+  },
+  {
+    "name": "Technical University of Dortmund",
+    "country": "Germany"
+  },
+  {
+    "name": "Thomas Jefferson University",
+    "country": "United States"
+  },
+  {
+    "name": "University of Alicante",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Augsburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Burgundy Europe",
+    "country": "France"
+  },
+  {
+    "name": "University of Ferrara",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Graz",
+    "country": "Austria"
+  },
+  {
+    "name": "University of Health Sciences Turkey",
+    "country": "Turkey"
+  },
+  {
+    "name": "University of Malaya",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Natural Resources and Life Sciences, Vienna",
+    "country": "Austria"
+  },
+  {
+    "name": "University of Oldenburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Oviedo",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Salerno",
+    "country": "Italy"
+  },
+  {
+    "name": "University Rovira i Virgili",
+    "country": "Spain"
+  },
+  {
+    "name": "Xinjiang University",
+    "country": "China"
+  },
+  {
+    "name": "Zhejiang Chinese Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Zhejiang Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Al-Azhar University",
+    "country": "Egypt"
+  },
+  {
+    "name": "Anhui Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Ankara University",
+    "country": "Turkey"
+  },
+  {
+    "name": "Army Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Bielefeld University",
+    "country": "Germany"
+  },
+  {
+    "name": "China Pharmaceutical University",
+    "country": "China"
+  },
+  {
+    "name": "Chongqing University of Posts and Telecommunications",
+    "country": "China"
+  },
+  {
+    "name": "Copenhagen Business School",
+    "country": "Denmark"
+  },
+  {
+    "name": "Federal University of Parana",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Santa Maria",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Sao Paulo",
+    "country": "Brazil"
+  },
+  {
+    "name": "Gachon University",
+    "country": "South Korea"
+  },
+  {
+    "name": "Guangxi Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Harbin Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Hebei Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Henan Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Hubei University",
+    "country": "China"
+  },
+  {
+    "name": "Humanitas University",
+    "country": "Italy"
+  },
+  {
+    "name": "Istanbul University Cerrahpasa",
+    "country": "Turkey"
+  },
+  {
+    "name": "Jiangxi Normal University",
+    "country": "China"
+  },
+  {
+    "name": "King Fahd University of Petroleum and Minerals",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Kitasato University",
+    "country": "Japan"
+  },
+  {
+    "name": "Lulea University of Technology",
+    "country": "Sweden"
+  },
+  {
+    "name": "National University of Malaysia",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Northumbria University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "NOVA University Lisbon",
+    "country": "Portugal"
+  },
+  {
+    "name": "Palacký University Olomouc",
+    "country": "Czech Republic"
+  },
+  {
+    "name": "Paris-East Créteil University",
+    "country": "France"
+  },
+  {
+    "name": "Polytechnic University of Catalonia",
+    "country": "Spain"
+  },
+  {
+    "name": "Scuola Normale Superiore - Pisa",
+    "country": "Italy"
+  },
+  {
+    "name": "Shantou University",
+    "country": "China"
+  },
+  {
+    "name": "Shanxi Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Southwestern University of Finance and Economics",
+    "country": "China"
+  },
+  {
+    "name": "SRM Institute of Science & Technology",
+    "country": "India"
+  },
+  {
+    "name": "Stockholm School of Economics",
+    "country": "Sweden"
+  },
+  {
+    "name": "SUNY Downstate Health Sciences University",
+    "country": "United States"
+  },
+  {
+    "name": "Suzhou University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Tarbiat Modares University",
+    "country": "Iran"
+  },
+  {
+    "name": "The University of Alabama, Tuscaloosa",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Texas at Arlington",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Texas at San Antonio",
+    "country": "United States"
+  },
+  {
+    "name": "The University of Waikato",
+    "country": "New Zealand"
+  },
+  {
+    "name": "Tiangong University",
+    "country": "China"
+  },
+  {
+    "name": "Tianjin University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "University at Albany",
+    "country": "United States"
+  },
+  {
+    "name": "University of Alcala",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Brasília",
+    "country": "Brazil"
+  },
+  {
+    "name": "University of Calabria",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Cantabria",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Clermont Auvergne",
+    "country": "France"
+  },
+  {
+    "name": "University of Extremadura",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Jinan",
+    "country": "China"
+  },
+  {
+    "name": "University of Jyvaskyla",
+    "country": "Finland"
+  },
+  {
+    "name": "University of La Laguna",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Mannheim",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Palermo(Italy)",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Quebec Montreal",
+    "country": "Canada"
+  },
+  {
+    "name": "University of Science, Malaysia",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University of Sherbrooke",
+    "country": "Canada"
+  },
+  {
+    "name": "University of South China",
+    "country": "China"
+  },
+  {
+    "name": "University of the Balearic Islands",
+    "country": "Spain"
+  },
+  {
+    "name": "Wuhan Institute of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Wuhan University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Xiangtan University",
+    "country": "China"
+  },
+  {
+    "name": "Xuzhou Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Anhui Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Augusta University",
+    "country": "United States"
+  },
+  {
+    "name": "Birkbeck, University of London",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Capital Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Central University of Finance and Economics",
+    "country": "China"
+  },
+  {
+    "name": "Changsha University of Science & Technology",
+    "country": "China"
+  },
+  {
+    "name": "Chengdu University",
+    "country": "China"
+  },
+  {
+    "name": "Cranfield University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Czech University of Life Sciences Prague",
+    "country": "Czech Republic"
+  },
+  {
+    "name": "Dongguan University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Ege University",
+    "country": "Turkey"
+  },
+  {
+    "name": "Federal University of Sao Carlos",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Vicosa",
+    "country": "Brazil"
+  },
+  {
+    "name": "Guangxi Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Guangzhou University of Chinese Medicine",
+    "country": "China"
+  },
+  {
+    "name": "Heilongjiang University",
+    "country": "China"
+  },
+  {
+    "name": "HSE University",
+    "country": "Russia"
+  },
+  {
+    "name": "INSA Toulouse",
+    "country": "France"
+  },
+  {
+    "name": "Manipal Academy of Higher Education",
+    "country": "India"
+  },
+  {
+    "name": "Maynooth University",
+    "country": "Ireland"
+  },
+  {
+    "name": "Montana State University, Bozeman",
+    "country": "United States"
+  },
+  {
+    "name": "National University of Colombia",
+    "country": "Colombia"
+  },
+  {
+    "name": "New York University Abu Dhabi",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "North China University of Water Resources and Electric Power",
+    "country": "China"
+  },
+  {
+    "name": "North University of China",
+    "country": "China"
+  },
+  {
+    "name": "Old Dominion University",
+    "country": "United States"
+  },
+  {
+    "name": "Qingdao Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Shahid Beheshti University of Medical Sciences",
+    "country": "Iran"
+  },
+  {
+    "name": "Shandong Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Shanghai University of Traditional Chinese Medicine",
+    "country": "China"
+  },
+  {
+    "name": "Shenyang Pharmaceutical University",
+    "country": "China"
+  },
+  {
+    "name": "Sichuan Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Skolkovo Institute of Science and Technology",
+    "country": "Russia"
+  },
+  {
+    "name": "The Graduate University for Advanced Studies, SOKENDAI",
+    "country": "Japan"
+  },
+  {
+    "name": "The Royal Veterinary College",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "The University of Texas at El Paso",
+    "country": "United States"
+  },
+  {
+    "name": "Ulster University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Antioquia",
+    "country": "Colombia"
+  },
+  {
+    "name": "University of Cagliari",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Jaen",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Kassel",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Lleida",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Magdeburg",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Malaga",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Nebraska Medical Center",
+    "country": "United States"
+  },
+  {
+    "name": "University of Oklahoma Health Sciences Center",
+    "country": "United States"
+  },
+  {
+    "name": "University of Poitiers",
+    "country": "France"
+  },
+  {
+    "name": "University of the Sunshine Coast",
+    "country": "Australia"
+  },
+  {
+    "name": "University of Versailles Saint-Quentin-en-Yvelines",
+    "country": "France"
+  },
+  {
+    "name": "University of Vigo",
+    "country": "Spain"
+  },
+  {
+    "name": "University Putra Malaysia",
+    "country": "Malaysia"
+  },
+  {
+    "name": "University Savoie Mont Blanc",
+    "country": "France"
+  },
+  {
+    "name": "Xi'an University of Architecture and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Yangtze University",
+    "country": "China"
+  },
+  {
+    "name": "Yantai University",
+    "country": "China"
+  },
+  {
+    "name": "Zhejiang A&F University",
+    "country": "China"
+  },
+  {
+    "name": "Al-Imam Mohammad Ibn Saud Islamic University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Amherst College",
+    "country": "United States"
+  },
+  {
+    "name": "Anhui University of Science & Technology",
+    "country": "China"
+  },
+  {
+    "name": "Carlos III University of Madrid",
+    "country": "Spain"
+  },
+  {
+    "name": "Chengdu University of Traditional Chinese Medicine",
+    "country": "China"
+  },
+  {
+    "name": "China Jiliang University",
+    "country": "China"
+  },
+  {
+    "name": "Comenius University in Bratislava",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Dalian Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Federal University of Bahia",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Ceara",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Pelotas",
+    "country": "Brazil"
+  },
+  {
+    "name": "Federal University of Pernambuco",
+    "country": "Brazil"
+  },
+  {
+    "name": "Free University of Bozen-Bolzano",
+    "country": "Italy"
+  },
+  {
+    "name": "Gansu Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Gazi University",
+    "country": "Turkey"
+  },
+  {
+    "name": "Gyeongsang National University",
+    "country": "South Korea"
+  },
+  {
+    "name": "Hainan Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Hamburg University of Technology",
+    "country": "Germany"
+  },
+  {
+    "name": "Hangzhou City University",
+    "country": "China"
+  },
+  {
+    "name": "Hangzhou Medical College",
+    "country": "China"
+  },
+  {
+    "name": "Hassan II University of Casablanca",
+    "country": "Morocco"
+  },
+  {
+    "name": "Hebei Normal University",
+    "country": "China"
+  },
+  {
+    "name": "Henan Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Henan Polytechnic University",
+    "country": "China"
+  },
+  {
+    "name": "Huaqiao University",
+    "country": "China"
+  },
+  {
+    "name": "Hunan Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Iran University of Medical Sciences",
+    "country": "Iran"
+  },
+  {
+    "name": "Jaume I University",
+    "country": "Spain"
+  },
+  {
+    "name": "Jazan University",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Jilin Agricultural University",
+    "country": "China"
+  },
+  {
+    "name": "Juntendo University",
+    "country": "Japan"
+  },
+  {
+    "name": "Kunming Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Liaocheng University",
+    "country": "China"
+  },
+  {
+    "name": "Lingnan University",
+    "country": "Hong Kong, China"
+  },
+  {
+    "name": "Linnaeus University",
+    "country": "Sweden"
+  },
+  {
+    "name": "Nanjing University of Finance & Economics",
+    "country": "China"
+  },
+  {
+    "name": "Ningxia University",
+    "country": "China"
+  },
+  {
+    "name": "North Dakota State University",
+    "country": "United States"
+  },
+  {
+    "name": "Orebro University",
+    "country": "Sweden"
+  },
+  {
+    "name": "RCSI University of Medicine and Health Sciences",
+    "country": "Ireland"
+  },
+  {
+    "name": "Rio de Janeiro State University",
+    "country": "Brazil"
+  },
+  {
+    "name": "Roma Tre University",
+    "country": "Italy"
+  },
+  {
+    "name": "Shaanxi University of Science & Technology",
+    "country": "China"
+  },
+  {
+    "name": "Shandong University of Technology",
+    "country": "China"
+  },
+  {
+    "name": "Shihezi University",
+    "country": "China"
+  },
+  {
+    "name": "Southwest Medical University",
+    "country": "China"
+  },
+  {
+    "name": "Southwest University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Taiyuan University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "The Islamia University of Bahawalpur",
+    "country": "Pakistan"
+  },
+  {
+    "name": "The Open University",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "University of Arkansas for Medical Sciences",
+    "country": "United States"
+  },
+  {
+    "name": "University of Beira Interior",
+    "country": "Portugal"
+  },
+  {
+    "name": "University of Cadiz",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Castilla-La Mancha",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Chieti-Pescara",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Cordoba",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Eastern Piedmont",
+    "country": "Italy"
+  },
+  {
+    "name": "University of Girona",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Hohenheim",
+    "country": "Germany"
+  },
+  {
+    "name": "University of Las Palmas de Gran Canaria",
+    "country": "Spain"
+  },
+  {
+    "name": "University of Picardie Jules Verne",
+    "country": "France"
+  },
+  {
+    "name": "University of Tennessee Health Science Center",
+    "country": "United States"
+  },
+  {
+    "name": "University of Wuppertal",
+    "country": "Germany"
+  },
+  {
+    "name": "Xi'an University of Science and Technology",
+    "country": "China"
+  },
+  {
+    "name": "Zhongnan University of Economics and Law",
+    "country": "China"
+  }
+]

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, useMemo } from 'react';
+import { useState, useTransition, useMemo, useEffect } from 'react';
 import { SemesterEditor } from '@/components/admin/SemesterEditor';
 import { TuitionOptionsEditor } from '@/components/admin/TuitionOptionsEditor';
 import { EntranceRequirementsEditor } from '@/components/admin/EntranceRequirementsEditor';
@@ -30,6 +30,7 @@ type Props = {
   action: (formData: FormData) => Promise<{ error: string } | never>;
   submitLabel: string;
   cancelHref: string;
+  moeNames?: string[];
 };
 
 const inputClass =
@@ -37,9 +38,14 @@ const inputClass =
 
 const labelClass = 'block text-sm font-medium text-foreground mb-1.5';
 
-export function UniversityForm({ defaultValues: d = {}, action, submitLabel, cancelHref }: Props) {
+function normalizeName(s: string) {
+  return s.toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+export function UniversityForm({ defaultValues: d = {}, action, submitLabel, cancelHref, moeNames }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [moeMatch, setMoeMatch] = useState(false);
 
   // Languages, majors and semesters are held in state so the tuition-variant
   // editor can offer them as dropdown choices — keeping all four fields in sync.
@@ -59,6 +65,17 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
     () => semesters.map((s) => s.name.trim()).filter(Boolean),
     [semesters],
   );
+
+  const moeNormalized = useMemo(
+    () => new Set((moeNames ?? []).map(normalizeName)),
+    [moeNames],
+  );
+
+  useEffect(() => {
+    if (d.name_en && moeNormalized.size > 0) {
+      setMoeMatch(moeNormalized.has(normalizeName(d.name_en)));
+    }
+  }, [d.name_en, moeNormalized]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -91,6 +108,11 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
               placeholder="Middle East Technical University"
               aria-label="University name in English"
               className={inputClass}
+              onChange={(e) => {
+                if (moeNormalized.size > 0) {
+                  setMoeMatch(moeNormalized.has(normalizeName(e.target.value)));
+                }
+              }}
             />
           </div>
           <div>
@@ -208,6 +230,15 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
         </div>
+        {moeMatch && (
+          <div
+            role="note"
+            className="flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          >
+            <span aria-hidden="true" className="shrink-0 text-base leading-5">★</span>
+            <span>{"This university is on the official MoE approved list — consider checking \"MoE approved\" below."}</span>
+          </div>
+        )}
         <div>
           <label className="flex items-center gap-2.5 cursor-pointer select-none">
             <input

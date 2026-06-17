@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { UniversityForm } from '@/components/admin/UniversityForm';
 import { createUniversityAction } from '@/app/admin/universities/actions';
@@ -6,8 +8,19 @@ import { requireAdmin } from '@/lib/admin/auth';
 
 export const metadata = { title: 'Add University — UniPath Admin' };
 
+function loadMoeNames(): string[] {
+  try {
+    const raw = readFileSync(join(process.cwd(), 'data', 'moe-universities.json'), 'utf8');
+    const list = JSON.parse(raw) as Array<{ name: string }>;
+    return list.map((e) => e.name);
+  } catch {
+    return [];
+  }
+}
+
 export default async function NewUniversityPage() {
   const { user } = await requireAdmin();
+  const moeNames = loadMoeNames();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,6 +38,7 @@ export default async function NewUniversityPage() {
           action={createUniversityAction}
           submitLabel={"Add university"}
           cancelHref="/admin/universities"
+          moeNames={moeNames}
         />
       </main>
     </div>

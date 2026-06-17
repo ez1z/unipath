@@ -13,7 +13,8 @@
     "menu_close": "Menyuny ýap",
     "main_nav_label": "Esasy nawigasiýa",
     "home_link_label": "UniPath baş sahypa",
-    "footer_nav_label": "Alt nawigasiýa"
+    "footer_nav_label": "Alt nawigasiýa",
+    "moe_approved": "Oblono Tassyklanan"
   },
   "home": {
     "hero_title": "Daşary ýurtdaky uniwersitediňizi tapyň",
@@ -394,5 +395,14 @@
     "gpa_100_equiv": "100 ballyk deňligi",
     "country_search_placeholder": "Ýurt gözläň…",
     "gpa_error_range": "OGB 2.0 bilen 5.0 aralygynda bolmaly"
+  },
+  "moe_approved_page": {
+    "title": "Oblono Tassyklanan Uniwersitetler",
+    "subtitle": "Türkmenistanyň Bilim ministrligi tarapyndan töleg geçirmek üçin ykrar edilen uniwersitetleriň resmi sanawy.",
+    "search_placeholder": "At ýa-da ýurt boýunça gözläň…",
+    "count": "{total} sanydan {found} sanysy UniPath-da bar",
+    "results": "{count} netije",
+    "not_listed": "Heniz UniPath-da ýok",
+    "hint_found": "Bu uniwersitet resmi Oblono tassyklanan sanawda bar — aşakdaky «Oblono tassyklanan» gutujygyny bellemegi maslahat berýäris."
   }
 }

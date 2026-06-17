@@ -27,6 +27,7 @@ export function MobileMenu({ locale, user, isAdmin = false }: Props) {
     { href: `/${locale}/compare`, label: t('compare') },
     { href: `/${locale}/transfer`, label: t('transfer') },
     { href: `/${locale}/scholarships`, label: t('scholarships') },
+    { href: `/${locale}/moe-approved`, label: t('moe_approved') },
     { href: `/${locale}/support`, label: t('support') },
   ];
 

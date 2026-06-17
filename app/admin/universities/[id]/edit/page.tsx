@@ -1,11 +1,23 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { UniversityForm } from '@/components/admin/UniversityForm';
 import type { UniversityFormDefaults } from '@/components/admin/UniversityForm';
 import { updateUniversityAction } from '@/app/admin/universities/actions';
 import { requireAdmin } from '@/lib/admin/auth';
 import type { UniversityDbRow } from '@/lib/data/university-types';
+
+function loadMoeNames(): string[] {
+  try {
+    const raw = readFileSync(join(process.cwd(), 'data', 'moe-universities.json'), 'utf8');
+    const list = JSON.parse(raw) as Array<{ name: string }>;
+    return list.map((e) => e.name);
+  } catch {
+    return [];
+  }
+}
 
 export const metadata = { title: 'Edit University — UniPath Admin' };
 
@@ -47,6 +59,7 @@ export default async function EditUniversityPage({ params: { id } }: Props) {
     tuition_options: parseTuitionOptionsJson(u.tuition_options),
   };
 
+  const moeNames = loadMoeNames();
   const boundAction = updateUniversityAction.bind(null, id);
 
   return (
@@ -66,6 +79,7 @@ export default async function EditUniversityPage({ params: { id } }: Props) {
           action={boundAction}
           submitLabel={"Saving…"}
           cancelHref="/admin/universities"
+          moeNames={moeNames}
         />
       </main>
     </div>

@@ -57,6 +57,9 @@ export async function NavBar({ locale }: Props) {
             <Link href={`/${locale}/scholarships`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
               {t('scholarships')}
             </Link>
+            <Link href={`/${locale}/moe-approved`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
+              {t('moe_approved')}
+            </Link>
             <Link href={`/${locale}/support`} className="px-3 py-2 rounded-md text-white/55 hover:text-gold hover:bg-white/5 transition-colors">
               {t('support')}
             </Link>

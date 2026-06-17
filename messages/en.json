@@ -13,7 +13,8 @@
     "menu_close": "Close menu",
     "main_nav_label": "Main navigation",
     "home_link_label": "UniPath home",
-    "footer_nav_label": "Footer navigation"
+    "footer_nav_label": "Footer navigation",
+    "moe_approved": "MoE Approved"
   },
   "home": {
     "hero_title": "Find Your University Abroad",
@@ -394,5 +395,14 @@
     "gpa_100_equiv": "100-point equivalent",
     "country_search_placeholder": "Search countries…",
     "gpa_error_range": "GPA must be between 2.0 and 5.0"
+  },
+  "moe_approved_page": {
+    "title": "MoE Approved Universities",
+    "subtitle": "Official list of universities recognised by the Turkmenistan Ministry of Education for tuition transfers.",
+    "search_placeholder": "Search by name or country…",
+    "count": "{found} of {total} listed on UniPath",
+    "results": "{count} results",
+    "not_listed": "Not listed on UniPath yet",
+    "hint_found": "This university is on the official MoE approved list — consider checking \"MoE approved\" below."
   }
 }
