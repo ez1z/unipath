@@ -36,7 +36,7 @@ export default async function AdminsPage() {
       <AdminHeader email={user.email!} role="superuser" />
 
       <main className="flex-1 container mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Link href="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               {"← Dashboard"}
@@ -46,7 +46,7 @@ export default async function AdminsPage() {
           </div>
           <Link
             href="/admin/admins/new"
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="self-start sm:self-auto px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
           >
             {"+ Add Admin"}
           </Link>

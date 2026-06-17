@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import Link from 'next/link';
 import { ScholarshipAdminRow } from '@/components/admin/ScholarshipAdminRow';
 import { bulkDeleteScholarshipsAction } from '@/app/admin/scholarships/actions';
+import { deleteScholarshipAction } from '@/app/admin/scholarships/actions';
 
 type RowData = {
   id: string;
@@ -28,6 +30,70 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'created-desc', label: 'Newest first' },
   { value: 'created-asc', label: 'Oldest first' },
 ];
+
+function ScholarshipCard({
+  s,
+  selected,
+  onToggle,
+}: {
+  s: RowData;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete() {
+    if (!confirm(`Delete "${s.name_en}"? This cannot be undone.`)) return;
+    startTransition(async () => {
+      const result = await deleteScholarshipAction(s.id);
+      if (!result.success) alert(`Error: ${result.error}`);
+    });
+  }
+
+  return (
+    <div
+      className={`bg-card border rounded-xl p-4 transition-colors ${
+        selected ? 'border-primary bg-primary/5' : 'border-border'
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onToggle}
+          aria-label={`Select ${s.name_en}`}
+          className="rounded border-border accent-primary cursor-pointer mt-1 shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-foreground leading-snug">{s.name_en}</p>
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <span className="text-sm text-muted-foreground">{s.country}</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border capitalize">
+              {s.type}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            href={`/admin/scholarships/${s.id}/edit`}
+            aria-label={`Edit ${s.name_en}`}
+            className="text-xs text-primary hover:underline"
+          >
+            {"Edit"}
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            aria-label={`Delete ${s.name_en}`}
+            className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
+          >
+            {"Delete"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ScholarshipAdminTable({ scholarships }: { scholarships: RowData[] }) {
   const [search, setSearch] = useState('');
@@ -118,7 +184,7 @@ export function ScholarshipAdminTable({ scholarships }: { scholarships: RowData[
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row">
         <input
           type="search"
           value={search}
@@ -155,7 +221,7 @@ export function ScholarshipAdminTable({ scholarships }: { scholarships: RowData[
       </div>
 
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 mb-4 px-4 py-2.5 bg-card border border-border rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 mb-4 px-4 py-2.5 bg-card border border-border rounded-lg">
           <span className="text-sm text-muted-foreground">
             {selectedIds.size} {selectedIds.size === 1 ? 'scholarship' : 'scholarships'} selected
           </span>
@@ -175,38 +241,64 @@ export function ScholarshipAdminTable({ scholarships }: { scholarships: RowData[
           <p className="text-muted-foreground text-sm">{"No scholarships match your filters."}</p>
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 w-10">
-                  <input
-                    ref={selectAllRef}
-                    type="checkbox"
-                    checked={allFilteredSelected}
-                    onChange={toggleAll}
-                    aria-label="Select all scholarships"
-                    className="rounded border-border accent-primary cursor-pointer"
+        <>
+          {/* Mobile: card list */}
+          <div className="sm:hidden space-y-2">
+            <div className="flex items-center gap-2 px-1 mb-3">
+              <input
+                ref={selectAllRef}
+                type="checkbox"
+                checked={allFilteredSelected}
+                onChange={toggleAll}
+                aria-label="Select all scholarships"
+                className="rounded border-border accent-primary cursor-pointer"
+              />
+              <span className="text-xs text-muted-foreground">{`${filtered.length} scholarships`}</span>
+            </div>
+            {filtered.map((s) => (
+              <ScholarshipCard
+                key={s.id}
+                s={s}
+                selected={selectedIds.has(s.id)}
+                onToggle={() => toggleOne(s.id)}
+              />
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block bg-card rounded-xl border border-border shadow-card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-muted text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 w-10">
+                    <input
+                      ref={selectAllRef}
+                      type="checkbox"
+                      checked={allFilteredSelected}
+                      onChange={toggleAll}
+                      aria-label="Select all scholarships"
+                      className="rounded border-border accent-primary cursor-pointer"
+                    />
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium">{"Scholarship"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"Type"}</th>
+                  <th className="px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((s) => (
+                  <ScholarshipAdminRow
+                    key={s.id}
+                    scholarship={s}
+                    selected={selectedIds.has(s.id)}
+                    onToggle={() => toggleOne(s.id)}
                   />
-                </th>
-                <th className="text-left px-4 py-3 font-medium">{"Scholarship"}</th>
-                <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
-                <th className="text-left px-4 py-3 font-medium">{"Type"}</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((s) => (
-                <ScholarshipAdminRow
-                  key={s.id}
-                  scholarship={s}
-                  selected={selectedIds.has(s.id)}
-                  onToggle={() => toggleOne(s.id)}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

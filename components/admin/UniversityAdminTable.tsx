@@ -1,10 +1,16 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import Link from 'next/link';
+import { formatDate } from '@/lib/format';
 import { UniversityAdminRow } from '@/components/admin/UniversityAdminRow';
 import {
   bulkDeleteUniversitiesAction,
   bulkSetMoeApprovedAction,
+} from '@/app/admin/universities/actions';
+import {
+  deleteUniversityAction,
+  toggleMoeApprovedAction,
 } from '@/app/admin/universities/actions';
 
 type RowData = {
@@ -31,6 +37,87 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'created-desc', label: 'Newest first' },
   { value: 'created-asc', label: 'Oldest first' },
 ];
+
+function UniversityCard({
+  u,
+  selected,
+  onToggle,
+}: {
+  u: RowData;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete() {
+    if (!confirm(`Delete "${u.name_en}"? This cannot be undone.`)) return;
+    startTransition(async () => {
+      const result = await deleteUniversityAction(u.id);
+      if (!result.success) alert(`Error: ${result.error}`);
+    });
+  }
+
+  function handleToggleMoe() {
+    startTransition(async () => {
+      const result = await toggleMoeApprovedAction(u.id, u.moe_approved);
+      if (!result.success) alert(`Error: ${result.error}`);
+    });
+  }
+
+  return (
+    <div
+      className={`bg-card border rounded-xl p-4 transition-colors ${
+        selected ? 'border-primary bg-primary/5' : 'border-border'
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onToggle}
+          aria-label={`Select ${u.name_en}`}
+          className="rounded border-border accent-primary cursor-pointer mt-1 shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-foreground leading-snug">{u.name_en}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{u.country}</p>
+          <p className="text-xs text-muted-foreground mt-1">{formatDate(new Date(u.created_at))}</p>
+        </div>
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          <button
+            onClick={handleToggleMoe}
+            disabled={isPending}
+            aria-label={`Toggle MoE approved for ${u.name_en}`}
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border transition-colors ${
+              u.moe_approved
+                ? 'bg-yellow-50 text-yellow-700 border-yellow-300 hover:bg-yellow-100'
+                : 'bg-muted text-muted-foreground border-border hover:bg-muted/60'
+            } disabled:opacity-50`}
+          >
+            {u.moe_approved ? '★ MoE' : 'Not MoE'}
+          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/admin/universities/${u.id}/edit`}
+              aria-label={`Edit ${u.name_en}`}
+              className="text-xs text-primary hover:underline"
+            >
+              {"Edit"}
+            </Link>
+            <button
+              onClick={handleDelete}
+              disabled={isPending}
+              aria-label={`Delete ${u.name_en}`}
+              className="text-xs text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
+            >
+              {"Delete"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function UniversityAdminTable({ universities }: { universities: RowData[] }) {
   const [search, setSearch] = useState('');
@@ -130,7 +217,7 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row">
         <input
           type="search"
           value={search}
@@ -167,7 +254,7 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
       </div>
 
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 mb-4 px-4 py-2.5 bg-card border border-border rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 mb-4 px-4 py-2.5 bg-card border border-border rounded-lg">
           <span className="text-sm text-muted-foreground">
             {selectedIds.size} {selectedIds.size === 1 ? 'university' : 'universities'} selected
           </span>
@@ -194,39 +281,65 @@ export function UniversityAdminTable({ universities }: { universities: RowData[]
           <p className="text-muted-foreground text-sm">{"No universities match your filters."}</p>
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 w-10">
-                  <input
-                    ref={selectAllRef}
-                    type="checkbox"
-                    checked={allFilteredSelected}
-                    onChange={toggleAll}
-                    aria-label="Select all universities"
-                    className="rounded border-border accent-primary cursor-pointer"
+        <>
+          {/* Mobile: card list */}
+          <div className="sm:hidden space-y-2">
+            <div className="flex items-center gap-2 px-1 mb-3">
+              <input
+                ref={selectAllRef}
+                type="checkbox"
+                checked={allFilteredSelected}
+                onChange={toggleAll}
+                aria-label="Select all universities"
+                className="rounded border-border accent-primary cursor-pointer"
+              />
+              <span className="text-xs text-muted-foreground">{`${filtered.length} universities`}</span>
+            </div>
+            {filtered.map((u) => (
+              <UniversityCard
+                key={u.id}
+                u={u}
+                selected={selectedIds.has(u.id)}
+                onToggle={() => toggleOne(u.id)}
+              />
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block bg-card rounded-xl border border-border shadow-card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-muted text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 w-10">
+                    <input
+                      ref={selectAllRef}
+                      type="checkbox"
+                      checked={allFilteredSelected}
+                      onChange={toggleAll}
+                      aria-label="Select all universities"
+                      className="rounded border-border accent-primary cursor-pointer"
+                    />
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium">{"University"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"MoE Approved"}</th>
+                  <th className="text-left px-4 py-3 font-medium">{"Created"}</th>
+                  <th className="px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((u) => (
+                  <UniversityAdminRow
+                    key={u.id}
+                    university={u}
+                    selected={selectedIds.has(u.id)}
+                    onToggle={() => toggleOne(u.id)}
                   />
-                </th>
-                <th className="text-left px-4 py-3 font-medium">{"University"}</th>
-                <th className="text-left px-4 py-3 font-medium">{"Country"}</th>
-                <th className="text-left px-4 py-3 font-medium">{"MoE Approved"}</th>
-                <th className="text-left px-4 py-3 font-medium">{"Created"}</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((u) => (
-                <UniversityAdminRow
-                  key={u.id}
-                  university={u}
-                  selected={selectedIds.has(u.id)}
-                  onToggle={() => toggleOne(u.id)}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );
