@@ -145,6 +145,35 @@ export async function toggleMoeApprovedAction(
   return { success: true };
 }
 
+export async function linkMoeUniversityAction(
+  universityId: string
+): Promise<{ success: boolean; error?: string }> {
+  const { supabase, user } = await requireAdmin();
+  const { data: uni } = await supabase
+    .from('universities')
+    .select('name_en')
+    .eq('id', universityId)
+    .single();
+  const { error } = await supabase
+    .from('universities')
+    .update({ moe_approved: true })
+    .eq('id', universityId);
+  if (error) return { success: false, error: error.message };
+  revalidateUniversityPaths();
+  for (const locale of SUPPORTED_LOCALES) {
+    revalidatePath(`/${locale}/moe-approved`);
+  }
+  await logAction({
+    adminUserId: user.id,
+    adminEmail: user.email!,
+    action: 'link_moe_university',
+    entityType: 'university',
+    entityId: universityId,
+    entityName: uni?.name_en ?? undefined,
+  });
+  return { success: true };
+}
+
 export async function createUniversityAction(
   formData: FormData
 ): Promise<{ error: string } | never> {

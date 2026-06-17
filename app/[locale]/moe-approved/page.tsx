@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { MoeUniversityList, type MoeEntry } from '@/components/moe/MoeUniversityList';
+import { MoeUniversityList, type MoeEntry, type DbUniversity } from '@/components/moe/MoeUniversityList';
 import { createClient } from '@/lib/supabase/server';
 import type { Locale } from '@/lib/constants';
 
@@ -30,18 +30,36 @@ export default async function MoeApprovedPage({ params: { locale } }: Props) {
   const t = await getTranslations('moe_approved_page');
 
   const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  let isAdmin = false;
+
+  if (user) {
+    const { data: adminRow } = await supabase
+      .from('admins')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .single();
+    isAdmin = !!adminRow;
+  }
+
   const { data: dbUniversities } = await supabase
     .from('universities')
-    .select('slug, name_en, moe_approved')
-    .eq('moe_approved', true);
+    .select('id, slug, name_en, moe_approved')
+    .order('name_en');
 
-  // Build a map of normalized name → slug for fast lookup
   const slugByName = new Map<string, string>();
   for (const u of dbUniversities ?? []) {
-    if (u.slug && u.name_en) {
+    if (u.moe_approved && u.slug && u.name_en) {
       slugByName.set(normalize(u.name_en), u.slug);
     }
   }
+
+  const allDbUniversities: DbUniversity[] = isAdmin
+    ? (dbUniversities ?? [])
+        .filter((u) => !u.moe_approved && u.name_en && u.id)
+        .map((u) => ({ id: u.id as string, name_en: u.name_en as string }))
+    : [];
 
   const moeList = loadMoeList();
   const entries: MoeEntry[] = moeList.map((entry) => ({
@@ -55,7 +73,12 @@ export default async function MoeApprovedPage({ params: { locale } }: Props) {
       <PageHeader title={t('title')} />
       <div className="container mx-auto px-4 py-8">
         <p className="text-muted-foreground text-sm mb-8 max-w-2xl">{t('subtitle')}</p>
-        <MoeUniversityList entries={entries} locale={locale} />
+        <MoeUniversityList
+          entries={entries}
+          locale={locale}
+          isAdmin={isAdmin}
+          allDbUniversities={allDbUniversities}
+        />
       </div>
     </>
   );

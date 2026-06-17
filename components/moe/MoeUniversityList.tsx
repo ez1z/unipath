@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import type { Locale } from '@/lib/constants';
+import { LinkUniversityDialog } from './LinkUniversityDialog';
 
 export type MoeEntry = {
   name: string;
@@ -11,14 +13,23 @@ export type MoeEntry = {
   slug?: string;
 };
 
+export type DbUniversity = {
+  id: string;
+  name_en: string;
+};
+
 type Props = {
   entries: MoeEntry[];
   locale: Locale;
+  isAdmin?: boolean;
+  allDbUniversities?: DbUniversity[];
 };
 
-export function MoeUniversityList({ entries, locale }: Props) {
+export function MoeUniversityList({ entries, locale, isAdmin, allDbUniversities = [] }: Props) {
   const t = useTranslations('moe_approved_page');
+  const router = useRouter();
   const [search, setSearch] = useState('');
+  const [dialogEntry, setDialogEntry] = useState<MoeEntry | null>(null);
 
   const listedCount = entries.filter((e) => e.slug).length;
 
@@ -28,6 +39,11 @@ export function MoeUniversityList({ entries, locale }: Props) {
         return e.name.toLowerCase().includes(q) || e.country.toLowerCase().includes(q);
       })
     : entries;
+
+  function handleSuccess() {
+    setDialogEntry(null);
+    router.refresh();
+  }
 
   return (
     <div className="space-y-6">
@@ -84,7 +100,7 @@ export function MoeUniversityList({ entries, locale }: Props) {
           ) : (
             <li key={i}>
               <div
-                className="flex flex-col gap-1 rounded-xl border border-border bg-card/50 px-4 py-3.5 opacity-60 cursor-default"
+                className="relative flex flex-col gap-1 rounded-xl border border-border bg-card/50 px-4 py-3.5 opacity-60 cursor-default"
                 aria-label={`${entry.name} — ${t('not_listed')}`}
               >
                 <span className="text-sm font-medium text-foreground line-clamp-2">
@@ -94,6 +110,19 @@ export function MoeUniversityList({ entries, locale }: Props) {
                   <span className="text-xs text-muted-foreground">{entry.country}</span>
                 )}
                 <span className="mt-1 text-xs text-muted-foreground">{t('not_listed')}</span>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setDialogEntry(entry)}
+                    aria-label={`Link ${entry.name} to UniPath`}
+                    className="absolute top-2.5 right-2.5 flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors opacity-100"
+                    title="Link to UniPath university"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </li>
           )
@@ -104,6 +133,15 @@ export function MoeUniversityList({ entries, locale }: Props) {
         <p className="text-center text-muted-foreground py-12 text-sm">
           {"No universities match your search."}
         </p>
+      )}
+
+      {dialogEntry && (
+        <LinkUniversityDialog
+          moeEntryName={dialogEntry.name}
+          allDbUniversities={allDbUniversities}
+          onClose={() => setDialogEntry(null)}
+          onSuccess={handleSuccess}
+        />
       )}
     </div>
   );
