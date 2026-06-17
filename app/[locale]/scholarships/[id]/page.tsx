@@ -76,13 +76,14 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   let isSaved = false;
+  let isAdmin = false;
   if (user) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('interested_scholarship_ids')
-      .eq('id', user.id)
-      .maybeSingle();
-    isSaved = (data?.interested_scholarship_ids ?? []).includes(scholarship.id);
+    const [{ data: profileData }, { data: adminData }] = await Promise.all([
+      supabase.from('profiles').select('interested_scholarship_ids').eq('id', user.id).maybeSingle(),
+      supabase.from('admins').select('role').eq('user_id', user.id).maybeSingle(),
+    ]);
+    isSaved = (profileData?.interested_scholarship_ids ?? []).includes(scholarship.id);
+    isAdmin = !!adminData;
   }
 
   const university = scholarship.university_id
@@ -245,6 +246,15 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+          {isAdmin && (
+            <a
+              href={`/admin/scholarships/${scholarship.id}/edit`}
+              className="flex-1 px-5 py-3 border-2 border-dashed border-muted-foreground/40 text-muted-foreground rounded-lg text-sm font-semibold text-center hover:border-primary hover:text-primary transition-colors"
+              aria-label="Edit in admin panel"
+            >
+              ✏ Edit
+            </a>
+          )}
           <BookmarkButton type="scholarship" id={scholarship.id} initialSaved={isSaved} locale={locale} size="detail" />
           {scholarship.application_url && (
             <a

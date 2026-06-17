@@ -35,13 +35,14 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   let isSaved = false;
+  let isAdmin = false;
   if (user) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('dream_university_ids')
-      .eq('id', user.id)
-      .maybeSingle();
-    isSaved = (data?.dream_university_ids ?? []).includes(university.id);
+    const [{ data: profileData }, { data: adminData }] = await Promise.all([
+      supabase.from('profiles').select('dream_university_ids').eq('id', user.id).maybeSingle(),
+      supabase.from('admins').select('role').eq('user_id', user.id).maybeSingle(),
+    ]);
+    isSaved = (profileData?.dream_university_ids ?? []).includes(university.id);
+    isAdmin = !!adminData;
   }
 
   const checklistItems = user
@@ -339,6 +340,15 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
 
         {/* Action links */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+          {isAdmin && (
+            <a
+              href={`/admin/universities/${university.id}/edit`}
+              className="flex-1 px-5 py-3 border-2 border-dashed border-muted-foreground/40 text-muted-foreground rounded-lg text-sm font-semibold text-center hover:border-primary hover:text-primary transition-colors"
+              aria-label="Edit in admin panel"
+            >
+              ✏ Edit
+            </a>
+          )}
           <BookmarkButton
             type="university"
             id={university.id}
