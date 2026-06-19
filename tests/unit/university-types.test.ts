@@ -11,6 +11,7 @@ const baseRow: UniversityDbRow = {
   country: 'Turkey',
   city: 'Istanbul',
   tuition_usd: '5000',
+  tuition_usd_max: null,
   moe_approved: true,
   ranking_qs: 42,
   languages: ['English', 'Turkish'],
@@ -38,6 +39,17 @@ describe('dbRowToUniversity', () => {
   it('converts tuition_usd numeric type to number', () => {
     const u = dbRowToUniversity({ ...baseRow, tuition_usd: 1234 });
     expect(u.tuition_usd).toBe(1234);
+  });
+
+  it('defaults null tuition_usd_max to null', () => {
+    const u = dbRowToUniversity(baseRow);
+    expect(u.tuition_usd_max).toBeNull();
+  });
+
+  it('converts tuition_usd_max to a number when present', () => {
+    const u = dbRowToUniversity({ ...baseRow, tuition_usd_max: '8000' });
+    expect(u.tuition_usd_max).toBe(8000);
+    expect(typeof u.tuition_usd_max).toBe('number');
   });
 
   it('defaults null entrance_requirements to empty object', () => {

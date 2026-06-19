@@ -19,6 +19,7 @@ export type ScholarshipDbRow = {
   type: ScholarshipType;
   coverage: string[];
   amount_usd: string | number | null;
+  amount_usd_max: string | number | null;
   deadline_text: string | null;
   semesters: unknown;
   requirements: Record<string, unknown>;
@@ -39,6 +40,7 @@ export type Scholarship = {
   type: ScholarshipType;
   coverage: string[];
   amount_usd: number | null;
+  amount_usd_max: number | null;
   deadline_text: string | null;
   semesters: Semester[];
   requirements: Record<string, unknown>;
@@ -56,6 +58,7 @@ export function dbRowToScholarship(row: ScholarshipDbRow): Scholarship {
     type: row.type,
     coverage: row.coverage,
     amount_usd: row.amount_usd !== null ? Number(row.amount_usd) : null,
+    amount_usd_max: row.amount_usd_max != null ? Number(row.amount_usd_max) : null,
     deadline_text: row.deadline_text,
     semesters: parseSemestersJson(row.semesters),
     requirements: row.requirements ?? {},
@@ -97,6 +100,15 @@ export const ScholarshipCsvRowSchema = z.object({
     }
     return n;
   }),
+  amount_usd_max: z.string().optional().transform((v, ctx) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    if (isNaN(n) || n <= 0) {
+      ctx.addIssue({ code: 'custom', message: 'must be a positive number or blank' });
+      return z.NEVER;
+    }
+    return n;
+  }),
   deadline_text: z.string().optional().transform((v) => v?.trim() || null),
   semesters: z.string().optional().transform((v) =>
     v ? parseSemestersCsv(v) : []
@@ -105,6 +117,9 @@ export const ScholarshipCsvRowSchema = z.object({
   description_ru: z.string().default(''),
   description_tk: z.string().default(''),
   application_url: z.string().optional().transform((v) => v?.trim() || ''),
+}).refine((r) => r.amount_usd_max == null || r.amount_usd == null || r.amount_usd_max >= r.amount_usd, {
+  message: 'amount_usd_max must be ≥ amount_usd',
+  path: ['amount_usd_max'],
 });
 
 export type ScholarshipCsvRow = z.infer<typeof ScholarshipCsvRowSchema>;
@@ -119,6 +134,7 @@ export type ScholarshipInsert = {
   type: ScholarshipType;
   coverage: string[];
   amount_usd: number | null;
+  amount_usd_max: number | null;
   deadline_text: string | null;
   semesters: Semester[];
   requirements: Record<string, unknown>;

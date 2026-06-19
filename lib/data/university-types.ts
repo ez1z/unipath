@@ -15,6 +15,7 @@ export type UniversityDbRow = {
   country: string;
   city: string;
   tuition_usd: string | number;
+  tuition_usd_max: string | number | null;
   moe_approved: boolean;
   ranking_qs: number | null;
   languages: string[];
@@ -34,6 +35,7 @@ export type University = {
   country: string;
   city: string;
   tuition_usd: number;
+  tuition_usd_max: number | null;
   moe_approved: boolean;
   ranking_qs: number | null;
   languages: string[];
@@ -53,6 +55,7 @@ export function dbRowToUniversity(row: UniversityDbRow): University {
     country: row.country,
     city: row.city,
     tuition_usd: Number(row.tuition_usd),
+    tuition_usd_max: row.tuition_usd_max != null ? Number(row.tuition_usd_max) : null,
     moe_approved: row.moe_approved,
     ranking_qs: row.ranking_qs,
     languages: row.languages,
@@ -88,6 +91,15 @@ export const CsvRowSchema = z.object({
     const n = Number(v);
     if (isNaN(n) || n < 0) {
       ctx.addIssue({ code: 'custom', message: 'must be a non-negative number' });
+      return z.NEVER;
+    }
+    return n;
+  }),
+  tuition_usd_max: z.string().optional().transform((v, ctx) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    if (isNaN(n) || n < 0) {
+      ctx.addIssue({ code: 'custom', message: 'must be a non-negative number or blank' });
       return z.NEVER;
     }
     return n;
@@ -131,6 +143,9 @@ export const CsvRowSchema = z.object({
   tuition_options: z.string().default('').transform((v) =>
     v ? parseTuitionOptionsCsv(v) : []
   ),
+}).refine((r) => r.tuition_usd_max == null || r.tuition_usd_max >= r.tuition_usd, {
+  message: 'tuition_usd_max must be ≥ tuition_usd',
+  path: ['tuition_usd_max'],
 });
 
 export type CsvRow = z.infer<typeof CsvRowSchema>;
@@ -143,6 +158,7 @@ export type UniversityInsert = {
   country: string;
   city: string;
   tuition_usd: number;
+  tuition_usd_max: number | null;
   moe_approved: boolean;
   ranking_qs: number | null;
   languages: string[];

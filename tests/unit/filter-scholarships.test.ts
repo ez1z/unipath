@@ -12,6 +12,7 @@ function makeScholarship(overrides: Partial<Scholarship> = {}): Scholarship {
     type: 'merit',
     coverage: ['tuition'],
     amount_usd: null,
+    amount_usd_max: null,
     deadline_text: null,
     semesters: [],
     requirements: {},

@@ -18,6 +18,11 @@ export const ScholarshipFormSchema = z.object({
     const n = Number(v);
     return isNaN(n) || n <= 0 ? null : n;
   }),
+  amount_usd_max: z.string().optional().transform((v) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    return isNaN(n) || n <= 0 ? null : n;
+  }),
   deadline_text: z.string().optional().transform((v) => v?.trim() || null),
   semesters: z.string().optional().transform((v) => {
     if (!v?.trim()) return [];
@@ -37,4 +42,7 @@ export const ScholarshipFormSchema = z.object({
       message: 'Must be a valid URL (https://...)',
     })
     .transform((v) => v),
+}).refine((d) => d.amount_usd_max == null || d.amount_usd == null || d.amount_usd_max >= d.amount_usd, {
+  message: 'Max amount must be ≥ amount',
+  path: ['amount_usd_max'],
 });

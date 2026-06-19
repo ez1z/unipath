@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { Scholarship } from '@/lib/data/scholarships';
-import { TMT_PER_USD } from '@/lib/constants';
+import { formatTuitionRange } from '@/lib/format';
 import type { Locale } from '@/lib/constants';
 
 type Props = {
@@ -94,7 +94,7 @@ export function ScholarshipCard({ scholarship: s, locale, universityName, compac
                   {t('amount_label')}
                 </span>
                 <span className="font-semibold text-foreground">
-                  ${s.amount_usd.toLocaleString('en')} / {(s.amount_usd * TMT_PER_USD).toLocaleString('ru')} TMT
+                  {formatTuitionRange(s.amount_usd, s.amount_usd_max)}
                 </span>
               </div>
             )}

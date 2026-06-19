@@ -10,6 +10,7 @@ function makeUni(overrides: Partial<University> = {}): University {
     country: 'Turkey',
     city: 'Ankara',
     tuition_usd: 5000,
+    tuition_usd_max: null,
     moe_approved: false,
     ranking_qs: null,
     languages: ['English'],

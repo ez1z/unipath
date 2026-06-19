@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { University } from '@/lib/data/universities';
-import { computeTuitionBreakdown } from '@/lib/format';
+import { computeTuitionBreakdown, formatRange, formatUsd, formatTmt, formatOldManatRange } from '@/lib/format';
 import { MoeBadge } from './MoeBadge';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
@@ -59,23 +59,26 @@ export function CompareClient({ universities, locale }: Props) {
       label: t('tuition'),
       key: 'tuition',
       render: (u) => {
-        const bd = computeTuitionBreakdown(u.tuition_usd);
-        const parts: string[] = [];
-        if (bd.billions > 0) parts.push(`${bd.billions} ${tUni('billion_word')}`);
-        if (bd.millions > 0) parts.push(`${bd.millions} ${tUni('million_word')}`);
-        if (bd.thousands > 0) parts.push(`${bd.thousands} ${tUni('thousand_word')}`);
-        const oldManatText = parts.join(' ') || `< 1 ${tUni('thousand_word')}`;
+        const bdMin = computeTuitionBreakdown(u.tuition_usd);
+        const hasRange = u.tuition_usd_max != null && u.tuition_usd_max > u.tuition_usd;
+        const bdMax = hasRange ? computeTuitionBreakdown(u.tuition_usd_max as number) : null;
+        const bd = bdMax ?? bdMin;
+        const oldManatText = formatOldManatRange(bdMin, bdMax, {
+          billion: tUni('billion_word'),
+          million: tUni('million_word'),
+          thousand: tUni('thousand_word'),
+        });
         return (
           <div className="space-y-0.5">
-            <div className="font-semibold text-foreground">${u.tuition_usd.toLocaleString('en')}</div>
+            <div className="font-semibold text-foreground">{formatRange(u.tuition_usd, u.tuition_usd_max, formatUsd)}</div>
             {bd.exceedsCap ? (
               <div className="text-xs">
-                <span className="text-gold-dark">{bd.officialTmt.toLocaleString('ru')} TMT</span>
+                <span className="text-gold-dark">{formatRange(bdMin.officialTmt, bdMax?.officialTmt, formatTmt)}</span>
                 {' + '}
-                <span className="text-crimson">{bd.unofficialTmt.toLocaleString('ru')} TMT</span>
+                <span className="text-crimson">{formatRange(bdMin.unofficialTmt, bdMax?.unofficialTmt, formatTmt)}</span>
               </div>
             ) : (
-              <div className="text-xs text-muted-foreground">{bd.officialTmt.toLocaleString('ru')} TMT</div>
+              <div className="text-xs text-muted-foreground">{formatRange(bdMin.officialTmt, bdMax?.officialTmt, formatTmt)}</div>
             )}
             <div className="text-xs text-amber-600">{oldManatText}</div>
           </div>

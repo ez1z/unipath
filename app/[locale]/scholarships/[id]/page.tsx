@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { getBySlug } from '@/lib/data/scholarships';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
 import { getById as getUniversityById } from '@/lib/data/universities';
-import { TMT_PER_USD } from '@/lib/constants';
+import { formatTuitionRange } from '@/lib/format';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { createClient } from '@/lib/supabase/server';
@@ -122,7 +122,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
             </div>
             <div className="font-heading font-bold text-lg text-foreground">
               {scholarship.amount_usd !== null
-                ? `$${scholarship.amount_usd.toLocaleString('en')} / ${(scholarship.amount_usd * TMT_PER_USD).toLocaleString('ru')} TMT`
+                ? formatTuitionRange(scholarship.amount_usd, scholarship.amount_usd_max)
                 : t('amount_varies')}
             </div>
           </div>

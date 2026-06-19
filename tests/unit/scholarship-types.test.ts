@@ -13,6 +13,7 @@ const baseRow: ScholarshipDbRow = {
   type: 'merit',
   coverage: ['tuition', 'accommodation'],
   amount_usd: '5000',
+  amount_usd_max: null,
   deadline_text: 'March 31',
   semesters: [{ name: 'Fall', start_date: '2024-09-01', deadline: null }],
   requirements: {},
@@ -49,6 +50,17 @@ describe('dbRowToScholarship', () => {
   it('preserves null amount_usd', () => {
     const s = dbRowToScholarship({ ...baseRow, amount_usd: null });
     expect(s.amount_usd).toBeNull();
+  });
+
+  it('defaults null amount_usd_max to null', () => {
+    const s = dbRowToScholarship(baseRow);
+    expect(s.amount_usd_max).toBeNull();
+  });
+
+  it('converts amount_usd_max to a number when present', () => {
+    const s = dbRowToScholarship({ ...baseRow, amount_usd_max: '9000' });
+    expect(s.amount_usd_max).toBe(9000);
+    expect(typeof s.amount_usd_max).toBe('number');
   });
 
   it('parses semesters from valid JSON array', () => {
@@ -158,6 +170,24 @@ describe('ScholarshipCsvRowSchema', () => {
 
   it('fails when amount_usd is not a number', () => {
     expect(ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, amount_usd: 'abc' }).success).toBe(false);
+  });
+
+  it('treats blank amount_usd_max as null', () => {
+    const result = ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, amount_usd: '3000', amount_usd_max: '' });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.amount_usd_max).toBeNull();
+  });
+
+  it('parses a valid amount_usd range', () => {
+    const result = ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, amount_usd: '3000', amount_usd_max: '5000' });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.amount_usd_max).toBe(5000);
+  });
+
+  it('fails when amount_usd_max is less than amount_usd', () => {
+    expect(
+      ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, amount_usd: '5000', amount_usd_max: '3000' }).success,
+    ).toBe(false);
   });
 
   it('trims deadline_text, converting blank to null', () => {

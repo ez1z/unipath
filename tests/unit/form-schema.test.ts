@@ -60,6 +60,23 @@ describe('FormSchema', () => {
     if (result.success) expect(result.data.tuition_usd).toBe(0);
   });
 
+  it('treats blank tuition_usd_max as null', () => {
+    const result = FormSchema.safeParse(validForm);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.tuition_usd_max).toBeNull();
+  });
+
+  it('parses a valid tuition range (max >= min)', () => {
+    const result = FormSchema.safeParse({ ...validForm, tuition_usd: '5000', tuition_usd_max: '8000' });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.tuition_usd_max).toBe(8000);
+  });
+
+  it('fails when tuition_usd_max is less than tuition_usd', () => {
+    const result = FormSchema.safeParse({ ...validForm, tuition_usd: '5000', tuition_usd_max: '3000' });
+    expect(result.success).toBe(false);
+  });
+
   it('converts moe_approved checkbox value "true" to boolean true', () => {
     const result = FormSchema.safeParse({ ...validForm, moe_approved: 'true' });
     expect(result.success).toBe(true);

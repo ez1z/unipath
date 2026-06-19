@@ -9,6 +9,11 @@ export const FormSchema = z.object({
   country: z.string().min(1, 'Country is required'),
   city: z.string().min(1, 'City is required'),
   tuition_usd: z.coerce.number().nonnegative('Must be ≥ 0'),
+  tuition_usd_max: z.string().optional().transform((v) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    return isNaN(n) || n < 0 ? null : n;
+  }),
   moe_approved: z.string().optional().transform((v) => v === 'true'),
   ranking_qs: z.string().optional().transform((v) => {
     if (!v || v.trim() === '') return null;
@@ -40,4 +45,7 @@ export const FormSchema = z.object({
     if (!v?.trim()) return [];
     try { return parseTuitionOptionsJson(JSON.parse(v)); } catch { return []; }
   }),
+}).refine((d) => d.tuition_usd_max == null || d.tuition_usd_max >= d.tuition_usd, {
+  message: 'Max tuition must be ≥ tuition',
+  path: ['tuition_usd_max'],
 });

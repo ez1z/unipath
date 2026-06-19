@@ -45,6 +45,7 @@ export default async function EditUniversityPage({ params: { id } }: Props) {
     country: u.country,
     city: u.city,
     tuition_usd: String(Number(u.tuition_usd)),
+    tuition_usd_max: u.tuition_usd_max != null ? String(Number(u.tuition_usd_max)) : '',
     moe_approved: u.moe_approved,
     ranking_qs: u.ranking_qs != null ? String(u.ranking_qs) : '',
     languages: u.languages,

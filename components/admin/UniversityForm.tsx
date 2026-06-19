@@ -15,6 +15,7 @@ export type UniversityFormDefaults = {
   country?: string;
   city?: string;
   tuition_usd?: string;
+  tuition_usd_max?: string;
   moe_approved?: boolean;
   ranking_qs?: string;
   languages?: string[];
@@ -158,7 +159,7 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
             <label htmlFor="tuition_usd" className={labelClass}>{"Annual tuition (USD) *"}</label>
             <input
@@ -170,6 +171,21 @@ export function UniversityForm({ defaultValues: d = {}, action, submitLabel, can
               className={inputClass}
             />
           </div>
+          <div>
+            <label htmlFor="tuition_usd_max" className={labelClass}>
+              {"Max tuition (USD)"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
+            </label>
+            <input
+              id="tuition_usd_max" name="tuition_usd_max" type="number" min="0" step="1"
+              defaultValue={d.tuition_usd_max}
+              disabled={isPending}
+              placeholder={"Leave blank for a single price"}
+              aria-label="Maximum annual tuition in USD (for a price range)"
+              className={inputClass}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="ranking_qs" className={labelClass}>
               {"QS ranking"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>

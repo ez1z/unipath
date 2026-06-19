@@ -17,6 +17,7 @@ export type ScholarshipFormDefaults = {
   type?: string;
   coverage?: string[];
   amount_usd?: string;
+  amount_usd_max?: string;
   deadline_text?: string;
   semesters?: Semester[];
   description_en?: string;
@@ -189,7 +190,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
             <label htmlFor="amount_usd" className={labelClass}>
               {"Annual amount (USD)"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
@@ -207,6 +208,25 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
               className={inputClass}
             />
           </div>
+          <div>
+            <label htmlFor="amount_usd_max" className={labelClass}>
+              {"Max amount (USD)"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
+            </label>
+            <input
+              id="amount_usd_max"
+              name="amount_usd_max"
+              type="number"
+              min="1"
+              step="1"
+              disabled={isPending}
+              defaultValue={d.amount_usd_max}
+              placeholder={"Leave blank for a single amount"}
+              aria-label="Maximum annual scholarship amount in USD (for a range)"
+              className={inputClass}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="deadline_text" className={labelClass}>
               {"Deadline"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>

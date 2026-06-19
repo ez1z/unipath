@@ -6,7 +6,7 @@ import { CsvRowSchema } from '@/lib/data/university-types';
 import { importUniversitiesAction } from '@/app/admin/universities/actions';
 
 const CSV_HEADERS = [
-  'name_en', 'name_ru', 'name_tk', 'country', 'city', 'tuition_usd',
+  'name_en', 'name_ru', 'name_tk', 'country', 'city', 'tuition_usd', 'tuition_usd_max',
   'moe_approved', 'ranking_qs', 'languages', 'majors',
   'official_website', 'application_portal_url', 'entrance_requirements',
   'semesters', 'tuition_options',
@@ -19,6 +19,7 @@ const CSV_EXAMPLE_ROW: Record<string, string> = {
   country: 'Turkey',
   city: 'Ankara',
   tuition_usd: '600',
+  tuition_usd_max: '900',
   moe_approved: 'true',
   ranking_qs: '601',
   languages: 'English|Turkish',
@@ -136,6 +137,10 @@ export function CsvImportClient({ existingData }: Props) {
             <code className="bg-muted px-1 rounded text-xs">Fall:English:Engineering:5000|::Medicine:8000</code>. The flat{' '}
             <code className="bg-muted px-1 rounded text-xs">tuition_usd</code> stays the baseline shown in search.
           </p>
+          <p>
+            <code className="bg-muted px-1 rounded text-xs">tuition_usd_max</code>: optional. Leave blank for a single price; set it (≥{' '}
+            <code className="bg-muted px-1 rounded text-xs">tuition_usd</code>) to show a range like <code className="bg-muted px-1 rounded text-xs">$600 – $900</code>.
+          </p>
         </div>
         <button
           onClick={() => triggerDownload(buildCsv(existingData), 'universities.csv')}
@@ -188,6 +193,7 @@ export function CsvImportClient({ existingData }: Props) {
                   <th className="text-left px-3 py-2 font-medium">name_en</th>
                   <th className="text-left px-3 py-2 font-medium">country</th>
                   <th className="text-left px-3 py-2 font-medium">tuition_usd</th>
+                  <th className="text-left px-3 py-2 font-medium">tuition_usd_max</th>
                   <th className="text-left px-3 py-2 font-medium">moe_approved</th>
                   <th className="text-left px-3 py-2 font-medium">{"Issues"}</th>
                 </tr>
@@ -202,6 +208,7 @@ export function CsvImportClient({ existingData }: Props) {
                     <td className="px-3 py-2">{row.raw.name_en}</td>
                     <td className="px-3 py-2">{row.raw.country}</td>
                     <td className="px-3 py-2">{row.raw.tuition_usd}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{row.raw.tuition_usd_max || '—'}</td>
                     <td className="px-3 py-2">{row.raw.moe_approved}</td>
                     <td className="px-3 py-2 text-red-600">{row.errors.join('; ')}</td>
                   </tr>

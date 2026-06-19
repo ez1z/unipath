@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getBySlug } from '@/lib/data/universities';
-import { formatTuition, computeTuitionBreakdown } from '@/lib/format';
+import { formatTuition, formatTuitionRange, computeTuitionBreakdown, formatRange, formatTmt, formatOldManatRange } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
 import { ScholarshipBadge } from '@/components/university/ScholarshipBadge';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
@@ -54,12 +54,22 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
   const t = await getTranslations('university');
   const tCommon = await getTranslations('common');
 
-  const bd = computeTuitionBreakdown(university.tuition_usd);
-  const oldManatParts: string[] = [];
-  if (bd.billions > 0) oldManatParts.push(`${bd.billions} ${t('billion_word')}`);
-  if (bd.millions > 0) oldManatParts.push(`${bd.millions} ${t('million_word')}`);
-  if (bd.thousands > 0) oldManatParts.push(`${bd.thousands} ${t('thousand_word')}`);
-  const oldManatText = oldManatParts.join(' ') || `< 1 ${t('thousand_word')}`;
+  const bdMin = computeTuitionBreakdown(university.tuition_usd);
+  const tuitionMax = university.tuition_usd_max;
+  const hasTuitionRange = tuitionMax != null && tuitionMax > university.tuition_usd;
+  const bdMax = hasTuitionRange ? computeTuitionBreakdown(tuitionMax) : null;
+  // Cap-split visibility keys off the upper bound (worst case for transfer planning).
+  const bd = bdMax ?? bdMin;
+  const oldManatText = formatOldManatRange(bdMin, bdMax, {
+    billion: t('billion_word'),
+    million: t('million_word'),
+    thousand: t('thousand_word'),
+  });
+  const overageText = formatRange(
+    bdMin.overageUsd,
+    bdMax?.overageUsd,
+    (n) => n.toLocaleString('en'),
+  );
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -114,7 +124,7 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <div className="bg-card border border-border border-t-4 border-t-primary rounded-xl p-5 shadow-card">
             <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('tuition')}</div>
-            <div className="font-heading font-bold text-lg text-foreground">{formatTuition(university.tuition_usd)}</div>
+            <div className="font-heading font-bold text-lg text-foreground">{formatTuitionRange(university.tuition_usd, tuitionMax)}</div>
           </div>
           <div className="bg-card border border-border border-t-4 border-t-gold rounded-xl p-5 shadow-card">
             <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('ranking')}</div>
@@ -135,7 +145,7 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
           {bd.exceedsCap && (
             <div className="mb-3 flex items-start gap-2.5 rounded-lg border border-crimson/30 bg-crimson-light/30 px-4 py-3 text-sm text-crimson-dark">
               <span className="font-bold text-base leading-tight shrink-0">!</span>
-              <span>{t('transfer_over_cap_note', { overage: bd.overageUsd.toLocaleString('en') })}</span>
+              <span>{t('transfer_over_cap_note', { overage: overageText })}</span>
             </div>
           )}
 
@@ -144,33 +154,33 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
               <>
                 <div className="border-2 border-primary/20 rounded-xl p-4 bg-background flex-1 min-w-[140px]">
                   <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('official_portion')}</div>
-                  <div className="font-heading font-bold text-lg text-primary">{bd.officialTmt.toLocaleString('ru')} TMT</div>
+                  <div className="font-heading font-bold text-lg text-primary">{formatRange(bdMin.officialTmt, bdMax?.officialTmt, formatTmt)}</div>
                   <div className="text-xs text-muted-foreground mt-1">{t('official_rate_detail')}</div>
                 </div>
                 <div className="border-2 border-crimson/20 rounded-xl p-4 bg-crimson-light/30 flex-1 min-w-[140px]">
                   <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('unofficial_portion')}</div>
-                  <div className="font-heading font-bold text-lg text-crimson">{bd.unofficialTmt.toLocaleString('ru')} TMT</div>
+                  <div className="font-heading font-bold text-lg text-crimson">{formatRange(bdMin.unofficialTmt, bdMax?.unofficialTmt, formatTmt)}</div>
                   <div className="text-xs text-muted-foreground mt-1">{t('unofficial_rate_detail')}</div>
                 </div>
               </>
             ) : (
               <div className="border-2 border-gold/30 rounded-xl p-4 bg-gold/5 flex-1 min-w-[140px]">
                 <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('tmt_equivalent')}</div>
-                <div className="font-heading font-bold text-xl text-gold-dark">{bd.officialTmt.toLocaleString('ru')} TMT</div>
+                <div className="font-heading font-bold text-xl text-gold-dark">{formatRange(bdMin.officialTmt, bdMax?.officialTmt, formatTmt)}</div>
               </div>
             )}
 
             {bd.exceedsCap && (
               <div className="border-2 border-gold/30 rounded-xl p-4 bg-gold/5 flex-1 min-w-[140px]">
                 <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{t('tmt_total')}</div>
-                <div className="font-heading font-bold text-xl text-gold-dark">{bd.totalTmt.toLocaleString('ru')} TMT</div>
+                <div className="font-heading font-bold text-xl text-gold-dark">{formatRange(bdMin.totalTmt, bdMax?.totalTmt, formatTmt)}</div>
               </div>
             )}
 
             <div className="border-2 border-amber-300/50 rounded-xl p-4 bg-amber-50/40 flex-1 min-w-[140px]">
               <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 font-medium">{tCommon('old_manat_label')}</div>
               <div className="font-heading font-bold text-lg text-amber-700">{oldManatText}</div>
-              <div className="text-xs text-muted-foreground mt-1">{bd.totalTmt.toLocaleString('ru')} TMT × 5 000</div>
+              <div className="text-xs text-muted-foreground mt-1">{formatRange(bdMin.totalTmt, bdMax?.totalTmt, formatTmt)} × 5 000</div>
             </div>
           </div>
         </section>

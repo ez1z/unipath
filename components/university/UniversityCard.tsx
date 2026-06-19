@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
-import { computeTuitionBreakdown } from '@/lib/format';
+import { computeTuitionBreakdown, formatRange, formatUsd, formatTmt, formatOldManatRange } from '@/lib/format';
 import { MoeBadge } from './MoeBadge';
 import { ScholarshipBadge } from './ScholarshipBadge';
 import type { Locale } from '@/lib/constants';
@@ -24,12 +24,17 @@ export function UniversityCard({ university, locale, bookmarkSlot, filtersQuery,
     ? `/${locale}/universities/${university.slug}?from=${encodeURIComponent(filtersQuery)}`
     : `/${locale}/universities/${university.slug}`;
 
-  const bd = computeTuitionBreakdown(university.tuition_usd);
-  const oldManatParts: string[] = [];
-  if (bd.billions > 0) oldManatParts.push(`${bd.billions} ${tUni('billion_word')}`);
-  if (bd.millions > 0) oldManatParts.push(`${bd.millions} ${tUni('million_word')}`);
-  if (bd.thousands > 0) oldManatParts.push(`${bd.thousands} ${tUni('thousand_word')}`);
-  const oldManatText = oldManatParts.join(' ') || `< 1 ${tUni('thousand_word')}`;
+  const bdMin = computeTuitionBreakdown(university.tuition_usd);
+  const tuitionMax = university.tuition_usd_max;
+  const hasTuitionRange = tuitionMax != null && tuitionMax > university.tuition_usd;
+  const bdMax = hasTuitionRange ? computeTuitionBreakdown(tuitionMax) : null;
+  // Cap-split visibility keys off the upper bound (worst case for transfer planning).
+  const bd = bdMax ?? bdMin;
+  const oldManatText = formatOldManatRange(bdMin, bdMax, {
+    billion: tUni('billion_word'),
+    million: tUni('million_word'),
+    thousand: tUni('thousand_word'),
+  });
 
   return (
     <div data-testid="university-card" className="relative bg-white rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 flex flex-col gap-0 group overflow-hidden">
@@ -62,15 +67,15 @@ export function UniversityCard({ university, locale, bookmarkSlot, filtersQuery,
             <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest block mb-1">
               {t('tuition_label')}
             </span>
-            <span className="font-semibold text-foreground">${university.tuition_usd.toLocaleString('en')}</span>
+            <span className="font-semibold text-foreground">{formatRange(university.tuition_usd, tuitionMax, formatUsd)}</span>
             {bd.exceedsCap ? (
               <span className="block text-xs mt-0.5">
-                <span className="text-gold-dark">{bd.officialTmt.toLocaleString('ru')} TMT</span>
+                <span className="text-gold-dark">{formatRange(bdMin.officialTmt, bdMax?.officialTmt, formatTmt)}</span>
                 {' + '}
-                <span className="text-crimson">{bd.unofficialTmt.toLocaleString('ru')} TMT</span>
+                <span className="text-crimson">{formatRange(bdMin.unofficialTmt, bdMax?.unofficialTmt, formatTmt)}</span>
               </span>
             ) : (
-              <span className="block text-xs text-muted-foreground mt-0.5">{bd.officialTmt.toLocaleString('ru')} TMT</span>
+              <span className="block text-xs text-muted-foreground mt-0.5">{formatRange(bdMin.officialTmt, bdMax?.officialTmt, formatTmt)}</span>
             )}
             <span className="block text-xs text-amber-600/80 mt-0.5">{oldManatText}</span>
           </div>
