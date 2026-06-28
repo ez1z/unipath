@@ -15,12 +15,16 @@ describe('parseSemestersJson', () => {
 
   it('parses a valid semester with null deadline', () => {
     const input = [{ name: 'Fall 2024', start_date: '2024-09-01', deadline: null }];
-    expect(parseSemestersJson(input)).toEqual(input);
+    expect(parseSemestersJson(input)).toEqual([
+      { ...input[0], language: null, major: null },
+    ]);
   });
 
   it('parses a valid semester with a deadline', () => {
     const input = [{ name: 'Spring 2025', start_date: '2025-01-15', deadline: '2024-11-30' }];
-    expect(parseSemestersJson(input)).toEqual(input);
+    expect(parseSemestersJson(input)).toEqual([
+      { ...input[0], language: null, major: null },
+    ]);
   });
 
   it('parses multiple valid semesters', () => {
