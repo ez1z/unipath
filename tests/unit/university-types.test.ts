@@ -12,6 +12,8 @@ const baseRow: UniversityDbRow = {
   city: 'Istanbul',
   tuition_usd: '5000',
   tuition_usd_max: null,
+  acceptance_rate_min: null,
+  acceptance_rate_max: null,
   moe_approved: true,
   ranking_qs: 42,
   languages: ['English', 'Turkish'],
@@ -50,6 +52,18 @@ describe('dbRowToUniversity', () => {
     const u = dbRowToUniversity({ ...baseRow, tuition_usd_max: '8000' });
     expect(u.tuition_usd_max).toBe(8000);
     expect(typeof u.tuition_usd_max).toBe('number');
+  });
+
+  it('defaults null acceptance rate columns to null', () => {
+    const u = dbRowToUniversity(baseRow);
+    expect(u.acceptance_rate_min).toBeNull();
+    expect(u.acceptance_rate_max).toBeNull();
+  });
+
+  it('converts acceptance rate columns to numbers when present', () => {
+    const u = dbRowToUniversity({ ...baseRow, acceptance_rate_min: '40', acceptance_rate_max: '55' });
+    expect(u.acceptance_rate_min).toBe(40);
+    expect(u.acceptance_rate_max).toBe(55);
   });
 
   it('defaults null entrance_requirements to empty object', () => {

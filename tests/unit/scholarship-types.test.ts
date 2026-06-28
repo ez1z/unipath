@@ -14,6 +14,8 @@ const baseRow: ScholarshipDbRow = {
   coverage: ['tuition', 'accommodation'],
   amount_usd: '5000',
   amount_usd_max: null,
+  acceptance_rate_min: null,
+  acceptance_rate_max: null,
   deadline_text: 'March 31',
   semesters: [{ name: 'Fall', start_date: '2024-09-01', deadline: null }],
   requirements: {},
@@ -61,6 +63,18 @@ describe('dbRowToScholarship', () => {
     const s = dbRowToScholarship({ ...baseRow, amount_usd_max: '9000' });
     expect(s.amount_usd_max).toBe(9000);
     expect(typeof s.amount_usd_max).toBe('number');
+  });
+
+  it('defaults null acceptance rate columns to null', () => {
+    const s = dbRowToScholarship(baseRow);
+    expect(s.acceptance_rate_min).toBeNull();
+    expect(s.acceptance_rate_max).toBeNull();
+  });
+
+  it('converts acceptance rate columns to numbers when present', () => {
+    const s = dbRowToScholarship({ ...baseRow, acceptance_rate_min: '8', acceptance_rate_max: '12' });
+    expect(s.acceptance_rate_min).toBe(8);
+    expect(s.acceptance_rate_max).toBe(12);
   });
 
   it('parses semesters from valid JSON array', () => {
@@ -187,6 +201,25 @@ describe('ScholarshipCsvRowSchema', () => {
   it('fails when amount_usd_max is less than amount_usd', () => {
     expect(
       ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, amount_usd: '5000', amount_usd_max: '3000' }).success,
+    ).toBe(false);
+  });
+
+  it('parses acceptance rate columns as numbers', () => {
+    const result = ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, acceptance_rate_min: '8', acceptance_rate_max: '12' });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.acceptance_rate_min).toBe(8);
+      expect(result.data.acceptance_rate_max).toBe(12);
+    }
+  });
+
+  it('fails when acceptance rate is above 100', () => {
+    expect(ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, acceptance_rate_min: '150' }).success).toBe(false);
+  });
+
+  it('fails when acceptance_rate_max is less than acceptance_rate_min', () => {
+    expect(
+      ScholarshipCsvRowSchema.safeParse({ ...validCsvRow, acceptance_rate_min: '20', acceptance_rate_max: '10' }).success,
     ).toBe(false);
   });
 

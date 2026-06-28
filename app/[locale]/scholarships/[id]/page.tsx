@@ -3,8 +3,9 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 import { getBySlug } from '@/lib/data/scholarships';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
+import { TestRequirementsSummary } from '@/components/university/TestRequirementsSummary';
 import { getById as getUniversityById } from '@/lib/data/universities';
-import { formatTuitionRange } from '@/lib/format';
+import { formatTuitionRange, formatPercentRange } from '@/lib/format';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { createClient } from '@/lib/supabase/server';
@@ -115,7 +116,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         {/* Key stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div className={`grid grid-cols-1 ${scholarship.acceptance_rate_min != null ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-4 mb-8`}>
           <div className="bg-card border border-border border-t-4 border-t-tk-green rounded-xl p-5 shadow-card">
             <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
               {t('amount_label')}
@@ -134,7 +135,20 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
               {scholarship.deadline_text ?? '—'}
             </div>
           </div>
+          {scholarship.acceptance_rate_min != null && (
+            <div className="bg-card border border-border border-t-4 border-t-primary rounded-xl p-5 shadow-card">
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                {t('acceptance_rate_label')}
+              </div>
+              <div className="font-heading font-bold text-lg text-foreground">
+                {formatPercentRange(scholarship.acceptance_rate_min, scholarship.acceptance_rate_max)}
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Minimum test scores summary */}
+        <TestRequirementsSummary requirements={scholarship.requirements} />
 
         {/* Semesters & intake dates */}
         {scholarship.semesters.length > 0 && (

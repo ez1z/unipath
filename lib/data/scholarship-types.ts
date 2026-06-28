@@ -20,6 +20,8 @@ export type ScholarshipDbRow = {
   coverage: string[];
   amount_usd: string | number | null;
   amount_usd_max: string | number | null;
+  acceptance_rate_min: string | number | null;
+  acceptance_rate_max: string | number | null;
   deadline_text: string | null;
   semesters: unknown;
   requirements: Record<string, unknown>;
@@ -41,6 +43,8 @@ export type Scholarship = {
   coverage: string[];
   amount_usd: number | null;
   amount_usd_max: number | null;
+  acceptance_rate_min: number | null;
+  acceptance_rate_max: number | null;
   deadline_text: string | null;
   semesters: Semester[];
   requirements: Record<string, unknown>;
@@ -59,6 +63,8 @@ export function dbRowToScholarship(row: ScholarshipDbRow): Scholarship {
     coverage: row.coverage,
     amount_usd: row.amount_usd !== null ? Number(row.amount_usd) : null,
     amount_usd_max: row.amount_usd_max != null ? Number(row.amount_usd_max) : null,
+    acceptance_rate_min: row.acceptance_rate_min != null ? Number(row.acceptance_rate_min) : null,
+    acceptance_rate_max: row.acceptance_rate_max != null ? Number(row.acceptance_rate_max) : null,
     deadline_text: row.deadline_text,
     semesters: parseSemestersJson(row.semesters),
     requirements: row.requirements ?? {},
@@ -109,6 +115,24 @@ export const ScholarshipCsvRowSchema = z.object({
     }
     return n;
   }),
+  acceptance_rate_min: z.string().optional().transform((v, ctx) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    if (isNaN(n) || n < 0 || n > 100) {
+      ctx.addIssue({ code: 'custom', message: 'must be a percentage 0–100 or blank' });
+      return z.NEVER;
+    }
+    return n;
+  }),
+  acceptance_rate_max: z.string().optional().transform((v, ctx) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    if (isNaN(n) || n < 0 || n > 100) {
+      ctx.addIssue({ code: 'custom', message: 'must be a percentage 0–100 or blank' });
+      return z.NEVER;
+    }
+    return n;
+  }),
   deadline_text: z.string().optional().transform((v) => v?.trim() || null),
   semesters: z.string().optional().transform((v) =>
     v ? parseSemestersCsv(v) : []
@@ -120,6 +144,9 @@ export const ScholarshipCsvRowSchema = z.object({
 }).refine((r) => r.amount_usd_max == null || r.amount_usd == null || r.amount_usd_max >= r.amount_usd, {
   message: 'amount_usd_max must be ≥ amount_usd',
   path: ['amount_usd_max'],
+}).refine((r) => r.acceptance_rate_max == null || r.acceptance_rate_min == null || r.acceptance_rate_max >= r.acceptance_rate_min, {
+  message: 'acceptance_rate_max must be ≥ acceptance_rate_min',
+  path: ['acceptance_rate_max'],
 });
 
 export type ScholarshipCsvRow = z.infer<typeof ScholarshipCsvRowSchema>;
@@ -135,6 +162,8 @@ export type ScholarshipInsert = {
   coverage: string[];
   amount_usd: number | null;
   amount_usd_max: number | null;
+  acceptance_rate_min: number | null;
+  acceptance_rate_max: number | null;
   deadline_text: string | null;
   semesters: Semester[];
   requirements: Record<string, unknown>;

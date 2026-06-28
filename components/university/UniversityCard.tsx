@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { University } from '@/lib/data/universities';
-import { computeTuitionBreakdown, formatRange, formatUsd, formatTmt, formatOldManatRange } from '@/lib/format';
+import { computeTuitionBreakdown, formatRange, formatUsd, formatTmt, formatOldManatRange, formatPercentRange } from '@/lib/format';
 import { MoeBadge } from './MoeBadge';
 import { ScholarshipBadge } from './ScholarshipBadge';
+import { TestRequirementsSummary } from './TestRequirementsSummary';
 import type { Locale } from '@/lib/constants';
 
 type Props = {
@@ -89,7 +90,20 @@ export function UniversityCard({ university, locale, bookmarkSlot, filtersQuery,
               </span>
             </div>
           )}
+          {university.acceptance_rate_min != null && (
+            <div className="flex-shrink-0 border-l border-border pl-4">
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest block mb-1">
+                {t('acceptance_label')}
+              </span>
+              <span className="font-semibold text-tk-green">
+                {formatPercentRange(university.acceptance_rate_min, university.acceptance_rate_max)}
+              </span>
+            </div>
+          )}
         </div>
+
+        {/* Minimum test scores */}
+        <TestRequirementsSummary requirements={university.entrance_requirements} variant="inline" />
 
         {/* Language pills */}
         <div className="flex gap-1.5 flex-wrap mt-auto">

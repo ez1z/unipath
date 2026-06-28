@@ -23,6 +23,16 @@ export const ScholarshipFormSchema = z.object({
     const n = Number(v);
     return isNaN(n) || n <= 0 ? null : n;
   }),
+  acceptance_rate_min: z.string().optional().transform((v) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    return isNaN(n) || n < 0 || n > 100 ? null : n;
+  }),
+  acceptance_rate_max: z.string().optional().transform((v) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    return isNaN(n) || n < 0 || n > 100 ? null : n;
+  }),
   deadline_text: z.string().optional().transform((v) => v?.trim() || null),
   semesters: z.string().optional().transform((v) => {
     if (!v?.trim()) return [];
@@ -45,4 +55,7 @@ export const ScholarshipFormSchema = z.object({
 }).refine((d) => d.amount_usd_max == null || d.amount_usd == null || d.amount_usd_max >= d.amount_usd, {
   message: 'Max amount must be ≥ amount',
   path: ['amount_usd_max'],
+}).refine((d) => d.acceptance_rate_max == null || d.acceptance_rate_min == null || d.acceptance_rate_max >= d.acceptance_rate_min, {
+  message: 'Max acceptance rate must be ≥ min acceptance rate',
+  path: ['acceptance_rate_max'],
 });

@@ -171,6 +171,35 @@ describe("CsvRowSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("parses acceptance rate columns as numbers", () => {
+    const result = CsvRowSchema.safeParse({
+      ...validRow,
+      acceptance_rate_min: "40",
+      acceptance_rate_max: "55",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.acceptance_rate_min).toBe(40);
+      expect(result.data.acceptance_rate_max).toBe(55);
+    }
+  });
+
+  it("treats blank acceptance rate as null", () => {
+    const result = CsvRowSchema.safeParse({ ...validRow, acceptance_rate_min: "" });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.acceptance_rate_min).toBeNull();
+  });
+
+  it("fails when acceptance rate is above 100", () => {
+    expect(CsvRowSchema.safeParse({ ...validRow, acceptance_rate_min: "120" }).success).toBe(false);
+  });
+
+  it("fails when acceptance_rate_max is less than acceptance_rate_min", () => {
+    expect(
+      CsvRowSchema.safeParse({ ...validRow, acceptance_rate_min: "60", acceptance_rate_max: "40" }).success,
+    ).toBe(false);
+  });
+
   it("treats blank entrance_requirements as empty object", () => {
     const result = CsvRowSchema.safeParse({
       ...validRow,

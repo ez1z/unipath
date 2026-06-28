@@ -45,6 +45,8 @@ export async function importUniversitiesAction(
     city: r.city,
     tuition_usd: r.tuition_usd,
     tuition_usd_max: r.tuition_usd_max,
+    acceptance_rate_min: r.acceptance_rate_min,
+    acceptance_rate_max: r.acceptance_rate_max,
     moe_approved: r.moe_approved,
     ranking_qs: r.ranking_qs,
     languages: r.languages,

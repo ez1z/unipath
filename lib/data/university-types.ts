@@ -16,6 +16,8 @@ export type UniversityDbRow = {
   city: string;
   tuition_usd: string | number;
   tuition_usd_max: string | number | null;
+  acceptance_rate_min: string | number | null;
+  acceptance_rate_max: string | number | null;
   moe_approved: boolean;
   ranking_qs: number | null;
   languages: string[];
@@ -36,6 +38,8 @@ export type University = {
   city: string;
   tuition_usd: number;
   tuition_usd_max: number | null;
+  acceptance_rate_min: number | null;
+  acceptance_rate_max: number | null;
   moe_approved: boolean;
   ranking_qs: number | null;
   languages: string[];
@@ -56,6 +60,8 @@ export function dbRowToUniversity(row: UniversityDbRow): University {
     city: row.city,
     tuition_usd: Number(row.tuition_usd),
     tuition_usd_max: row.tuition_usd_max != null ? Number(row.tuition_usd_max) : null,
+    acceptance_rate_min: row.acceptance_rate_min != null ? Number(row.acceptance_rate_min) : null,
+    acceptance_rate_max: row.acceptance_rate_max != null ? Number(row.acceptance_rate_max) : null,
     moe_approved: row.moe_approved,
     ranking_qs: row.ranking_qs,
     languages: row.languages,
@@ -104,6 +110,24 @@ export const CsvRowSchema = z.object({
     }
     return n;
   }),
+  acceptance_rate_min: z.string().optional().transform((v, ctx) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    if (isNaN(n) || n < 0 || n > 100) {
+      ctx.addIssue({ code: 'custom', message: 'must be a percentage 0–100 or blank' });
+      return z.NEVER;
+    }
+    return n;
+  }),
+  acceptance_rate_max: z.string().optional().transform((v, ctx) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    if (isNaN(n) || n < 0 || n > 100) {
+      ctx.addIssue({ code: 'custom', message: 'must be a percentage 0–100 or blank' });
+      return z.NEVER;
+    }
+    return n;
+  }),
   moe_approved: z.string().transform((v, ctx) => {
     const lower = v.toLowerCase().trim();
     if (lower === 'true') return true;
@@ -146,6 +170,9 @@ export const CsvRowSchema = z.object({
 }).refine((r) => r.tuition_usd_max == null || r.tuition_usd_max >= r.tuition_usd, {
   message: 'tuition_usd_max must be ≥ tuition_usd',
   path: ['tuition_usd_max'],
+}).refine((r) => r.acceptance_rate_max == null || r.acceptance_rate_min == null || r.acceptance_rate_max >= r.acceptance_rate_min, {
+  message: 'acceptance_rate_max must be ≥ acceptance_rate_min',
+  path: ['acceptance_rate_max'],
 });
 
 export type CsvRow = z.infer<typeof CsvRowSchema>;
@@ -159,6 +186,8 @@ export type UniversityInsert = {
   city: string;
   tuition_usd: number;
   tuition_usd_max: number | null;
+  acceptance_rate_min: number | null;
+  acceptance_rate_max: number | null;
   moe_approved: boolean;
   ranking_qs: number | null;
   languages: string[];

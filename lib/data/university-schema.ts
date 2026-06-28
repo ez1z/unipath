@@ -14,6 +14,16 @@ export const FormSchema = z.object({
     const n = Number(v);
     return isNaN(n) || n < 0 ? null : n;
   }),
+  acceptance_rate_min: z.string().optional().transform((v) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    return isNaN(n) || n < 0 || n > 100 ? null : n;
+  }),
+  acceptance_rate_max: z.string().optional().transform((v) => {
+    if (!v || v.trim() === '') return null;
+    const n = Number(v);
+    return isNaN(n) || n < 0 || n > 100 ? null : n;
+  }),
   moe_approved: z.string().optional().transform((v) => v === 'true'),
   ranking_qs: z.string().optional().transform((v) => {
     if (!v || v.trim() === '') return null;
@@ -48,4 +58,7 @@ export const FormSchema = z.object({
 }).refine((d) => d.tuition_usd_max == null || d.tuition_usd_max >= d.tuition_usd, {
   message: 'Max tuition must be ≥ tuition',
   path: ['tuition_usd_max'],
+}).refine((d) => d.acceptance_rate_max == null || d.acceptance_rate_min == null || d.acceptance_rate_max >= d.acceptance_rate_min, {
+  message: 'Max acceptance rate must be ≥ min acceptance rate',
+  path: ['acceptance_rate_max'],
 });

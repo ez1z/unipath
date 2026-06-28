@@ -13,6 +13,8 @@ function makeScholarship(overrides: Partial<Scholarship> = {}): Scholarship {
     coverage: ['tuition'],
     amount_usd: null,
     amount_usd_max: null,
+    acceptance_rate_min: null,
+    acceptance_rate_max: null,
     deadline_text: null,
     semesters: [],
     requirements: {},

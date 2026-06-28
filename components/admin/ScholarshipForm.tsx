@@ -18,6 +18,8 @@ export type ScholarshipFormDefaults = {
   coverage?: string[];
   amount_usd?: string;
   amount_usd_max?: string;
+  acceptance_rate_min?: string;
+  acceptance_rate_max?: string;
   deadline_text?: string;
   semesters?: Semester[];
   description_en?: string;
@@ -226,7 +228,7 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label htmlFor="deadline_text" className={labelClass}>
               {"Deadline"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
@@ -239,6 +241,42 @@ export function ScholarshipForm({ universities, defaultValues: d = {}, action, s
               defaultValue={d.deadline_text ?? ''}
               placeholder={"April 15 / Rolling"}
               aria-label="Application deadline"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="acceptance_rate_min" className={labelClass}>
+              {"Acceptance rate %"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
+            </label>
+            <input
+              id="acceptance_rate_min"
+              name="acceptance_rate_min"
+              type="number"
+              min="0"
+              max="100"
+              step="0.1"
+              disabled={isPending}
+              defaultValue={d.acceptance_rate_min}
+              placeholder={"e.g. 10"}
+              aria-label="Acceptance rate (percent), or lower bound of a range"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="acceptance_rate_max" className={labelClass}>
+              {"Max acceptance %"} <span className="text-muted-foreground font-normal">{"(optional)"}</span>
+            </label>
+            <input
+              id="acceptance_rate_max"
+              name="acceptance_rate_max"
+              type="number"
+              min="0"
+              max="100"
+              step="0.1"
+              disabled={isPending}
+              defaultValue={d.acceptance_rate_max}
+              placeholder={"For a range"}
+              aria-label="Maximum acceptance rate (percent), for a range"
               className={inputClass}
             />
           </div>

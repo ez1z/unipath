@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { Scholarship } from '@/lib/data/scholarships';
-import { formatTuitionRange } from '@/lib/format';
+import { formatTuitionRange, formatPercentRange } from '@/lib/format';
+import { TestRequirementsSummary } from '@/components/university/TestRequirementsSummary';
 import type { Locale } from '@/lib/constants';
 
 type Props = {
@@ -106,7 +107,21 @@ export function ScholarshipCard({ scholarship: s, locale, universityName, compac
                 <span className="font-semibold text-foreground">{s.deadline_text}</span>
               </div>
             )}
+            {s.acceptance_rate_min != null && (
+              <div className={s.amount_usd !== null || s.deadline_text ? 'border-l border-border pl-4' : ''}>
+                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest block mb-1">
+                  {t('acceptance_label')}
+                </span>
+                <span className="font-semibold text-tk-green">
+                  {formatPercentRange(s.acceptance_rate_min, s.acceptance_rate_max)}
+                </span>
+              </div>
+            )}
           </div>
+        )}
+
+        {!compact && (
+          <TestRequirementsSummary requirements={s.requirements} variant="inline" />
         )}
 
         {compact && s.deadline_text && (

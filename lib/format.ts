@@ -19,6 +19,17 @@ export function formatRange(min: number, max: number | null | undefined, fmt: (n
   return `${fmt(min)} ${EN_DASH} ${fmt(max)}`;
 }
 
+/** A single acceptance-rate percentage, e.g. "45%". Trailing-zero decimals trimmed. */
+export function formatPercent(value: number): string {
+  return `${Number(value.toFixed(1))}%`;
+}
+
+/** Range-aware acceptance rate: "45%" or "40 – 55%". */
+export function formatPercentRange(min: number, max: number | null | undefined): string {
+  if (max == null || max <= min) return formatPercent(min);
+  return `${Number(min.toFixed(1))} ${EN_DASH} ${formatPercent(max)}`;
+}
+
 export function formatTuition(usd: number): string {
   return `${formatUsd(usd)} / ${formatTmt(usd * TMT_PER_USD)}`;
 }

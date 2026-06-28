@@ -39,6 +39,8 @@ export default async function EditScholarshipPage({ params: { id } }: Props) {
     coverage: s.coverage,
     amount_usd: s.amount_usd != null ? String(Number(s.amount_usd)) : '',
     amount_usd_max: s.amount_usd_max != null ? String(Number(s.amount_usd_max)) : '',
+    acceptance_rate_min: s.acceptance_rate_min != null ? String(Number(s.acceptance_rate_min)) : '',
+    acceptance_rate_max: s.acceptance_rate_max != null ? String(Number(s.acceptance_rate_max)) : '',
     deadline_text: s.deadline_text ?? '',
     semesters: parseSemestersJson(s.semesters),
     requirements: s.requirements ? JSON.stringify(s.requirements) : '',

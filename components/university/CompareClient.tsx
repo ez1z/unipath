@@ -5,8 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { University } from '@/lib/data/universities';
-import { computeTuitionBreakdown, formatRange, formatUsd, formatTmt, formatOldManatRange } from '@/lib/format';
+import { computeTuitionBreakdown, formatRange, formatUsd, formatTmt, formatOldManatRange, formatPercentRange } from '@/lib/format';
 import { MoeBadge } from './MoeBadge';
+import { TestRequirementsSummary, getTestEntries } from './TestRequirementsSummary';
 import { Select } from '@/components/ui/Select';
 import type { Locale } from '@/lib/constants';
 
@@ -93,6 +94,28 @@ export function CompareClient({ universities, locale }: Props) {
           <span className="font-semibold text-gold-dark">{t('ranking_value', { rank: u.ranking_qs })}</span>
         ) : (
           <span className="text-muted-foreground">{t('ranking_unranked')}</span>
+        ),
+    },
+    {
+      label: t('acceptance_rate'),
+      key: 'acceptance',
+      render: (u) =>
+        u.acceptance_rate_min != null ? (
+          <span className="font-semibold text-tk-green">
+            {formatPercentRange(u.acceptance_rate_min, u.acceptance_rate_max)}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+    {
+      label: t('test_requirements'),
+      key: 'tests',
+      render: (u) =>
+        getTestEntries(u.entrance_requirements).length > 0 ? (
+          <TestRequirementsSummary requirements={u.entrance_requirements} variant="inline" showLabel={false} />
+        ) : (
+          <span className="text-muted-foreground">—</span>
         ),
     },
     {

@@ -22,6 +22,29 @@ function amountText(min: number | null, max: number | null): string {
   return `$${min}`;
 }
 
+function acceptanceText(min: number | null, max: number | null): string | null {
+  if (min == null) return null;
+  if (max != null && max > min) return `acceptance ${min}-${max}%`;
+  return `acceptance ${min}%`;
+}
+
+type TestEntry = { type: string; min_score?: number; min_math?: number; min_verbal?: number };
+
+function testText(requirements: Record<string, unknown> | null | undefined): string | null {
+  const tests = Array.isArray(requirements?.tests) ? (requirements!.tests as TestEntry[]) : [];
+  if (tests.length === 0) return null;
+  const parts = tests.map((t) => {
+    if (t.type === 'sat') {
+      const total = (t.min_math ?? 0) + (t.min_verbal ?? 0);
+      return total > 0 ? `SAT ${total}` : 'SAT';
+    }
+    const abbr =
+      t.type === 'toefl' ? 'TOEFL' : t.type === 'ielts' ? 'IELTS' : t.type === 'duolingo' ? 'Duolingo' : t.type;
+    return t.min_score != null ? `${abbr} ${t.min_score}` : abbr;
+  });
+  return `min tests: ${parts.join('/')}`;
+}
+
 type UniIndexed = {
   line: string; // compact display string
   slug: string; // for the UniPath detail-page link
@@ -62,8 +85,10 @@ async function load(): Promise<Snapshot> {
       tuitionText(u.tuition_usd, u.tuition_usd_max),
       u.moe_approved ? 'MoE-approved' : 'not MoE-approved',
       u.ranking_qs ? `QS #${u.ranking_qs}` : null,
+      acceptanceText(u.acceptance_rate_min, u.acceptance_rate_max),
       u.languages.length ? `langs: ${u.languages.join('/')}` : null,
       majors ? `majors: ${majors}` : null,
+      testText(u.entrance_requirements),
     ]
       .filter(Boolean)
       .join(' | ');
@@ -97,8 +122,10 @@ async function load(): Promise<Snapshot> {
       s.country,
       s.type,
       amountText(s.amount_usd, s.amount_usd_max),
+      acceptanceText(s.acceptance_rate_min, s.acceptance_rate_max),
       s.coverage.length ? `covers: ${s.coverage.join('/')}` : null,
       s.deadline_text ? `deadline: ${s.deadline_text}` : null,
+      testText(s.requirements),
     ]
       .filter(Boolean)
       .join(' | ');
