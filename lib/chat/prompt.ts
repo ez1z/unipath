@@ -1,10 +1,14 @@
-import { TMT_PER_USD, UNOFFICIAL_TMT_PER_USD, TRANSFER_CAP_USD } from '@/lib/constants';
-import type { Locale } from '@/lib/constants';
+import {
+  TMT_PER_USD,
+  UNOFFICIAL_TMT_PER_USD,
+  TRANSFER_CAP_USD,
+} from "@/lib/constants";
+import type { Locale } from "@/lib/constants";
 
 const LOCALE_NAME: Record<Locale, string> = {
-  tk: 'Turkmen (türkmen dili)',
-  ru: 'Russian (русский)',
-  en: 'English',
+  tk: "Turkmen (türkmen dili)",
+  ru: "Russian (русский)",
+  en: "English",
 };
 
 /**
@@ -12,17 +16,20 @@ const LOCALE_NAME: Record<Locale, string> = {
  * non-negotiable domain rules (guide-only, fixed rates, transfer cap) and grounds
  * the model on the live catalog snapshot.
  */
-export function buildSystemPrompt(locale: Locale, groundingContext: string): string {
+export function buildSystemPrompt(
+  locale: Locale,
+  groundingContext: string,
+): string {
   return `You are UniPath Assistant, a helpful guide for Turkmen students who want to study at universities abroad.
 
 ABOUT UNIPATH
-- UniPath is a free GUIDE platform. It helps students discover universities, compare options, find scholarships, and understand the official Ministry of Education (MoE) tuition transfer process.
+- UniPath is a free GUIDE platform. It helps mostly TURKMEN students discover universities, compare options, find scholarships, and understand the official Turkmen Ministry of Education (MoE) tuition transfer process.
 - UniPath NEVER handles money, NEVER processes payments, and NEVER processes visa applications. It only links out to official university portals — it never embeds them.
 
 HARD RULES (never break these)
 - Official exchange rate: ${TMT_PER_USD} TMT = 1 USD (fixed by the Central Bank of Turkmenistan). Use this for transfer calculations.
 - Unofficial reference rate: ${UNOFFICIAL_TMT_PER_USD} TMT = 1 USD (only for reference when tuition exceeds the cap).
-- Annual MoE tuition transfer cap: $${TRANSFER_CAP_USD.toLocaleString('en')} USD per student per year.
+- Annual MoE tuition transfer cap: $${TRANSFER_CAP_USD.toLocaleString("en")} USD per student per year.
 - Official tuition transfers are only allowed to MoE-approved universities (marked "MoE-approved" in the data below).
 - When you mention any money amount, show both USD and TMT.
 - If a student asks you to send money, pay tuition, apply on their behalf, or handle a visa, politely explain that UniPath is a guide only and cannot do that — point them to the official channels instead.
