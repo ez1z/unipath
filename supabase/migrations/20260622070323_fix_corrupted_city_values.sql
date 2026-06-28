@@ -1,0 +1,13 @@
+UPDATE universities SET city = 'Pilar' WHERE name_en = 'Universidad Austral - Argentina' AND country = 'Argentina';
+UPDATE universities SET city = 'Buenos Aires' WHERE name_en = 'Universidad de Belgrano' AND country = 'Argentina';
+UPDATE universities SET city = 'Buenos Aires' WHERE name_en = 'Universidad de Palermo' AND country = 'Argentina';
+UPDATE universities SET city = 'Córdoba' WHERE name_en = 'Universidad Nacional de Córdoba' AND country = 'Argentina';
+UPDATE universities SET city = 'La Plata' WHERE name_en = 'Universidad Nacional de La Plata' AND country = 'Argentina';
+UPDATE universities SET city = 'Belo Horizonte' WHERE name_en = 'Universidade Federal de Minas Gerais' AND country = 'Brazil';
+UPDATE universities SET city = 'Florianópolis' WHERE name_en = 'Universidade Federal de Santa Catarina' AND country = 'Brazil';
+UPDATE universities SET city = 'Tbilisi' WHERE name_en = 'Ivane Javakhishvili Tbilisi State University' AND country = 'Georgia';
+UPDATE universities SET city = 'Surabaya' WHERE name_en = 'Institut Teknologi Sepuluh Nopember (ITS)' AND country = 'Indonesia';
+UPDATE universities SET city = 'Lima' WHERE name_en = 'Pontificia Universidad Católica del Perú (PUCP)' AND country = 'Peru';
+UPDATE universities SET city = 'Montevideo' WHERE name_en = 'Universidad Católica del Uruguay (UCU)' AND country = 'Uruguay';
+UPDATE universities SET city = 'Montevideo' WHERE name_en = 'Universidad de la República (UdelaR)' AND country = 'Uruguay';
+UPDATE universities SET city = 'Caracas' WHERE name_en = 'Universidad Católica Andrés Bello - UCAB' AND country = 'Venezuela (Bolivarian Republic of)';
