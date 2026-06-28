@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
+import { EntityViewTracker } from '@/components/analytics/EntityViewTracker';
 import { getByUniversity } from '@/lib/data/scholarships';
 import { getOrInitChecklist } from '@/lib/data/checklist';
 import type { Locale } from '@/lib/constants';
@@ -105,6 +106,12 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
 
   return (
     <>
+      <EntityViewTracker
+        type="university"
+        id={university.id}
+        slug={university.slug}
+        country={university.country}
+      />
       <PageHeader
         title={name}
         subtitle={`${university.city}, ${university.country}`}

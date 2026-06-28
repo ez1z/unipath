@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { trackEvent } from '@/lib/analytics/track';
 import type { University } from '@/lib/data/universities';
 import { filterUniversities } from '@/lib/data/filter-universities';
 import type { UniversitySortBy } from '@/lib/data/university-types';
@@ -106,6 +107,19 @@ export function UniversityListClient({
   useEffect(() => {
     window.history.replaceState(null, '', filtersQuery ? `${pathname}?${filtersQuery}` : pathname);
   }, [filtersQuery, pathname]);
+
+  // Log search terms (debounced) for the admin analytics dashboard. Filtering is
+  // client-side, so this is the only place a query is observable server-side.
+  const lastLoggedQuery = useRef(query.trim().toLowerCase());
+  useEffect(() => {
+    const term = query.trim();
+    if (term.length < 2 || term.toLowerCase() === lastLoggedQuery.current) return;
+    const handle = setTimeout(() => {
+      lastLoggedQuery.current = term.toLowerCase();
+      trackEvent({ event_type: 'search', search_query: term, locale });
+    }, 1000);
+    return () => clearTimeout(handle);
+  }, [query, locale]);
 
   const scholarshipSet = useMemo(() => new Set(scholarshipEligibleIds), [scholarshipEligibleIds]);
 

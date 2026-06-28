@@ -30,6 +30,9 @@ export async function AdminHeader({ email, role }: Props) {
             </Link>
             {role === 'superuser' && (
               <>
+                <Link href="/admin/analytics" className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors whitespace-nowrap">
+                  {"Analytics"}
+                </Link>
                 <Link href="/admin/admins" className="rounded-md px-3 py-1.5 text-sm font-medium text-white/55 hover:text-gold hover:bg-white/5 transition-colors whitespace-nowrap">
                   {"Admins"}
                 </Link>

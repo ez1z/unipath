@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { z } from 'zod';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { buildGroundingContext } from '@/lib/chat/context';
 import { buildSystemPrompt } from '@/lib/chat/prompt';
 import { logError } from '@/lib/logger';
+import { createServiceClient } from '@/lib/supabase/service';
 
 export const runtime = 'nodejs';
 
@@ -66,6 +68,22 @@ export async function POST(req: NextRequest) {
   // Retrieve only catalog records relevant to the latest user message, so the
   // request stays under the provider's per-minute token limit.
   const lastUserMessage = [...body.messages].reverse().find((m) => m.role === 'user')?.content ?? '';
+
+  // Log the question for the admin analytics dashboard. Fire-and-forget — the
+  // request stays alive while streaming, so the insert completes without blocking.
+  if (lastUserMessage.trim()) {
+    const visitorId = req.cookies.get('up_vid')?.value ?? randomUUID();
+    void createServiceClient()
+      .from('analytics_events')
+      .insert({
+        event_type: 'ai_question',
+        visitor_id: visitorId,
+        locale: body.locale,
+        ai_question: lastUserMessage.slice(0, 1000),
+      })
+      .then(() => {}, () => {});
+  }
+
   const groundingContext = await buildGroundingContext(lastUserMessage, body.locale);
   const systemPrompt = buildSystemPrompt(body.locale, groundingContext);
 

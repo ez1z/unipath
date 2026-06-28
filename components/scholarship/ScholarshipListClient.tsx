@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { trackEvent } from '@/lib/analytics/track';
 import type { Scholarship } from '@/lib/data/scholarships';
 import { filterScholarships } from '@/lib/data/filter-scholarships';
 import type { ScholarshipSortBy } from '@/lib/data/scholarship-types';
@@ -45,6 +46,18 @@ export function ScholarshipListClient({
   const [sortBy, setSortBy] = useState<ScholarshipSortBy>('name');
   const [prefsActive, setPrefsActive] = useState(false);
   const [scoresActive, setScoresActive] = useState(false);
+
+  // Log search terms (debounced) for the admin analytics dashboard.
+  const lastLoggedQuery = useRef('');
+  useEffect(() => {
+    const term = query.trim();
+    if (term.length < 2 || term.toLowerCase() === lastLoggedQuery.current) return;
+    const handle = setTimeout(() => {
+      lastLoggedQuery.current = term.toLowerCase();
+      trackEvent({ event_type: 'search', search_query: term, locale });
+    }, 1000);
+    return () => clearTimeout(handle);
+  }, [query, locale]);
 
   const hasPrefs = userPrefs !== null && userPrefs.countries.length > 0;
   const hasScores = qualifiedUniversityIds !== null;

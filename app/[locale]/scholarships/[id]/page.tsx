@@ -9,6 +9,7 @@ import { formatTuitionRange, formatPercentRange } from '@/lib/format';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { createClient } from '@/lib/supabase/server';
+import { EntityViewTracker } from '@/components/analytics/EntityViewTracker';
 import type { Locale } from '@/lib/constants';
 import type { Semester } from '@/lib/types/semester';
 
@@ -102,6 +103,12 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
 
   return (
     <>
+      <EntityViewTracker
+        type="scholarship"
+        id={scholarship.id}
+        slug={scholarship.slug}
+        country={scholarship.country}
+      />
       <PageHeader
         title={name}
         subtitle={scholarship.country}
