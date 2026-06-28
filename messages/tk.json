@@ -1,4 +1,15 @@
 {
+  "chat": {
+    "title": "UniPath kömekçisi",
+    "open_label": "Söhbetdeş kömekçini aç",
+    "close_label": "Söhbeti ýap",
+    "input_placeholder": "Uniwersitetler, stipendiýalar, geçirimler barada soraň…",
+    "send_label": "Habary iber",
+    "greeting": "Salam! Men UniPath kömekçisi. 👋",
+    "empty_hint": "Daşary ýurtdaky uniwersitetler, stipendiýalar, Bilim ministrliginiň tassyklamasy ýa-da okuw töleginiň geçirim prosesi barada soraň.",
+    "error": "Bagyşlaň, bir näsazlyk ýüze çykdy. Biraz wagtdan soň ýene synanyşyň.",
+    "disclaimer": "Jogaplar emeli aň tarapyndan döredildi — möhüm maglumatlary barlaň. UniPath diňe gollanma bolup, hiç haçan pul geçirmeýär."
+  },
   "nav": {
     "home": "Baş sahypa",
     "universities": "Uniwersitetler",

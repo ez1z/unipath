@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import type { Locale } from '@/lib/constants';
 import { NavBar } from '@/components/NavBar';
+import { ChatWidget } from '@/components/chat/ChatWidget';
 import '@/app/globals.css';
 
 const fraunces = Fraunces({
@@ -59,6 +60,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <NavBar locale={locale as Locale} />
           <main className="flex-1">{children}</main>
+          <ChatWidget />
 
           <footer className="bg-brand-dark">
             <div className="container mx-auto px-5 pt-12 pb-8">

@@ -39,6 +39,11 @@ function createSupabaseMiddlewareClient(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ── API routes ────────────────────────────────────────────────────────────
+  // Skip i18n rewriting and auth handling so route handlers (e.g. /api/chat)
+  // are reached untouched.
+  if (pathname.startsWith('/api')) return NextResponse.next();
+
   // ── Admin routes ──────────────────────────────────────────────────────────
   if (pathname.startsWith('/admin')) {
     if (pathname === '/admin/signin') return NextResponse.next();

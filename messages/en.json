@@ -1,4 +1,15 @@
 {
+  "chat": {
+    "title": "UniPath Assistant",
+    "open_label": "Open chat assistant",
+    "close_label": "Close chat",
+    "input_placeholder": "Ask about universities, scholarships, transfers…",
+    "send_label": "Send message",
+    "greeting": "Hi! I'm the UniPath Assistant. 👋",
+    "empty_hint": "Ask me about universities abroad, scholarships, MoE approval, or the tuition transfer process.",
+    "error": "Sorry, something went wrong. Please try again in a moment.",
+    "disclaimer": "AI-generated guidance — please verify important details. UniPath is a guide only and never handles money."
+  },
   "nav": {
     "home": "Home",
     "universities": "Universities",
