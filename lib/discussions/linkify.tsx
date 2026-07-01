@@ -1,0 +1,34 @@
+// Splits plain text into text and URL segments so the renderer can gate links
+// behind a trust warning. No HTML is produced — React escapes text segments.
+
+export type Segment = { type: 'text'; value: string } | { type: 'url'; value: string };
+
+// Matches http(s):// URLs and bare www. URLs. Trailing punctuation is trimmed below.
+const URL_RE = /((?:https?:\/\/|www\.)[^\s]+)/gi;
+
+export function linkify(text: string): Segment[] {
+  const segments: Segment[] = [];
+  let last = 0;
+  for (const match of text.matchAll(URL_RE)) {
+    const start = match.index!;
+    let url = match[0];
+    // Move trailing sentence punctuation back into the text segment.
+    const trailing = url.match(/[.,!?)\]}'"]+$/);
+    let tail = '';
+    if (trailing) {
+      tail = trailing[0];
+      url = url.slice(0, url.length - tail.length);
+    }
+    if (start > last) segments.push({ type: 'text', value: text.slice(last, start) });
+    segments.push({ type: 'url', value: url });
+    if (tail) segments.push({ type: 'text', value: tail });
+    last = start + match[0].length;
+  }
+  if (last < text.length) segments.push({ type: 'text', value: text.slice(last) });
+  return segments;
+}
+
+// Normalise a bare www. URL to an absolute href.
+export function toHref(url: string): string {
+  return url.startsWith('www.') ? `https://${url}` : url;
+}

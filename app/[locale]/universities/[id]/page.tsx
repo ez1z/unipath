@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getBySlug } from '@/lib/data/universities';
+import { getMessageCount } from '@/lib/data/discussions';
 import { formatTuition, formatTuitionRange, computeTuitionBreakdown, formatRange, formatTmt, formatOldManatRange, formatPercentRange } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
 import { ScholarshipBadge } from '@/components/university/ScholarshipBadge';
@@ -52,9 +54,11 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
     : [];
 
   const scholarships = await getByUniversity(university.id, university.country);
+  const discussionCount = await getMessageCount('university', university.id);
 
   const t = await getTranslations('university');
   const tCommon = await getTranslations('common');
+  const tDisc = await getTranslations('discussions');
 
   const bdMin = computeTuitionBreakdown(university.tuition_usd);
   const tuitionMax = university.tuition_usd_max;
@@ -128,6 +132,19 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
       />
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
+        <Link
+          href={`/${locale}/universities/${university.slug}/discussion`}
+          className="flex items-center justify-between gap-3 bg-card border border-border rounded-xl px-5 py-3.5 mb-8 hover:shadow-card transition-shadow group"
+        >
+          <span className="flex items-center gap-2.5">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span className="text-sm font-medium text-foreground">{tDisc('open_link', { count: discussionCount })}</span>
+          </span>
+          <span className="text-muted-foreground group-hover:text-foreground transition-colors" aria-hidden="true">→</span>
+        </Link>
+
         {/* Key stats */}
         <div className={`grid grid-cols-1 ${university.acceptance_rate_min != null ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-4 mb-8`}>
           <div className="bg-card border border-border border-t-4 border-t-primary rounded-xl p-5 shadow-card">

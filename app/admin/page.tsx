@@ -73,6 +73,15 @@ export default async function AdminPage() {
                 <p className="text-sm text-muted-foreground">{"Visitor trends, top universities, searches, and AI questions."}</p>
               </a>
               <a
+                href="/admin/discussions"
+                className="bg-card rounded-xl border border-border border-t-4 border-t-primary p-6 hover:shadow-card transition-shadow group"
+              >
+                <div className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+                  {"Reported Messages"}
+                </div>
+                <p className="text-sm text-muted-foreground">{"Review reported discussion messages and remove violations."}</p>
+              </a>
+              <a
                 href="/admin/admins"
                 className="bg-card rounded-xl border border-border border-t-4 border-t-amber-400 p-6 hover:shadow-card transition-shadow group"
               >
