@@ -32,3 +32,38 @@ export function linkify(text: string): Segment[] {
 export function toHref(url: string): string {
   return url.startsWith('www.') ? `https://${url}` : url;
 }
+
+export type MessageSegment =
+  | Segment
+  | { type: 'mention'; name: string; entityType: 'university' | 'scholarship'; slug: string };
+
+// Mention token embedded in the body text: @[Display Name](u:slug) or @[Name](s:slug).
+const MENTION_RE = /@\[([^\]]+)\]\((u|s):([a-z0-9-]+)\)/g;
+
+export function buildMentionToken(
+  entityType: 'university' | 'scholarship',
+  slug: string,
+  name: string,
+): string {
+  // Names can't contain ']' — strip to keep the token parseable.
+  return `@[${name.replace(/[[\]]/g, '')}](${entityType === 'university' ? 'u' : 's'}:${slug})`;
+}
+
+// Parse mentions first, then linkify the remaining text runs for URLs.
+export function parseMessage(text: string): MessageSegment[] {
+  const out: MessageSegment[] = [];
+  let last = 0;
+  for (const m of text.matchAll(MENTION_RE)) {
+    const start = m.index!;
+    if (start > last) out.push(...linkify(text.slice(last, start)));
+    out.push({
+      type: 'mention',
+      name: m[1],
+      entityType: m[2] === 'u' ? 'university' : 'scholarship',
+      slug: m[3],
+    });
+    last = start + m[0].length;
+  }
+  if (last < text.length) out.push(...linkify(text.slice(last)));
+  return out;
+}

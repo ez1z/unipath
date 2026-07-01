@@ -1,26 +1,38 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { linkify } from '@/lib/discussions/linkify';
+import { parseMessage } from '@/lib/discussions/linkify';
 import { useDiscussion } from './context';
 
 type Props = { body: string; isDeleted: boolean };
 
 export function MessageBody({ body, isDeleted }: Props) {
   const t = useTranslations('discussions');
-  const { openLink } = useDiscussion();
+  const { locale, openLink } = useDiscussion();
 
   if (isDeleted) {
     return <p className="text-sm italic text-muted-foreground">{t('removed')}</p>;
   }
 
-  const segments = linkify(body);
+  const segments = parseMessage(body);
   return (
     <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
-      {segments.map((seg, i) =>
-        seg.type === 'text' ? (
-          <span key={i}>{seg.value}</span>
-        ) : (
+      {segments.map((seg, i) => {
+        if (seg.type === 'text') return <span key={i}>{seg.value}</span>;
+        if (seg.type === 'mention') {
+          const base = seg.entityType === 'university' ? 'universities' : 'scholarships';
+          return (
+            <Link
+              key={i}
+              href={`/${locale}/${base}/${seg.slug}`}
+              className="font-medium text-primary hover:text-primary/80"
+            >
+              @{seg.name}
+            </Link>
+          );
+        }
+        return (
           <button
             key={i}
             type="button"
@@ -29,8 +41,8 @@ export function MessageBody({ body, isDeleted }: Props) {
           >
             {seg.value}
           </button>
-        ),
-      )}
+        );
+      })}
     </p>
   );
 }
