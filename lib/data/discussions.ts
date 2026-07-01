@@ -18,44 +18,45 @@ export function maskEmail(email: string): string {
 export type Viewer = {
   authed: boolean;
   userId: string | null;
-  nickname: string | null;
-  promptDismissed: boolean;
-  maskedEmail: string | null;
+  displayName: string | null;
 };
+
+/** Display label from the profile, falling back to a masked email. */
+export function resolveLabel(displayName: string | null, email: string | null): string {
+  const name = displayName?.trim();
+  if (name) return name;
+  return email ? maskEmail(email) : 'anonymous';
+}
 
 export async function getViewer(supabase: SupabaseClient): Promise<Viewer> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return { authed: false, userId: null, nickname: null, promptDismissed: false, maskedEmail: null };
+    return { authed: false, userId: null, displayName: null };
   }
   const { data: profile } = await supabase
     .from('profiles')
-    .select('nickname, nickname_prompt_dismissed')
+    .select('display_name')
     .eq('id', user.id)
     .maybeSingle();
   return {
     authed: true,
     userId: user.id,
-    nickname: (profile?.nickname as string | null) ?? null,
-    promptDismissed: !!profile?.nickname_prompt_dismissed,
-    maskedEmail: user.email ? maskEmail(user.email) : null,
+    displayName: resolveLabel((profile?.display_name as string | null) ?? null, user.email ?? null),
   };
 }
 
 export async function getThread(
   entityType: EntityType,
-  entityId: string,
+  entityId: string | null,
   viewerId: string | null,
   sort: 'top' | 'new',
 ) {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('discussion_messages')
-    .select('*')
-    .eq('entity_type', entityType)
-    .eq('entity_id', entityId);
+  let q = supabase.from('discussion_messages').select('*').eq('entity_type', entityType);
+  q = entityId === null ? q.is('entity_id', null) : q.eq('entity_id', entityId);
+  const { data, error } = await q;
   if (error) throw new Error(`Failed to fetch discussion: ${error.message}`);
   const rows = (data ?? []) as DiscussionMessageDbRow[];
 
@@ -72,14 +73,18 @@ export async function getThread(
   return buildTree(rows, votes, sort);
 }
 
-export async function getMessageCount(entityType: EntityType, entityId: string): Promise<number> {
+export async function getMessageCount(
+  entityType: EntityType,
+  entityId: string | null,
+): Promise<number> {
   const supabase = await createClient();
-  const { count } = await supabase
+  let q = supabase
     .from('discussion_messages')
     .select('id', { count: 'exact', head: true })
     .eq('entity_type', entityType)
-    .eq('entity_id', entityId)
     .eq('is_deleted', false);
+  q = entityId === null ? q.is('entity_id', null) : q.eq('entity_id', entityId);
+  const { count } = await q;
   return count ?? 0;
 }
 

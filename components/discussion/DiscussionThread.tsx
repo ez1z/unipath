@@ -1,22 +1,19 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Locale } from '@/lib/constants';
 import type { DiscussionMessage, EntityType } from '@/lib/data/discussion-types';
 import { toHref } from '@/lib/discussions/linkify';
-import { setNicknameAction, dismissNicknamePromptAction } from '@/app/[locale]/discussions/actions';
 import { DiscussionProvider, type ClientViewer } from './context';
 import { PostBox } from './PostBox';
 import { MessageItem } from './MessageItem';
-import { NicknameDialog } from './NicknameDialog';
 import { LinkWarningDialog } from './LinkWarningDialog';
 
 type Props = {
   locale: Locale;
   entityType: EntityType;
-  entityId: string;
+  entityId: string | null;
   messages: DiscussionMessage[];
   viewer: ClientViewer;
   isSuperuser: boolean;
@@ -37,37 +34,10 @@ function sortTree(list: DiscussionMessage[], sort: Sort): DiscussionMessage[] {
 
 export function DiscussionThread({ locale, entityType, entityId, messages, viewer, isSuperuser }: Props) {
   const t = useTranslations('discussions');
-  const router = useRouter();
   const [sort, setSort] = useState<Sort>('top');
   const [linkUrl, setLinkUrl] = useState<string | null>(null);
-  const [nickError, setNickError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const [showPrompt, setShowPrompt] = useState(
-    viewer.authed && !viewer.nickname && !viewer.promptDismissed,
-  );
 
   const sorted = useMemo(() => sortTree(messages, sort), [messages, sort]);
-
-  function savePromptNickname(nickname: string) {
-    setNickError(null);
-    startTransition(async () => {
-      const r = await setNicknameAction(locale, nickname);
-      if (r.success) {
-        setShowPrompt(false);
-        router.refresh();
-      } else {
-        setNickError(r.error);
-      }
-    });
-  }
-
-  function skipPrompt() {
-    startTransition(async () => {
-      await dismissNicknamePromptAction();
-      setShowPrompt(false);
-      router.refresh();
-    });
-  }
 
   return (
     <DiscussionProvider
@@ -112,17 +82,6 @@ export function DiscussionThread({ locale, entityType, entityId, messages, viewe
           </div>
         )}
       </div>
-
-      {showPrompt && (
-        <NicknameDialog
-          mode="prompt"
-          busy={isPending}
-          error={nickError}
-          onConfirm={savePromptNickname}
-          onSecondary={skipPrompt}
-          onClose={skipPrompt}
-        />
-      )}
 
       {linkUrl && (
         <LinkWarningDialog

@@ -1,4 +1,4 @@
-export type EntityType = 'university' | 'scholarship';
+export type EntityType = 'university' | 'scholarship' | 'general';
 
 export type DiscussionMessageDbRow = {
   id: string;

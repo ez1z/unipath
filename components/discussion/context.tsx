@@ -6,15 +6,13 @@ import type { EntityType } from '@/lib/data/discussion-types';
 
 export type ClientViewer = {
   authed: boolean;
-  nickname: string | null;
-  promptDismissed: boolean;
-  maskedEmail: string | null;
+  displayName: string | null;
 };
 
 export type DiscussionContextValue = {
   locale: Locale;
   entityType: EntityType;
-  entityId: string;
+  entityId: string | null;
   viewer: ClientViewer;
   isSuperuser: boolean;
   openLink: (url: string) => void;

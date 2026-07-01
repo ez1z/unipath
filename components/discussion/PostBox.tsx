@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { postMessageAction } from '@/app/[locale]/discussions/actions';
 import { useDiscussion } from './context';
-import { NicknameDialog } from './NicknameDialog';
 
 type Props = {
   parentId?: string | null;
@@ -20,7 +19,6 @@ export function PostBox({ parentId = null, onDone, autoFocus = false }: Props) {
   const { locale, entityType, entityId, viewer } = useDiscussion();
   const [body, setBody] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [showNickname, setShowNickname] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   if (!viewer.authed) {
@@ -33,7 +31,8 @@ export function PostBox({ parentId = null, onDone, autoFocus = false }: Props) {
     );
   }
 
-  function submit(setNickname?: string) {
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     const trimmed = body.trim();
     if (!trimmed) return;
     setError(null);
@@ -43,29 +42,15 @@ export function PostBox({ parentId = null, onDone, autoFocus = false }: Props) {
         entityId,
         parentId,
         body: trimmed,
-        setNickname,
       });
       if (r.success) {
         setBody('');
-        setShowNickname(false);
         onDone?.();
         router.refresh();
       } else {
         setError(r.error);
-        setShowNickname(false);
       }
     });
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!body.trim()) return;
-    // Gate: no nickname yet and prompt not dismissed → ask before posting.
-    if (!viewer.nickname && !viewer.promptDismissed) {
-      setShowNickname(true);
-      return;
-    }
-    submit();
   }
 
   return (
@@ -82,9 +67,7 @@ export function PostBox({ parentId = null, onDone, autoFocus = false }: Props) {
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs text-muted-foreground">
-          {viewer.nickname ? `@${viewer.nickname}` : viewer.maskedEmail}
-        </span>
+        <span className="text-xs text-muted-foreground">{viewer.displayName}</span>
         <div className="flex gap-2">
           {onDone && (
             <button
@@ -104,17 +87,6 @@ export function PostBox({ parentId = null, onDone, autoFocus = false }: Props) {
           </button>
         </div>
       </div>
-
-      {showNickname && (
-        <NicknameDialog
-          mode="post"
-          busy={isPending}
-          error={error}
-          onConfirm={(nick) => submit(nick)}
-          onSecondary={() => submit()}
-          onClose={() => setShowNickname(false)}
-        />
-      )}
     </form>
   );
 }

@@ -7,7 +7,7 @@ import { DiscussionThread } from './DiscussionThread';
 type Props = {
   locale: Locale;
   entityType: EntityType;
-  entityId: string;
+  entityId: string | null;
 };
 
 // Server component: loads viewer + thread, then hands off to the client thread.
@@ -35,9 +35,7 @@ export async function DiscussionSection({ locale, entityType, entityId }: Props)
       messages={messages}
       viewer={{
         authed: viewer.authed,
-        nickname: viewer.nickname,
-        promptDismissed: viewer.promptDismissed,
-        maskedEmail: viewer.maskedEmail,
+        displayName: viewer.displayName,
       }}
       isSuperuser={isSuperuser}
     />

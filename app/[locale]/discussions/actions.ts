@@ -5,22 +5,25 @@ import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { logAction } from '@/lib/admin/auth';
-import { maskEmail } from '@/lib/data/discussions';
+import { resolveLabel } from '@/lib/data/discussions';
 
 export type ActionResult =
   | { success: true }
   | { success: false; error: string };
 
-const EntityType = z.enum(['university', 'scholarship']);
-const NicknameSchema = z.string().trim().min(2).max(30);
+const EntityType = z.enum(['university', 'scholarship', 'general']);
 
-const PostSchema = z.object({
-  entityType: EntityType,
-  entityId: z.string().uuid(),
-  parentId: z.string().uuid().nullable().optional(),
-  body: z.string().trim().min(1).max(4000),
-  setNickname: NicknameSchema.optional(),
-});
+const PostSchema = z
+  .object({
+    entityType: EntityType,
+    entityId: z.string().uuid().nullable(),
+    parentId: z.string().uuid().nullable().optional(),
+    body: z.string().trim().min(1).max(4000),
+  })
+  .refine(
+    (d) => (d.entityType === 'general' ? d.entityId === null : d.entityId !== null),
+    { message: 'entityId must be null only for general discussions', path: ['entityId'] },
+  );
 
 const MAX_POSTS_PER_WINDOW = 5;
 const WINDOW_MS = 30_000;
@@ -32,7 +35,7 @@ export async function postMessageAction(
   const t = await getTranslations({ locale, namespace: 'discussions' });
   const parsed = PostSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: t('error_invalid') };
-  const { entityType, entityId, parentId, body, setNickname } = parsed.data;
+  const { entityType, entityId, parentId, body } = parsed.data;
 
   const supabase = await createClient();
   const {
@@ -51,28 +54,13 @@ export async function postMessageAction(
     return { success: false, error: t('error_rate') };
   }
 
-  // Resolve the display label. setNickname wins; else existing nickname; else masked email.
+  // Snapshot the profile display name as the author label (join-free at read time).
   const { data: profile } = await supabase
     .from('profiles')
-    .select('nickname')
+    .select('display_name')
     .eq('id', user.id)
     .maybeSingle();
-
-  let label: string;
-  if (setNickname) {
-    const { error: upErr } = await supabase
-      .from('profiles')
-      .update({ nickname: setNickname, nickname_prompt_dismissed: true })
-      .eq('id', user.id);
-    if (upErr) return { success: false, error: t('error_save') };
-    label = `@${setNickname}`;
-  } else if (profile?.nickname) {
-    label = `@${profile.nickname}`;
-  } else {
-    // Posting under email — stop nagging with the nickname prompt.
-    await supabase.from('profiles').update({ nickname_prompt_dismissed: true }).eq('id', user.id);
-    label = user.email ? maskEmail(user.email) : 'anonymous';
-  }
+  const label = resolveLabel((profile?.display_name as string | null) ?? null, user.email ?? null);
 
   const { error } = await supabase.from('discussion_messages').insert({
     entity_type: entityType,
@@ -140,35 +128,6 @@ export async function reportMessageAction(
     { message_id: parsed.data.messageId, reporter_id: user.id, reason: parsed.data.reason ?? null },
     { onConflict: 'message_id,reporter_id' },
   );
-  return { success: true };
-}
-
-export async function setNicknameAction(locale: string, nickname: string): Promise<ActionResult> {
-  const t = await getTranslations({ locale, namespace: 'discussions' });
-  const parsed = NicknameSchema.safeParse(nickname);
-  if (!parsed.success) return { success: false, error: t('error_nickname') };
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: t('error_signin') };
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({ nickname: parsed.data, nickname_prompt_dismissed: true })
-    .eq('id', user.id);
-  if (error) return { success: false, error: t('error_save') };
-  return { success: true };
-}
-
-export async function dismissNicknamePromptAction(): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'unauthenticated' };
-  await supabase.from('profiles').update({ nickname_prompt_dismissed: true }).eq('id', user.id);
   return { success: true };
 }
 
