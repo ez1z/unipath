@@ -1,10 +1,24 @@
+import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FaqAccordion } from "@/components/support/FaqAccordion";
+import { canonicalFor, localeAlternates, jsonLdScript } from "@/lib/seo";
 import type { Locale } from "@/lib/constants";
 
 type Props = { params: { locale: Locale } };
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return {
+    title: t('support_title'),
+    description: t('support_description'),
+    alternates: {
+      canonical: canonicalFor(locale, '/support'),
+      languages: localeAlternates('/support'),
+    },
+  };
+}
 
 export default function SupportPage({ params: { locale } }: Props) {
   setRequestLocale(locale);
@@ -21,8 +35,22 @@ export default function SupportPage({ params: { locale } }: Props) {
     { question: t("faq_contact_title"), answer: t("faq_contact_body") },
   ];
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(faqJsonLd) }}
+      />
       <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">

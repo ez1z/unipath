@@ -9,6 +9,7 @@ import type { Locale } from '@/lib/constants';
 import { NavBar } from '@/components/NavBar';
 import { ChatWidget } from '@/components/chat/ChatWidget';
 import { AnalyticsTracker } from '@/components/analytics/AnalyticsTracker';
+import { getSiteUrl, localeAlternates, organizationJsonLd, websiteJsonLd, jsonLdScript } from '@/lib/seo';
 import '@/app/globals.css';
 
 const fraunces = Fraunces({
@@ -25,15 +26,46 @@ const dmSans = DM_Sans({
   display: 'swap',
 });
 
-export const metadata: Metadata = {
-  title: 'UniPath — University Search for Turkmen Students',
-  description: 'Find MoE-approved universities abroad, compare options, and learn about official tuition transfer.',
-};
-
 type Props = {
   children: React.ReactNode;
   params: { locale: string };
 };
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  if (!SUPPORTED_LOCALES.includes(locale as Locale)) return {};
+  const t = await getTranslations({ locale: locale as Locale, namespace: 'meta' });
+  const siteUrl = getSiteUrl();
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: t('site_title'),
+      template: `%s | UniPath`,
+    },
+    description: t('site_description'),
+    alternates: {
+      canonical: `${siteUrl}/${locale}`,
+      languages: localeAlternates(''),
+    },
+    openGraph: {
+      siteName: 'UniPath',
+      locale,
+      type: 'website',
+      url: `${siteUrl}/${locale}`,
+      title: t('site_title'),
+      description: t('site_description'),
+    },
+    twitter: {
+      card: 'summary',
+      title: t('site_title'),
+      description: t('site_description'),
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
@@ -58,6 +90,14 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} className={`${fraunces.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-background font-sans flex flex-col antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd(locale as Locale)) }}
+        />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <NavBar locale={locale as Locale} />
           <main className="flex-1">{children}</main>

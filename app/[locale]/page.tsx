@@ -1,11 +1,26 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { getAll } from "@/lib/data/universities";
+import { canonicalFor, localeAlternates } from "@/lib/seo";
 import type { Locale } from "@/lib/constants";
 
 export const dynamic = 'force-dynamic';
 
 type Props = { params: { locale: Locale } };
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return {
+    title: t('home_title'),
+    description: t('home_description'),
+    alternates: {
+      canonical: canonicalFor(locale, ''),
+      languages: localeAlternates(''),
+    },
+    openGraph: { title: t('home_title'), description: t('home_description') },
+  };
+}
 
 export default async function HomePage({ params: { locale } }: Props) {
   setRequestLocale(locale);

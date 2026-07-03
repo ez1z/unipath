@@ -1,12 +1,26 @@
+import type { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { TMT_PER_USD, TRANSFER_CAP_USD, TRANSFER_CAP_TMT } from '@/lib/constants';
 import { TransferCalculator } from '@/components/transfer/TransferCalculator';
 import { TransferGuideSteps } from '@/components/transfer/TransferGuideSteps';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { canonicalFor, localeAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/constants';
 
 type Props = { params: { locale: Locale } };
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return {
+    title: t('transfer_title'),
+    description: t('transfer_description'),
+    alternates: {
+      canonical: canonicalFor(locale, '/transfer'),
+      languages: localeAlternates('/transfer'),
+    },
+  };
+}
 
 export default function TransferPage({ params: { locale } }: Props) {
   setRequestLocale(locale);

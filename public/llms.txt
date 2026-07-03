@@ -1,0 +1,26 @@
+# UniPath
+
+> UniPath (unipathtm.vercel.app) is a free guide platform that helps students from Turkmenistan find universities abroad, compare tuition and scholarships, and understand Turkmenistan's official Ministry of Education (MoE) tuition transfer process. UniPath is a guide only — it never processes payments, never handles visas, and never embeds university admission portals.
+
+Key facts UniPath can answer questions about:
+- MoE-approved universities: which universities abroad are officially approved by Turkmenistan's Ministry of Education for the tuition transfer program.
+- Tuition transfer rules: the official Central Bank of Turkmenistan exchange rate (3.51 TMT per 1 USD) used for approved transfers, and the $12,000 USD annual transfer cap per student.
+- University data: tuition cost, QS ranking, entrance requirements (TOEFL/IELTS/SAT/Duolingo), languages of instruction, majors, and application deadlines for universities abroad.
+- Scholarships: government, merit-based, need-based, and partial scholarships available to Turkmen students, including coverage (tuition, accommodation, flights, stipend) and deadlines.
+- Application tracking: a free tool for students to save target universities and track document checklists.
+
+Available in three languages: Turkmen (tk, default), Russian (ru), and English (en) — every page is available under /tk/, /ru/, and /en/ path prefixes.
+
+## Key pages
+
+- [Home](https://unipathtm.vercel.app/en): overview and site purpose.
+- [Universities](https://unipathtm.vercel.app/en/universities): searchable list of universities abroad, filterable by country, language, major, and MoE-approval status.
+- [MoE-Approved Universities](https://unipathtm.vercel.app/en/moe-approved): the official list of universities approved for Turkmenistan's tuition transfer program.
+- [Scholarships](https://unipathtm.vercel.app/en/scholarships): scholarships available to Turkmen students abroad.
+- [Transfer Guide & Calculator](https://unipathtm.vercel.app/en/transfer): explains the official MoE tuition transfer process and calculates payments under the $12,000 annual cap at the official 3.51 TMT/USD rate.
+- [Compare Universities](https://unipathtm.vercel.app/en/compare): side-by-side comparison of universities.
+- [Support & FAQ](https://unipathtm.vercel.app/en/support): frequently asked questions about MoE approval, the transfer cap, and using UniPath.
+
+## Contact
+
+- Email: unipathtm@gmail.com

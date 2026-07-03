@@ -1,14 +1,28 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAll, getUniqueCountries, getUniqueLanguages, getUniqueMajors } from '@/lib/data/universities';
 import { getScholarshipEligibleUniversityIds } from '@/lib/data/scholarships';
 import { UniversityListClient } from '@/components/university/UniversityListClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { createClient } from '@/lib/supabase/server';
+import { canonicalFor, localeAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
 type Props = { params: { locale: Locale } };
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return {
+    title: t('universities_title'),
+    description: t('universities_description'),
+    alternates: {
+      canonical: canonicalFor(locale, '/universities'),
+      languages: localeAlternates('/universities'),
+    },
+  };
+}
 
 export default async function UniversitiesPage({ params: { locale } }: Props) {
   setRequestLocale(locale);

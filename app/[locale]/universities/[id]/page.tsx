@@ -1,7 +1,9 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getBySlug } from '@/lib/data/universities';
+import { canonicalFor, localeAlternates, universityJsonLd, breadcrumbJsonLd, jsonLdScript } from '@/lib/seo';
 import { getMessageCount } from '@/lib/data/discussions';
 import { formatTuition, formatTuitionRange, computeTuitionBreakdown, formatRange, formatTmt, formatOldManatRange, formatPercentRange } from '@/lib/format';
 import { MoeBadge } from '@/components/university/MoeBadge';
@@ -25,6 +27,25 @@ type Props = {
 };
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params: { locale, id } }: Props): Promise<Metadata> {
+  const university = await getBySlug(id);
+  if (!university) return {};
+  const name = university.name[locale] ?? university.name.en;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  const title = `${name} — ${university.city}, ${university.country}`;
+  const description = t('university_description', { name, city: university.city, country: university.country });
+  const path = `/universities/${university.slug}`;
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalFor(locale, path),
+      languages: localeAlternates(path),
+    },
+    openGraph: { title, description },
+  };
+}
 
 export default async function UniversityDetailPage({ params: { locale, id }, searchParams }: Props) {
   setRequestLocale(locale);
@@ -59,6 +80,7 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
   const t = await getTranslations('university');
   const tCommon = await getTranslations('common');
   const tDisc = await getTranslations('discussions');
+  const tNav = await getTranslations('nav');
 
   const bdMin = computeTuitionBreakdown(university.tuition_usd);
   const tuitionMax = university.tuition_usd_max;
@@ -108,8 +130,22 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
   }
   const name = university.name[locale] ?? university.name.en;
 
+  const breadcrumb = breadcrumbJsonLd([
+    { name: tNav('home'), url: canonicalFor(locale, '') },
+    { name: tNav('universities'), url: canonicalFor(locale, '/universities') },
+    { name, url: canonicalFor(locale, `/universities/${university.slug}`) },
+  ]);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(universityJsonLd(university, locale)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumb) }}
+      />
       <EntityViewTracker
         type="university"
         id={university.id}

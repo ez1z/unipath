@@ -1,7 +1,9 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 import { getBySlug } from '@/lib/data/scholarships';
+import { canonicalFor, localeAlternates, breadcrumbJsonLd, jsonLdScript } from '@/lib/seo';
 import { EntranceRequirements } from '@/components/university/EntranceRequirements';
 import { TestRequirementsSummary } from '@/components/university/TestRequirementsSummary';
 import { getById as getUniversityById } from '@/lib/data/universities';
@@ -52,6 +54,25 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+export async function generateMetadata({ params: { locale, id } }: Props): Promise<Metadata> {
+  const scholarship = await getBySlug(id);
+  if (!scholarship) return {};
+  const name = scholarship.name[locale] ?? scholarship.name.en;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  const title = name;
+  const description = t('scholarship_description', { name });
+  const path = `/scholarships/${scholarship.slug}`;
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalFor(locale, path),
+      languages: localeAlternates(path),
+    },
+    openGraph: { title, description },
+  };
+}
+
 export default async function ScholarshipDetailPage({ params: { locale, id } }: Props) {
   setRequestLocale(locale);
   const scholarship = await getBySlug(id);
@@ -59,6 +80,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
 
   const t = await getTranslations('scholarships');
   const tCommon = await getTranslations('common');
+  const tNav = await getTranslations('nav');
   const name = scholarship.name[locale] ?? scholarship.name.en;
   const description = scholarship.description[locale] ?? scholarship.description.en;
 
@@ -105,8 +127,18 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
     left: (n: number) => t('deadline_days_left', { days: n }),
   };
 
+  const breadcrumb = breadcrumbJsonLd([
+    { name: tNav('home'), url: canonicalFor(locale, '') },
+    { name: tNav('scholarships'), url: canonicalFor(locale, '/scholarships') },
+    { name, url: canonicalFor(locale, `/scholarships/${scholarship.slug}`) },
+  ]);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumb) }}
+      />
       <EntityViewTracker
         type="scholarship"
         id={scholarship.id}

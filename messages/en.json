@@ -1,4 +1,24 @@
 {
+  "meta": {
+    "site_title": "UniPath — University Search for Turkmen Students",
+    "site_description": "Free guide for Turkmen students applying abroad. Browse MoE-approved universities, compare tuition, find scholarships, and calculate your official tuition transfer under the $12,000 cap.",
+    "home_title": "UniPath — Find MoE-Approved Universities Abroad for Turkmen Students",
+    "home_description": "Search 250+ universities abroad, check MoE (Ministry of Education) approval status, compare tuition in USD and TMT, and learn the official tuition transfer process for Turkmen students.",
+    "universities_title": "Universities Abroad for Turkmen Students",
+    "universities_description": "Browse and filter universities abroad by country, language, major, and MoE-approval status. See tuition, rankings, and scholarships in one place.",
+    "university_description": "{name} in {city}, {country} — tuition, MoE approval status, entrance requirements, and official tuition transfer breakdown for Turkmen students.",
+    "scholarships_title": "Scholarships for Turkmen Students Abroad",
+    "scholarships_description": "Find government, merit-based, and need-based scholarships covering tuition, accommodation, flights, and stipends for Turkmen students studying abroad.",
+    "scholarship_description": "{name} — scholarship details, coverage, eligibility requirements, and how to apply.",
+    "compare_title": "Compare Universities Side by Side",
+    "compare_description": "Compare tuition, rankings, MoE approval, and requirements across universities abroad to find the best fit.",
+    "transfer_title": "MoE Tuition Transfer Guide & Calculator",
+    "transfer_description": "Understand Turkmenistan's official tuition transfer process. Calculate your payment at the Central Bank rate (3.51 TMT/USD) under the $12,000 annual cap.",
+    "support_title": "Support & FAQ",
+    "support_description": "Answers to common questions about MoE-approved universities, tuition transfers, and using UniPath.",
+    "moe_approved_title": "MoE-Approved Universities",
+    "moe_approved_description": "Universities officially approved by Turkmenistan's Ministry of Education for the tuition transfer program."
+  },
   "chat": {
     "title": "UniPath Assistant",
     "open_label": "Open chat assistant",

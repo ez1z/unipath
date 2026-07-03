@@ -1,9 +1,11 @@
+import type { Metadata } from 'next';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { MoeUniversityList, type MoeEntry, type DbUniversity } from '@/components/moe/MoeUniversityList';
 import { createClient } from '@/lib/supabase/server';
+import { canonicalFor, localeAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
@@ -24,6 +26,18 @@ function normalize(s: string) {
 }
 
 type Props = { params: { locale: Locale } };
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return {
+    title: t('moe_approved_title'),
+    description: t('moe_approved_description'),
+    alternates: {
+      canonical: canonicalFor(locale, '/moe-approved'),
+      languages: localeAlternates('/moe-approved'),
+    },
+  };
+}
 
 export default async function MoeApprovedPage({ params: { locale } }: Props) {
   setRequestLocale(locale);

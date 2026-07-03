@@ -1,4 +1,24 @@
 {
+  "meta": {
+    "site_title": "UniPath — türkmen talyplary üçin uniwersitet gözleg platformasy",
+    "site_description": "Daşary ýurtda okamak isleýän türkmen talyplary üçin mugt gollanma. Bilim ministrligi tassyklan uniwersitetler, töleg deňeşdirmesi, stipendiýalar we $12,000 çäginde resmi töleg geçiriş kalkulýatory.",
+    "home_title": "UniPath — türkmen talyplary üçin Bilim ministrligi tassyklan uniwersitetler",
+    "home_description": "Daşary ýurtdaky 250-den gowrak uniwersiteti gözläň, Bilim ministrligi tassyklamasyny barlaň, tölegleri USD we TMT-de deňeşdiriň hem-de türkmen talyplary üçin resmi töleg geçiriş prosesini öwreniň.",
+    "universities_title": "Türkmen talyplary üçin daşary ýurt uniwersitetleri",
+    "universities_description": "Uniwersitetleri ýurt, dil, hünär we Bilim ministrligi tassyklamasy boýunça süzüň. Töleg, reýting we stipendiýalar bir ýerde.",
+    "university_description": "{name} — {city}, {country} şäherinde. Töleg, Bilim ministrligi tassyklamasy, kabul ediş talaplary we türkmen talyplary üçin resmi töleg geçiriş hasaplamasy.",
+    "scholarships_title": "Türkmen talyplary üçin daşary ýurt stipendiýalary",
+    "scholarships_description": "Töleg, ýaşaýyş, uçar we stipendiýa tölegini öz içine alýan döwlet, üstünlik we mätäçlige esaslanan stipendiýalary tapyň.",
+    "scholarship_description": "{name} — stipendiýanyň şertleri, öz içine alýan zatlary, talaplary we ýüz tutmak tertibi.",
+    "compare_title": "Uniwersitetleri deňeşdiriň",
+    "compare_description": "Daşary ýurt uniwersitetleriniň tölegini, reýtingini, Bilim ministrligi tassyklamasyny we talaplaryny deňeşdiriň.",
+    "transfer_title": "Bilim ministrliginiň töleg geçiriş gollanmasy we kalkulýatory",
+    "transfer_description": "Türkmenistanyň resmi töleg geçiriş prosesini öwreniň. Merkezi Bankyň resmi nyrhy (3.51 TMT/USD) boýunça $12,000 ýyllyk çäkde hasaplaň.",
+    "support_title": "Goldaw we ýygy-ýygydan soralýan soraglar",
+    "support_description": "Bilim ministrligi tassyklan uniwersitetler, töleg geçirişi we UniPath-dan peýdalanmak barada soraglaryň jogaby.",
+    "moe_approved_title": "Bilim ministrligi tassyklan uniwersitetler",
+    "moe_approved_description": "Türkmenistanyň Bilim ministrligi tarapyndan töleg geçiriş programmasy üçin resmi taýdan tassyklanan uniwersitetler."
+  },
   "chat": {
     "title": "UniPath kömekçisi",
     "open_label": "Söhbetdeş kömekçini aç",
