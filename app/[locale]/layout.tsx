@@ -64,6 +64,9 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
       index: true,
       follow: true,
     },
+    verification: {
+      google: 'P_frIdnsB-yRF5WmUH-VzBecXxBK7fvGeVemESTR8as',
+    },
   };
 }
 
