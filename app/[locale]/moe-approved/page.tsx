@@ -21,8 +21,60 @@ function loadMoeList(): RawMoeEntry[] {
   }
 }
 
+// name variants that refer to the same institution but are spelled differently
+// across DB records and the MoE source rankings (kept in sync with scripts/parse-moe-list.mjs)
+const NAME_ALIASES = new Map([
+  ['agh university of krakow', 'agh university of science and technology'],
+  ['applied science private university jordan', 'applied science private university'],
+  ['ben gurion university', 'ben gurion university of the negev'],
+  ['birla institute of technology and science', 'birla institute of technology and science pilani'],
+  ['central queensland university', 'central queensland university australia cquniversity'],
+  ['china medical university', 'china medical university taiwan'],
+  ['czech university of life sciences in prague', 'czech university of life sciences prague czu'],
+  ['ecole normale superieure lyon', 'ecole normale superieure de lyon'],
+  ['friedrich schiller university jena', 'friedrich schiller university of jena'],
+  ['heinrich heine university duesseldorf', 'heinrich heine university dusseldorf'],
+  ['jamia millia islamia', 'jamia millia islamia new delhi'],
+  ['johannes kepler university linz', 'johannes kepler university of linz'],
+  ['manipal academy of higher education', 'manipal academy of higher education manipal university mahe'],
+  ['montana state university', 'montana state university bozeman'],
+  ['moscow institute of physics and technology mipt', 'moscow institute of physics and technology state university'],
+  ['nanyang technological university', 'nanyang technological university singapore'],
+  ['national university of science and technology', 'national university of science and technology misis'],
+  ['nicolaus copernicus university', 'nicolaus copernicus university in torun'],
+  ['north carolina state university', 'north carolina state university at raleigh'],
+  ['ohio state university main campus', 'ohio state university columbus'],
+  ['scuola normale superiore pisa', 'scuola normale superiore di pisa'],
+  ['tashkent institute of irrigation and agricultural mechanisation', 'tashkent institute of irrigation and agricultural mechanization engineers national research university tiiame nru'],
+  ['trinity college dublin', 'trinity college dublin the university of dublin'],
+  ['universidade estadual paulista julio de mesquita filho unesp', 'universidade estadual paulista unesp'],
+  ['university at buffalo', 'university at buffalo suny'],
+  ['university at buffalo the state university of new york', 'university at buffalo suny'],
+  ['university of bari', 'university of bari aldo moro'],
+  ['university of delhi', 'university of delhi delhi'],
+  ['university of galway', 'university of galway ollscoil na gaillimhe'],
+  ['university of illinois chicago', 'university of illinois at chicago'],
+  ['university of illinois urbana champaign', 'university of illinois at urbana champaign'],
+  ['university of michigan', 'university of michigan ann arbor'],
+  ['university of minnesota', 'university of minnesota twin cities'],
+  ['university of new brunswick', 'university of new brunswick unb'],
+  ['university of north carolina chapel hill', 'university of north carolina at chapel hill'],
+  ['university of oklahoma', 'university of oklahoma norman'],
+  ['university of rome ii tor vergata', 'university of rome tor vergata'],
+  ['university of santiago compostela', 'university of santiago de compostela'],
+  ['vellore institute of technology', 'vellore institute of technology vit vellore india'],
+]);
+
 function normalize(s: string) {
-  return s.toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+  const key = s
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/\(.*?\)/g, '')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return NAME_ALIASES.get(key) ?? key;
 }
 
 type Props = { params: { locale: Locale } };
