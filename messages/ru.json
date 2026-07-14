@@ -148,7 +148,12 @@
     "filter_deadline": "Дедлайн",
     "filter_deadline_all": "Любой дедлайн",
     "filter_deadline_upcoming": "Предстоящие",
-    "filter_deadline_passed": "Прошедшие"
+    "filter_deadline_passed": "Прошедшие",
+    "filters_button": "Фильтры",
+    "filters_title": "Фильтры",
+    "filters_close": "Закрыть фильтры",
+    "filters_clear_all": "Сбросить всё",
+    "filters_show_results": "Показать {count} результатов"
   },
   "university": {
     "moe_badge": "Одобрено МОН",
@@ -341,7 +346,12 @@
     "filter_deadline": "Дедлайн",
     "filter_deadline_all": "Любой дедлайн",
     "filter_deadline_upcoming": "Предстоящие",
-    "filter_deadline_passed": "Прошедшие"
+    "filter_deadline_passed": "Прошедшие",
+    "filters_button": "Фильтры",
+    "filters_title": "Фильтры",
+    "filters_close": "Закрыть фильтры",
+    "filters_clear_all": "Сбросить всё",
+    "filters_show_results": "Показать {count} результатов"
   },
   "checklist": {
     "next_deadline": "Следующий дедлайн",

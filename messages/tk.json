@@ -148,7 +148,12 @@
     "filter_deadline": "Möhlet",
     "filter_deadline_all": "Islendik möhlet",
     "filter_deadline_upcoming": "Gelejekki",
-    "filter_deadline_passed": "Geçen"
+    "filter_deadline_passed": "Geçen",
+    "filters_button": "Filtrler",
+    "filters_title": "Filtrler",
+    "filters_close": "Filtrleri ýap",
+    "filters_clear_all": "Ählisini arassala",
+    "filters_show_results": "{count} netije görkez"
   },
   "university": {
     "moe_badge": "Oblono Tassyklady",
@@ -341,7 +346,12 @@
     "filter_deadline": "Möhlet",
     "filter_deadline_all": "Islendik möhlet",
     "filter_deadline_upcoming": "Gelejekki",
-    "filter_deadline_passed": "Geçen"
+    "filter_deadline_passed": "Geçen",
+    "filters_button": "Filtrler",
+    "filters_title": "Filtrler",
+    "filters_close": "Filtrleri ýap",
+    "filters_clear_all": "Ählisini arassala",
+    "filters_show_results": "{count} netije görkez"
   },
   "checklist": {
     "next_deadline": "Indiki möhlet",

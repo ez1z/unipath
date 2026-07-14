@@ -148,7 +148,12 @@
     "filter_deadline": "Deadline",
     "filter_deadline_all": "Any deadline",
     "filter_deadline_upcoming": "Upcoming",
-    "filter_deadline_passed": "Passed"
+    "filter_deadline_passed": "Passed",
+    "filters_button": "Filters",
+    "filters_title": "Filters",
+    "filters_close": "Close filters",
+    "filters_clear_all": "Clear all",
+    "filters_show_results": "Show {count} results"
   },
   "university": {
     "moe_badge": "MoE Approved",
@@ -341,7 +346,12 @@
     "filter_deadline": "Deadline",
     "filter_deadline_all": "Any deadline",
     "filter_deadline_upcoming": "Upcoming",
-    "filter_deadline_passed": "Passed"
+    "filter_deadline_passed": "Passed",
+    "filters_button": "Filters",
+    "filters_title": "Filters",
+    "filters_close": "Close filters",
+    "filters_clear_all": "Clear all",
+    "filters_show_results": "Show {count} results"
   },
   "checklist": {
     "next_deadline": "Next deadline",

@@ -10,6 +10,8 @@ import { getNextDeadline } from '@/lib/types/semester';
 import { ScholarshipCard } from './ScholarshipCard';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
+import { FilterSheet } from '@/components/ui/FilterSheet';
+import { SlidersHorizontal } from 'lucide-react';
 import type { Locale } from '@/lib/constants';
 
 type UserPrefs = { countries: string[] };
@@ -46,6 +48,7 @@ export function ScholarshipListClient({
   const [sortBy, setSortBy] = useState<ScholarshipSortBy>('name');
   const [prefsActive, setPrefsActive] = useState(false);
   const [scoresActive, setScoresActive] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   // Log search terms (debounced) for the admin analytics dashboard.
   const lastLoggedQuery = useRef('');
@@ -150,6 +153,13 @@ export function ScholarshipListClient({
     deadlineStatus || sortBy !== 'name';
   const hasActivePersonalization = prefsActive || scoresActive;
 
+  // Fields that live inside the filter sheet (excludes search + sort, which
+  // stay on the visible bar) — drives the badge count on the filter icon.
+  const sheetFilterCount =
+    [country, type, coverage, minAmount, deadlineStatus].filter(Boolean).length +
+    (hasAmount ? 1 : 0) +
+    (prefsActive ? 1 : 0) + (scoresActive ? 1 : 0);
+
   const countryOptions = [
     { value: '', label: t('filter_all_countries'), muted: true },
     ...countries.map((c) => ({ value: c, label: c })),
@@ -203,109 +213,131 @@ export function ScholarshipListClient({
   return (
     <div>
       {/* Filter bar */}
-      <div className="bg-card border border-border rounded-xl p-4 mb-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
-          {/* Search */}
-          <div className="relative flex-1 min-w-0 sm:min-w-48">
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('search_placeholder')}
-              aria-label={t('search_placeholder')}
-              className="w-full pl-9 pr-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
-            />
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-          </div>
+      <div className="flex gap-3 mb-6">
+        {/* Search */}
+        <div className="relative flex-1 min-w-0">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('search_placeholder')}
+            aria-label={t('search_placeholder')}
+            className="w-full pl-9 pr-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+          />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+        </div>
 
-          <Select
-            value={country}
-            onChange={setCountry}
-            options={countryOptions}
-            aria-label={t('filter_country')}
-            className="sm:w-44"
-          />
-          <Select
-            value={type}
-            onChange={setType}
-            options={typeOptions}
-            aria-label={t('filter_type')}
-            className="sm:w-44"
-          />
-          <Select
-            value={coverage}
-            onChange={setCoverage}
-            options={coverageOptions}
-            aria-label={t('filter_coverage')}
-            className="sm:w-52"
-          />
-
-          {/* Min amount input */}
-          <div className="relative sm:w-44">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none select-none">
-              $
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          aria-label={t('filters_button')}
+          className="relative flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 border border-input rounded-lg text-sm bg-card hover:border-primary/40 transition-colors"
+        >
+          <SlidersHorizontal size={16} aria-hidden="true" />
+          <span className="hidden sm:inline">{t('filters_button')}</span>
+          {sheetFilterCount > 0 && (
+            <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[11px] font-semibold leading-none">
+              {sheetFilterCount}
             </span>
-            <input
-              type="number"
-              min="0"
-              step="500"
-              value={minAmount}
-              onChange={(e) => setMinAmount(e.target.value)}
-              placeholder={t('filter_min_amount')}
-              aria-label={t('filter_min_amount')}
-              className="w-full pl-7 pr-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
-          </div>
+          )}
+        </button>
 
-          <Select
-            value={deadlineStatus}
-            onChange={setDeadlineStatus}
-            options={deadlineStatusOptions}
-            aria-label={t('filter_deadline')}
-            className="sm:w-40"
-          />
-          <Select
-            value={sortBy}
-            onChange={(v) => setSortBy(v as ScholarshipSortBy)}
-            options={sortOptions}
-            aria-label={t('sort_label')}
-            className="sm:w-48"
+        <Select
+          value={sortBy}
+          onChange={(v) => setSortBy(v as ScholarshipSortBy)}
+          options={sortOptions}
+          aria-label={t('sort_label')}
+          className="w-32 sm:w-48 flex-shrink-0"
+        />
+      </div>
+
+      <FilterSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        title={t('filters_title')}
+        closeLabel={t('filters_close')}
+        clearLabel={t('filters_clear_all')}
+        applyLabel={t('filters_show_results', { count: sorted.length })}
+        onClear={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
+        hasFilters={Boolean(hasFilters || hasActivePersonalization)}
+      >
+        <Select
+          value={country}
+          onChange={setCountry}
+          options={countryOptions}
+          aria-label={t('filter_country')}
+          searchable
+        />
+        <Select
+          value={type}
+          onChange={setType}
+          options={typeOptions}
+          aria-label={t('filter_type')}
+        />
+        <Select
+          value={coverage}
+          onChange={setCoverage}
+          options={coverageOptions}
+          aria-label={t('filter_coverage')}
+        />
+
+        {/* Min amount input */}
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none select-none">
+            $
+          </span>
+          <input
+            type="number"
+            min="0"
+            step="500"
+            value={minAmount}
+            onChange={(e) => setMinAmount(e.target.value)}
+            placeholder={t('filter_min_amount')}
+            aria-label={t('filter_min_amount')}
+            className="w-full pl-7 pr-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
 
-        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
-          <div className="flex items-center gap-3 flex-wrap">
-            <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={hasAmount}
-                onChange={(e) => setHasAmount(e.target.checked)}
-                className="rounded border-input accent-primary"
-                aria-label={t('filter_has_amount')}
-              />
-              <span className="text-muted-foreground">{t('filter_has_amount')}</span>
-            </label>
+        <Select
+          value={deadlineStatus}
+          onChange={setDeadlineStatus}
+          options={deadlineStatusOptions}
+          aria-label={t('filter_deadline')}
+        />
 
+        <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={hasAmount}
+            onChange={(e) => setHasAmount(e.target.checked)}
+            className="rounded border-input accent-primary"
+            aria-label={t('filter_has_amount')}
+          />
+          <span className="text-muted-foreground">{t('filter_has_amount')}</span>
+        </label>
+
+        {(hasPrefs || hasScores) && (
+          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-border">
             {hasPrefs && (
               <button
                 type="button"
                 onClick={() => setPrefsActive((v) => !v)}
                 aria-pressed={prefsActive}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-lg text-xs font-semibold border transition-colors ${
                   prefsActive
                     ? 'bg-primary/10 border-primary text-primary'
                     : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
@@ -333,7 +365,7 @@ export function ScholarshipListClient({
                 type="button"
                 onClick={() => setScoresActive((v) => !v)}
                 aria-pressed={scoresActive}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-lg text-xs font-semibold border transition-colors ${
                   scoresActive
                     ? 'bg-primary/10 border-primary text-primary'
                     : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
@@ -357,17 +389,8 @@ export function ScholarshipListClient({
               </button>
             )}
           </div>
-
-          {(hasFilters || hasActivePersonalization) && (
-            <button
-              onClick={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
-              className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
-            >
-              {t('clear_filters')}
-            </button>
-          )}
-        </div>
-      </div>
+        )}
+      </FilterSheet>
 
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
         <span>{t('results_count', { count: sorted.length })}</span>
