@@ -49,13 +49,13 @@ export default async function HomePage({ params: { locale } }: Props) {
   const [universities, scholarships, popular] = await Promise.all([
     getAll(),
     getAllScholarships(),
-    loadPopularIds(3),
+    loadPopularIds(6),
   ]);
   const moeCount = universities.filter((u) => u.moe_approved).length;
   const countryCount = new Set(universities.map((u) => u.country)).size;
 
-  const popularUniversities = pickPopular(universities, popular.universityIds, 3);
-  const popularScholarships = pickPopular(scholarships, popular.scholarshipIds, 3);
+  const popularUniversities = pickPopular(universities, popular.universityIds, 6);
+  const popularScholarships = pickPopular(scholarships, popular.scholarshipIds, 6);
   const uniNameById = new Map(universities.map((u) => [u.id, u.name[locale] ?? u.name.en]));
 
   const features = [

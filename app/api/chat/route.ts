@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 
 // NVIDIA build.nvidia.com — free tier, no credit card. OpenAI-compatible chat completions API.
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
-const NVIDIA_MODEL = 'moonshotai/kimi-k2.6';
+const NVIDIA_MODEL = 'meta/llama-3.3-70b-instruct';
 const MAX_MESSAGES = 20;
 const MAX_CONTENT_LENGTH = 4000;
 
