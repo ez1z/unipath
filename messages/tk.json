@@ -28,6 +28,13 @@
     "greeting": "Salam! Men UniPath kömekçisi. 👋",
     "empty_hint": "Daşary ýurtdaky uniwersitetler, stipendiýalar, Bilim ministrliginiň tassyklamasy ýa-da okuw töleginiň geçirim prosesi barada soraň.",
     "error": "Bagyşlaň, bir näsazlyk ýüze çykdy. Biraz wagtdan soň ýene synanyşyň.",
+    "stop_label": "Duruz",
+    "retry_label": "Gaýtala",
+    "starters": [
+      "Türkiýede arzan uniwersitetler",
+      "Uçar biletini öz içine alýan stipendiýalar",
+      "MoE tölegi geçirmek nähili işleýär?"
+    ],
     "disclaimer": "Jogaplar emeli aň tarapyndan döredildi — möhüm maglumatlary barlaň. UniPath diňe gollanma bolup, hiç haçan pul geçirmeýär."
   },
   "nav": {

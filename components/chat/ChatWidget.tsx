@@ -49,17 +49,41 @@ function markdownComponents(onNavigate: () => void): Components {
   };
 }
 
+const STORAGE_KEY = 'unipath_chat';
+
 export function ChatWidget() {
   const t = useTranslations('chat');
   const locale = useLocale() as Locale;
+  const starters = (t.raw('starters') as string[]) ?? [];
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [canRetry, setCanRetry] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Restore the conversation from the current tab's session on mount, then
+  // persist on every change so a refresh doesn't wipe the thread.
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) setMessages(JSON.parse(saved));
+    } catch {
+      // corrupt/unavailable storage — start fresh
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch {
+      // storage full / disabled — persistence is best-effort
+    }
+  }, [messages]);
 
   // Focus the input when the panel opens.
   useEffect(() => {
@@ -71,20 +95,19 @@ export function ChatWidget() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages, loading]);
 
-  async function send() {
-    const text = input.trim();
-    if (!text || loading) return;
-
-    const nextMessages: ChatMessage[] = [...messages, { role: 'user', content: text }];
-    setMessages(nextMessages);
-    setInput('');
+  // Streams a completion for the given conversation. Shared by send and retry.
+  async function run(conversation: ChatMessage[]) {
     setLoading(true);
+    setCanRetry(false);
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locale, messages: nextMessages }),
+        body: JSON.stringify({ locale, messages: conversation }),
+        signal: controller.signal,
       });
 
       if (!res.ok || !res.body) throw new Error('chat failed');
@@ -106,11 +129,41 @@ export function ChatWidget() {
         });
       }
     } catch {
-      setMessages((prev) => [...prev, { role: 'model', content: t('error') }]);
+      if (controller.signal.aborted) {
+        // User stopped generation — keep whatever streamed; drop an empty bubble.
+        setMessages((prev) => {
+          const last = prev[prev.length - 1];
+          return last?.role === 'model' && last.content === '' ? prev.slice(0, -1) : prev;
+        });
+      } else {
+        setMessages((prev) => [...prev, { role: 'model', content: t('error') }]);
+        setCanRetry(true);
+      }
     } finally {
       setLoading(false);
+      abortRef.current = null;
       inputRef.current?.focus();
     }
+  }
+
+  function send(text?: string) {
+    const value = (text ?? input).trim();
+    if (!value || loading) return;
+    const next: ChatMessage[] = [...messages, { role: 'user', content: value }];
+    setMessages(next);
+    setInput('');
+    run(next);
+  }
+
+  function stop() {
+    abortRef.current?.abort();
+  }
+
+  function retry() {
+    // Drop the trailing error bubble, then resend from the last user message.
+    const base = messages[messages.length - 1]?.content === t('error') ? messages.slice(0, -1) : messages;
+    setMessages(base);
+    run(base);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -177,9 +230,23 @@ export function ChatWidget() {
             className="flex-1 space-y-3 overflow-y-auto px-4 py-4"
           >
             {messages.length === 0 ? (
-              <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="space-y-3 text-sm text-muted-foreground">
                 <p className="text-foreground">{t('greeting')}</p>
                 <p className="text-xs leading-relaxed">{t('empty_hint')}</p>
+                {starters.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {starters.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => send(s)}
+                        className="rounded-full border border-border bg-background px-3 py-1.5 text-left text-xs text-foreground transition-colors hover:border-gold hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-gold"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               messages.map((m, i) =>
@@ -209,6 +276,15 @@ export function ChatWidget() {
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground" />
               </div>
             )}
+            {canRetry && !loading && (
+              <button
+                type="button"
+                onClick={retry}
+                className="mr-auto rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-gold hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-gold"
+              >
+                ↻ {t('retry_label')}
+              </button>
+            )}
           </div>
 
           {/* Input */}
@@ -225,18 +301,31 @@ export function ChatWidget() {
                 disabled={loading}
                 className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold disabled:opacity-60"
               />
-              <button
-                type="button"
-                onClick={send}
-                disabled={loading || !input.trim()}
-                aria-label={t('send_label')}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold text-primary transition-opacity hover:bg-gold/90 disabled:opacity-40"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <line x1="22" y1="2" x2="11" y2="13" />
-                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                </svg>
-              </button>
+              {loading ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  aria-label={t('stop_label')}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold text-primary transition-opacity hover:bg-gold/90"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <rect x="6" y="6" width="12" height="12" rx="1.5" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => send()}
+                  disabled={!input.trim()}
+                  aria-label={t('send_label')}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold text-primary transition-opacity hover:bg-gold/90 disabled:opacity-40"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                </button>
+              )}
             </div>
             <p className="mt-2 px-1 text-[11px] leading-tight text-muted-foreground">{t('disclaimer')}</p>
           </div>

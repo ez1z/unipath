@@ -66,7 +66,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable          | Description                                                                     |
 | ----------------- | ------------------------------------------------------------------------------- |
-| `CEREBRAS_API_KEY` | Cerebras API key (server-only, never exposed to client). Free tier at cloud.cerebras.ai. Leave blank to disable chat widget. |
+| `NVIDIA_API_KEY` | NVIDIA API key (server-only, never exposed to client). Free tier at build.nvidia.com. Leave blank to disable chat widget. |
 | `NEXT_PUBLIC_SITE_URL` | Public URL of the deployed site (used for chat widget configuration) |
 
 ## Project Structure
@@ -147,7 +147,7 @@ npx vitest run tests/unit/csv-schema.test.ts   # run a single file
 
 ## AI Assistant
 
-The platform includes an AI chatbot powered by **Cerebras API** (GPT model) that provides personalized guidance to students. The assistant:
+The platform includes an AI chatbot powered by **NVIDIA API** (Kimi K2.6 model) that provides personalized guidance to students. The assistant:
 
 - **Answers questions** about universities, scholarships, and the tuition transfer process
 - **Uses live catalog data** — grounding context is generated from the current database, so responses always reference current information
@@ -158,10 +158,10 @@ The platform includes an AI chatbot powered by **Cerebras API** (GPT model) that
 The chat widget appears as a floating button on public pages. Student questions are processed via a server action that:
 1. Loads relevant universities/scholarships matching the query
 2. Builds a grounding context from the catalog data
-3. Sends the query to Cerebras with domain-specific system prompts
+3. Sends the query to NVIDIA with domain-specific system prompts
 4. Renders the response with Markdown and internal linking support
 
-**Configuration:** Set `CEREBRAS_API_KEY` in environment variables (free tier available at [cloud.cerebras.ai](https://cloud.cerebras.ai), no credit card required). Leave blank to disable the chat widget.
+**Configuration:** Set `NVIDIA_API_KEY` in environment variables (free tier available at [build.nvidia.com](https://build.nvidia.com), no credit card required). Leave blank to disable the chat widget.
 
 ## Analytics
 

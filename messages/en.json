@@ -28,6 +28,13 @@
     "greeting": "Hi! I'm the UniPath Assistant. 👋",
     "empty_hint": "Ask me about universities abroad, scholarships, MoE approval, or the tuition transfer process.",
     "error": "Sorry, something went wrong. Please try again in a moment.",
+    "stop_label": "Stop generating",
+    "retry_label": "Retry",
+    "starters": [
+      "Cheap universities in Turkey",
+      "Scholarships that cover flights",
+      "How does the MoE tuition transfer work?"
+    ],
     "disclaimer": "AI-generated guidance — please verify important details. UniPath is a guide only and never handles money."
   },
   "nav": {

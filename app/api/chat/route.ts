@@ -9,9 +9,9 @@ import { createServiceClient } from '@/lib/supabase/service';
 
 export const runtime = 'nodejs';
 
-// Cerebras — free, no credit card. OpenAI-compatible chat completions API.
-const CEREBRAS_URL = 'https://api.cerebras.ai/v1/chat/completions';
-const CEREBRAS_MODEL = 'gpt-oss-120b';
+// NVIDIA build.nvidia.com — free tier, no credit card. OpenAI-compatible chat completions API.
+const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
+const NVIDIA_MODEL = 'moonshotai/kimi-k2.6';
 const MAX_MESSAGES = 20;
 const MAX_CONTENT_LENGTH = 4000;
 
@@ -29,7 +29,7 @@ const BodySchema = z.object({
 });
 
 // ── Lightweight in-memory rate limit (per IP) ───────────────────────────────
-// Protects the free Cerebras quota from bursts. Resets on cold start — acceptable
+// Protects the free NVIDIA quota from bursts. Resets on cold start — acceptable
 // for v1; swap for a durable store (e.g. Supabase/Upstash) if abuse appears.
 const RATE_LIMIT = 15;
 const RATE_WINDOW_MS = 60_000;
@@ -49,7 +49,7 @@ function getIp(req: NextRequest): string {
 }
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.CEREBRAS_API_KEY;
+  const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: 'chat_unavailable' }, { status: 503 });
   }
@@ -97,32 +97,49 @@ export async function POST(req: NextRequest) {
     })),
   ];
 
-  const upstreamRes = await fetch(CEREBRAS_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: CEREBRAS_MODEL,
-      messages,
-      stream: true,
-      temperature: 0.6,
-      max_tokens: 1024,
-    }),
-  });
+  // Abort if NVIDIA doesn't return response headers within 20s (hung connection).
+  // Cleared once streaming starts, so a long answer is never cut mid-stream.
+  const abort = new AbortController();
+  const connectTimeout = setTimeout(() => abort.abort(), 20_000);
+
+  let upstreamRes: Response;
+  try {
+    upstreamRes = await fetch(NVIDIA_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: NVIDIA_MODEL,
+        messages,
+        stream: true,
+        temperature: 0.6,
+        max_tokens: 1536,
+      }),
+      signal: abort.signal,
+    });
+  } catch (err) {
+    clearTimeout(connectTimeout);
+    console.error('[chat] NVIDIA connect failed/timeout', err);
+    await logError('chat', 'NVIDIA connect failed/timeout', {
+      message: err instanceof Error ? err.message : String(err),
+    });
+    return NextResponse.json({ error: 'upstream_error' }, { status: 502 });
+  }
+  clearTimeout(connectTimeout);
 
   if (!upstreamRes.ok || !upstreamRes.body) {
     const detail = await upstreamRes.text().catch(() => '');
-    console.error(`[chat] Cerebras upstream ${upstreamRes.status}: ${detail}`);
-    await logError('chat', `Cerebras upstream error ${upstreamRes.status}`, {
+    console.error(`[chat] NVIDIA upstream ${upstreamRes.status}: ${detail}`);
+    await logError('chat', `NVIDIA upstream error ${upstreamRes.status}`, {
       status: upstreamRes.status,
       body: detail.slice(0, 1000),
     });
     return NextResponse.json({ error: 'upstream_error' }, { status: 502 });
   }
 
-  // Re-stream Cerebras's OpenAI-style SSE as plain UTF-8 text chunks for the client.
+  // Re-stream NVIDIA's OpenAI-style SSE as plain UTF-8 text chunks for the client.
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const reader = upstreamRes.body!.getReader();

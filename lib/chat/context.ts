@@ -164,6 +164,59 @@ const CHEAP_RE = /cheap|afford|budget|inexpensive|lowest|under \$?\d|less than|u
 const TOP_RE = /\btop\b|best|highest|prestig|ranking|ranked|лучш|рейтинг|престиж|iň gowy|abraý/i;
 const MOE_RE = /\bmoe\b|approv|transfer|eligible|tassyk|одобрен|перевод/i;
 
+// Foreign-language spellings of countries in the catalog, keyed by the English
+// DB value (lowercased). Turkmen students rarely type "Turkey" — they type
+// "Türkiýe" or "Турция". Without this, the country filter silently never fires
+// and they get worse results. Extend as new study destinations are added.
+// Aliases are matched as token PREFIXES (see matchTerm), so agglutinative Turkmen
+// ("Türkiýede") and fusional Russian ("Турции") suffixed forms still hit. Russian
+// entries are therefore stems (e.g. "турци", not "турция") so every declension
+// matches. Latin aliases avoid ambiguous 2-letter forms except where exact-matched.
+const COUNTRY_ALIASES: Record<string, string[]> = {
+  turkey: ['türkiýe', 'turkiye', 'турци', 'туркия'],
+  russia: ['russiýa', 'orsyýet', 'росси', 'rossiya'],
+  belarus: ['belarus', 'беларус', 'белорусси'],
+  ukraine: ['ukraina', 'украин'],
+  kazakhstan: ['gazagystan', 'казахстан'],
+  uzbekistan: ['özbegistan', 'узбекистан'],
+  china: ['hytaý', 'кита'],
+  malaysia: ['malaýziýa', 'малайзи'],
+  india: ['hindistan', 'инди'],
+  germany: ['germaniýa', 'германи', 'deutschland'],
+  poland: ['polşa', 'польш'],
+  cyprus: ['kipr', 'кипр'],
+  'united states': ['amerika', 'abş', 'сша', 'америк', 'usa'],
+  'united kingdom': ['angliýa', 'britaniýa', 'англи', 'британи', 'uk'],
+  azerbaijan: ['azerbaýjan', 'азербайджан'],
+  hungary: ['wengriýa', 'венгри'],
+  italy: ['italiýa', 'итали'],
+};
+
+/**
+ * Matches a country term against query tokens:
+ * - multiword ("united states") → the whole phrase must appear
+ * - short (≤3 chars, e.g. "usa", "abş", "uk") → an exact token, to avoid
+ *   "us" hitting "use" / "must"
+ * - otherwise → a token PREFIX, so suffixed forms ("türkiýede", "германии") hit
+ *   while unrelated words ("woman" vs "oman") don't (they'd need the same start).
+ */
+function matchTerm(term: string, tokens: string[], padded: string): boolean {
+  const t = term.toLowerCase();
+  if (t.includes(' ')) return padded.includes(` ${t} `);
+  if (t.length <= 3) return tokens.includes(t);
+  return tokens.some((tok) => tok.startsWith(t));
+}
+
+/** Returns the set of catalog countries (lowercased English) mentioned in the query. */
+function matchCountries(query: string, countries: string[]): Set<string> {
+  const tokens = query.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').split(' ').filter(Boolean);
+  const padded = ` ${tokens.join(' ')} `;
+  const matched = countries
+    .map((c) => c.toLowerCase())
+    .filter((c) => matchTerm(c, tokens, padded) || (COUNTRY_ALIASES[c] ?? []).some((a) => matchTerm(a, tokens, padded)));
+  return new Set(matched);
+}
+
 /**
  * Builds a small, query-relevant grounding context. Filters the catalog to the
  * universities/scholarships that match the user's latest message (by country,
@@ -173,17 +226,16 @@ const MOE_RE = /\bmoe\b|approv|transfer|eligible|tassyk|одобрен|пере�
 export async function buildGroundingContext(query: string, locale: Locale): Promise<string> {
   const snap = await getSnapshot();
   const q = query.toLowerCase();
-  const words = q.split(/[^a-z0-9а-яё]+/i).filter((w) => w.length >= 3);
+  // Keep Turkmen (äçğıňöşüýž) and Cyrillic letters together as word characters —
+  // otherwise "ýokary" splits at ý into unsearchable fragments.
+  const words = q.split(/[^a-z0-9а-яёäçğıňöşüýž]+/i).filter((w) => w.length >= 3);
 
   // ── Universities ──────────────────────────────────────────────────────────
   let unis = snap.unis;
 
-  const mentionedCountries = snap.countries
-    .map((c) => c.toLowerCase())
-    .filter((c) => q.includes(c));
-  if (mentionedCountries.length) {
-    const set = new Set(mentionedCountries);
-    const filtered = unis.filter((u) => set.has(u.country));
+  const mentionedCountries = matchCountries(query, snap.countries);
+  if (mentionedCountries.size) {
+    const filtered = unis.filter((u) => mentionedCountries.has(u.country));
     if (filtered.length) unis = filtered;
   }
 
@@ -211,9 +263,8 @@ export async function buildGroundingContext(query: string, locale: Locale): Prom
 
   // ── Scholarships ──────────────────────────────────────────────────────────
   let sch = snap.scholarships;
-  if (mentionedCountries.length) {
-    const set = new Set(mentionedCountries);
-    const filtered = sch.filter((s) => set.has(s.country));
+  if (mentionedCountries.size) {
+    const filtered = sch.filter((s) => mentionedCountries.has(s.country));
     if (filtered.length) sch = filtered;
   }
   if (words.length) {
