@@ -147,7 +147,7 @@ npx vitest run tests/unit/csv-schema.test.ts   # run a single file
 
 ## AI Assistant
 
-The platform includes an AI chatbot powered by **NVIDIA API** (Llama 3.3 70B model) that provides personalized guidance to students. The assistant:
+The platform includes an AI chatbot powered by **NVIDIA API** (OpenAI gpt-oss 120B model) that provides personalized guidance to students. The assistant:
 
 - **Answers questions** about universities, scholarships, and the tuition transfer process
 - **Uses live catalog data** — grounding context is generated from the current database, so responses always reference current information

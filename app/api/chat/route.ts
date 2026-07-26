@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 
 // NVIDIA build.nvidia.com — free tier, no credit card. OpenAI-compatible chat completions API.
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
-const NVIDIA_MODEL = 'meta/llama-3.3-70b-instruct';
+const NVIDIA_MODEL = 'openai/gpt-oss-120b';
 const MAX_MESSAGES = 20;
 const MAX_CONTENT_LENGTH = 4000;
 
@@ -116,6 +116,9 @@ export async function POST(req: NextRequest) {
         stream: true,
         temperature: 0.6,
         max_tokens: 1536,
+        // gpt-oss reasons before answering; 'low' keeps the pre-answer blank short.
+        // Reasoning arrives in delta.reasoning (not delta.content) so it's already dropped.
+        reasoning_effort: 'low',
       }),
       signal: abort.signal,
     });
