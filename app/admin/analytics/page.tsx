@@ -12,6 +12,7 @@ import {
   LocaleDonut,
   AiTrendChart,
   SignupsTrendChart,
+  PeakHoursChart,
 } from '@/components/admin/analytics/Charts';
 
 export const metadata = { title: 'Analytics — UniPath Admin' };
@@ -147,6 +148,27 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
               barClass="bg-gold/20"
               emptyText="No external referrers yet."
             />
+          </Section>
+        </div>
+
+        {/* City interest / device / peak hours */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+          <Section title="Top cities" subtitle="Views by university city">
+            <BarList
+              rows={a.topCities.map((r) => ({ label: `${r.city}, ${r.country}`, value: r.views }))}
+              barClass="bg-primary/15"
+              emptyText="No city views yet."
+            />
+          </Section>
+          <Section title="Devices" subtitle="Mobile vs desktop">
+            <BarList
+              rows={a.deviceSplit.map((r) => ({ label: r.device, value: r.visits }))}
+              barClass="bg-tk-green/15"
+              emptyText="No visits yet."
+            />
+          </Section>
+          <Section title="Peak hours" subtitle="Pageviews by hour (local time)">
+            <PeakHoursChart data={a.peakHours} />
           </Section>
         </div>
 

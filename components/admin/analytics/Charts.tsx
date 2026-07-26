@@ -15,7 +15,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import type { DailyVisit, MonthlyVisit, LocaleSplit, DailyCount, SignupDaily } from '@/lib/analytics/queries';
+import type { DailyVisit, MonthlyVisit, LocaleSplit, DailyCount, SignupDaily, PeakHour } from '@/lib/analytics/queries';
 
 const PRIMARY = '#691C22';
 const GOLD = '#C49A1E';
@@ -112,6 +112,20 @@ export function AiTrendChart({ data }: { data: DailyCount[] }) {
         <YAxis allowDecimals={false} {...axisProps} width={32} />
         <Tooltip {...tooltipStyle} labelFormatter={(v) => dayLabel(String(v))} cursor={{ fill: 'rgba(196,154,30,0.08)' }} />
         <Bar dataKey="count" name="Questions" fill={GOLD} radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function PeakHoursChart({ data }: { data: PeakHour[] }) {
+  return (
+    <ResponsiveContainer width="100%" height={200}>
+      <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
+        <XAxis dataKey="hour" tickFormatter={(h) => `${h}h`} interval={2} {...axisProps} />
+        <YAxis allowDecimals={false} {...axisProps} width={32} />
+        <Tooltip {...tooltipStyle} labelFormatter={(h) => `${h}:00`} cursor={{ fill: 'rgba(105,28,34,0.05)' }} />
+        <Bar dataKey="visits" name="Visits" fill={PRIMARY} radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

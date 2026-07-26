@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { Fraunces, DM_Sans } from 'next/font/google';
+import { Lora, Inter } from 'next/font/google';
 import Link from 'next/link';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import type { Locale } from '@/lib/constants';
@@ -12,16 +12,17 @@ import { AnalyticsTracker } from '@/components/analytics/AnalyticsTracker';
 import { getSiteUrl, localeAlternates, organizationJsonLd, websiteJsonLd, jsonLdScript } from '@/lib/seo';
 import '@/app/globals.css';
 
-const fraunces = Fraunces({
-  subsets: ['latin'],
+// All three cover Latin, Latin-Extended (Turkmen: ň ý ž ş ç ö ä ü) and Cyrillic (Russian).
+const lora = Lora({
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
   weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-heading',
   display: 'swap',
 });
 
-const dmSans = DM_Sans({
-  subsets: ['latin'],
+const inter = Inter({
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
   variable: '--font-body',
   display: 'swap',
 });
@@ -91,7 +92,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const year = new Date().getFullYear();
 
   return (
-    <html lang={locale} className={`${fraunces.variable} ${dmSans.variable}`}>
+    <html lang={locale} className={`${lora.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-background font-sans flex flex-col antialiased">
         <script
           type="application/ld+json"

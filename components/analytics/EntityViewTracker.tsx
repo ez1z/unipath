@@ -9,11 +9,12 @@ type Props = {
   id: string;
   slug: string;
   country?: string;
+  city?: string;
 };
 
 // Records a single university/scholarship view. Mounted on the detail pages,
 // separate from the pageview tracker so pageviews are never double-counted.
-export function EntityViewTracker({ type, id, slug, country }: Props) {
+export function EntityViewTracker({ type, id, slug, country, city }: Props) {
   const locale = useLocale();
   const fired = useRef<string | null>(null);
 
@@ -25,9 +26,10 @@ export function EntityViewTracker({ type, id, slug, country }: Props) {
       entity_id: id,
       entity_slug: slug,
       country,
+      city,
       locale,
     });
-  }, [type, id, slug, country, locale]);
+  }, [type, id, slug, country, city, locale]);
 
   return null;
 }

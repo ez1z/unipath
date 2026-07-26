@@ -10,6 +10,7 @@ export type TrackPayload = {
   entity_id?: string;
   entity_slug?: string;
   country?: string;
+  city?: string;
   search_query?: string;
 };
 

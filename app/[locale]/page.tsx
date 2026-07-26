@@ -2,8 +2,29 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { getAll } from "@/lib/data/universities";
+import { getAll as getAllScholarships } from "@/lib/data/scholarships";
+import { loadPopularIds } from "@/lib/analytics/queries";
+import { UniversityCard } from "@/components/university/UniversityCard";
+import { ScholarshipCard } from "@/components/scholarship/ScholarshipCard";
 import { canonicalFor, localeAlternates } from "@/lib/seo";
 import type { Locale } from "@/lib/constants";
+
+// Most-viewed ids first (preserving rank), then fill from the front so the
+// sections are never empty while analytics is still sparse.
+function pickPopular<T extends { id: string }>(all: T[], ids: string[], n: number): T[] {
+  const byId = new Map(all.map((x) => [x.id, x]));
+  const picked: T[] = [];
+  const seen = new Set<string>();
+  for (const id of ids) {
+    const x = byId.get(id);
+    if (x && !seen.has(id)) { picked.push(x); seen.add(id); }
+  }
+  for (const x of all) {
+    if (picked.length >= n) break;
+    if (!seen.has(x.id)) { picked.push(x); seen.add(x.id); }
+  }
+  return picked.slice(0, n);
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -25,9 +46,17 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
 export default async function HomePage({ params: { locale } }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("home");
-  const universities = await getAll();
+  const [universities, scholarships, popular] = await Promise.all([
+    getAll(),
+    getAllScholarships(),
+    loadPopularIds(3),
+  ]);
   const moeCount = universities.filter((u) => u.moe_approved).length;
   const countryCount = new Set(universities.map((u) => u.country)).size;
+
+  const popularUniversities = pickPopular(universities, popular.universityIds, 3);
+  const popularScholarships = pickPopular(scholarships, popular.scholarshipIds, 3);
+  const uniNameById = new Map(universities.map((u) => [u.id, u.name[locale] ?? u.name.en]));
 
   const features = [
     {
@@ -114,6 +143,49 @@ export default async function HomePage({ params: { locale } }: Props) {
           ))}
         </div>
       </section>
+
+      {/* Popular universities */}
+      {popularUniversities.length > 0 && (
+        <section className="container mx-auto px-5 pb-4">
+          <div className="flex items-end justify-between mb-5">
+            <h2 className="font-heading text-xl sm:text-2xl font-bold text-foreground">
+              {t("popular_universities_title")}
+            </h2>
+            <Link href={`/${locale}/universities`} className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors whitespace-nowrap">
+              {t("view_all")}
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {popularUniversities.map((u) => (
+              <UniversityCard key={u.id} university={u} locale={locale} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Popular scholarships */}
+      {popularScholarships.length > 0 && (
+        <section className="container mx-auto px-5 py-16 sm:py-20">
+          <div className="flex items-end justify-between mb-5">
+            <h2 className="font-heading text-xl sm:text-2xl font-bold text-foreground">
+              {t("popular_scholarships_title")}
+            </h2>
+            <Link href={`/${locale}/scholarships`} className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors whitespace-nowrap">
+              {t("view_all")}
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {popularScholarships.map((sc) => (
+              <ScholarshipCard
+                key={sc.id}
+                scholarship={sc}
+                locale={locale}
+                universityName={sc.university_id ? uniNameById.get(sc.university_id) : undefined}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }

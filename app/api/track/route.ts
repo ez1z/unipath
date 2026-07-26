@@ -19,8 +19,19 @@ const BodySchema = z.object({
   entity_id: z.string().uuid().optional(),
   entity_slug: z.string().max(256).optional(),
   country: z.string().max(128).optional(),
+  city: z.string().max(128).optional(),
   search_query: z.string().max(256).optional(),
 });
+
+// Coarse device class from user-agent. Server-side so it can't be spoofed by the
+// beacon payload. Order matters: tablets often also match the mobile keywords.
+function parseDevice(ua: string | null): string {
+  if (!ua) return 'unknown';
+  const s = ua.toLowerCase();
+  if (/ipad|tablet|playbook|silk|kindle|(android(?!.*mobi))/.test(s)) return 'tablet';
+  if (/mobi|iphone|ipod|android|blackberry|iemobile|opera mini|windows phone/.test(s)) return 'mobile';
+  return 'desktop';
+}
 
 // ── Lightweight in-memory rate limit (per IP) ───────────────────────────────
 // Blunts beacon spam. Resets on cold start — acceptable for first-party analytics.
@@ -94,6 +105,8 @@ export async function POST(req: NextRequest) {
       entity_id: body.entity_id ?? null,
       entity_slug: body.entity_slug ?? null,
       country: body.country ?? null,
+      city: body.city ?? null,
+      device: parseDevice(req.headers.get('user-agent')),
       search_query: body.search_query ?? null,
     });
   } catch {

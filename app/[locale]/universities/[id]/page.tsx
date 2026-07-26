@@ -151,6 +151,7 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
         id={university.id}
         slug={university.slug}
         country={university.country}
+        city={university.city}
       />
       <PageHeader
         title={name}
