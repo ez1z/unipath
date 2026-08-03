@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import type { Locale } from '@/lib/constants';
 import { NavBar } from '@/components/NavBar';
-import { ChatWidget } from '@/components/chat/ChatWidget';
 import { AnalyticsTracker } from '@/components/analytics/AnalyticsTracker';
 import { getSiteUrl, localeAlternates, organizationJsonLd, websiteJsonLd, jsonLdScript } from '@/lib/seo';
 import '@/app/globals.css';
@@ -105,7 +104,6 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <NavBar locale={locale as Locale} />
           <main className="flex-1">{children}</main>
-          <ChatWidget />
           <AnalyticsTracker />
 
           <footer className="bg-brand-dark">
