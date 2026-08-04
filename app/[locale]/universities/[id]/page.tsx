@@ -17,7 +17,7 @@ import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
 import { createClient } from '@/lib/supabase/server';
 import { EntityViewTracker } from '@/components/analytics/EntityViewTracker';
 import { getByUniversity } from '@/lib/data/scholarships';
-import { getOrInitChecklist } from '@/lib/data/checklist';
+import { getDocsDiffs } from '@/lib/data/docs';
 import type { Locale } from '@/lib/constants';
 import type { Semester } from '@/lib/types/semester';
 
@@ -70,9 +70,9 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
     isAdmin = !!adminData;
   }
 
-  const checklistItems = user
-    ? await getOrInitChecklist(university.id, locale)
-    : [];
+  // Guests get `{}` and fill their own progress in from localStorage after
+  // mount, so the checklist works signed out as well as signed in.
+  const docsDiffs = await getDocsDiffs([university.id]);
 
   const scholarships = await getByUniversity(university.id, university.country);
   const discussionCount = await getMessageCount('university', university.id);
@@ -394,15 +394,17 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
           </section>
         )}
 
-        {/* Document checklist (auth'd users only) */}
-        {user && (
-          <section className="mb-8">
-            <DocumentChecklist
-              universityId={university.id}
-              initialItems={checklistItems}
-            />
-          </section>
-        )}
+        {/* Document checklist — derived from this university's requirements,
+            so it exists for signed-out visitors too */}
+        <section className="mb-8">
+          <DocumentChecklist
+            universityId={university.id}
+            locale={locale}
+            isSignedIn={Boolean(user)}
+            entranceRequirements={university.entrance_requirements}
+            initialDiffs={docsDiffs}
+          />
+        </section>
 
         {/* Scholarships */}
         <ScholarshipSection

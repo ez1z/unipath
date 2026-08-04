@@ -1,17 +1,7 @@
 import { useTranslations } from 'next-intl';
+import { getTestEntries, type TestEntry } from '@/lib/data/fit';
 
-type TestEntry = {
-  type: 'toefl' | 'ielts' | 'sat' | 'duolingo';
-  format?: 'ibt' | 'pbt';
-  min_score?: number;
-  min_math?: number;
-  min_verbal?: number;
-};
-
-/** Pull the standardized-test entries out of an entrance_requirements / requirements blob. */
-export function getTestEntries(requirements: Record<string, unknown> | null | undefined): TestEntry[] {
-  return Array.isArray(requirements?.tests) ? (requirements!.tests as TestEntry[]) : [];
-}
+export { getTestEntries };
 
 type SummaryItem = { key: string; text: string };
 

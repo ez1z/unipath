@@ -5,7 +5,7 @@ import type { Locale } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 import { getAll, getUniqueMajors } from '@/lib/data/universities';
 import { getAll as getAllScholarships } from '@/lib/data/scholarships';
-import { getChecklistProgress } from '@/lib/data/checklist';
+import { getDocsDiffs } from '@/lib/data/docs';
 import { ProfileForm } from './ProfileForm';
 import { ProfileChecklistSummary } from '@/components/checklist/ProfileChecklistSummary';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -44,7 +44,7 @@ export default async function ProfilePage({ params }: Props) {
 
   const dreamUniIds = (profile?.dream_university_ids as string[] | null) ?? [];
   const dreamUniversities = universities.filter((u) => dreamUniIds.includes(u.id));
-  const checklistProgress = await getChecklistProgress(dreamUniIds);
+  const docsDiffs = await getDocsDiffs(dreamUniIds);
 
   const t = await getTranslations({ locale, namespace: 'profile' });
 
@@ -69,7 +69,7 @@ export default async function ProfilePage({ params }: Props) {
         />
         <ProfileChecklistSummary
           dreamUniversities={dreamUniversities}
-          checklistProgress={checklistProgress}
+          docsDiffs={docsDiffs}
           locale={locale}
         />
       </div>

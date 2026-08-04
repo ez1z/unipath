@@ -8,21 +8,23 @@ export default function Loading() {
         </div>
       </div>
       <div className="container mx-auto px-4 py-8 animate-pulse">
-        {/* Selector */}
-        <div className="h-10 w-full max-w-sm bg-muted rounded-lg mb-8" />
-        {/* Compare table placeholder */}
+        {/* Toolbar: add-university picker, columns, export */}
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="h-10 flex-1 bg-muted rounded-md" />
+          <div className="flex gap-2">
+            <div className="h-10 w-24 bg-muted rounded-md" />
+            <div className="h-10 w-28 bg-muted rounded-md" />
+          </div>
+        </div>
+        {/* Rows */}
         <div className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
-          <div className="h-14 bg-primary/20" />
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex border-t border-border">
-              <div className="w-32 px-4 py-3 bg-muted/30 flex-shrink-0">
-                <div className="h-3 bg-muted rounded w-20" />
-              </div>
-              {[0, 1, 2].map((j) => (
-                <div key={j} className="flex-1 px-4 py-3 border-l border-border">
-                  <div className="h-4 bg-muted rounded w-3/4" />
-                </div>
-              ))}
+          <div className="h-11 bg-muted/40 border-b border-border" />
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex gap-4 px-4 py-4 border-b border-border last:border-0">
+              <div className="h-4 bg-muted rounded w-40 flex-shrink-0" />
+              <div className="h-4 bg-muted rounded w-20" />
+              <div className="h-4 bg-muted rounded w-24" />
+              <div className="h-4 bg-muted rounded flex-1" />
             </div>
           ))}
         </div>

@@ -1,11 +1,32 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+
+/** Semantic colour for an option, drawn from the Turkmen palette. */
+export type SelectTone = 'crimson' | 'gold' | 'green' | 'primary' | 'muted';
 
 export type SelectOption = {
   value: string;
   label: string;
   muted?: boolean;
+  tone?: SelectTone;
+};
+
+const TONE_DOT: Record<SelectTone, string> = {
+  crimson: 'bg-crimson',
+  gold: 'bg-gold',
+  green: 'bg-tk-green',
+  primary: 'bg-primary',
+  muted: 'bg-muted-foreground/40',
+};
+
+const TONE_TRIGGER: Record<SelectTone, string> = {
+  crimson: 'bg-crimson-light/40 border-crimson/30 text-crimson-dark',
+  gold: 'bg-gold-light/50 border-gold/50 text-gold-dark',
+  green: 'bg-tk-green-light/60 border-tk-green/30 text-tk-green',
+  primary: 'bg-primary/10 border-primary/30 text-primary',
+  muted: 'bg-card border-input text-muted-foreground',
 };
 
 type Props = {
@@ -16,7 +37,24 @@ type Props = {
   className?: string;
   /** Lets the trigger act as a text input that filters the option list while typing. */
   searchable?: boolean;
+  /**
+   * Render the panel into document.body. Required inside a scroll container
+   * (an `overflow-x-auto` table clips an absolutely positioned panel).
+   */
+  portal?: boolean;
+  /** Tint the trigger with the selected option's tone — for categorical values. */
+  tinted?: boolean;
+  size?: 'sm' | 'md';
 };
+
+function Dot({ tone }: { tone: SelectTone }) {
+  return (
+    <span
+      className={`w-2 h-2 rounded-full flex-shrink-0 ${TONE_DOT[tone]}`}
+      aria-hidden="true"
+    />
+  );
+}
 
 export function Select({
   value,
@@ -25,10 +63,14 @@ export function Select({
   'aria-label': ariaLabel,
   className = '',
   searchable = false,
+  portal = false,
+  tinted = false,
+  size = 'md',
 }: Props) {
   const [open, setOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [query, setQuery] = useState('');
+  const [rect, setRect] = useState<DOMRect | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,7 +89,13 @@ export function Select({
   useEffect(() => {
     if (!open) return;
     function handler(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      // The panel may be portalled outside the container, so it has to be
+      // checked separately — otherwise mousedown closes it before the option's
+      // click lands and nothing is ever selectable.
+      const inside =
+        containerRef.current?.contains(target) || listRef.current?.contains(target);
+      if (!inside) {
         setOpen(false);
         setFocusedIndex(-1);
         setQuery('');
@@ -64,7 +112,31 @@ export function Select({
     items[focusedIndex]?.scrollIntoView({ block: 'nearest' });
   }, [focusedIndex]);
 
+  // A portalled panel is positioned from the trigger's viewport rect, so it has
+  // to be re-measured whenever the page moves under it.
+  const measure = useCallback(() => {
+    if (containerRef.current) setRect(containerRef.current.getBoundingClientRect());
+  }, []);
+
+  useEffect(() => {
+    if (!portal || !open) return;
+    const close = () => setOpen(false);
+    // Scrolling the option list itself must not dismiss it — only movement of
+    // the page or the table underneath invalidates the measured position.
+    const onScroll = (e: Event) => {
+      if (listRef.current?.contains(e.target as Node)) return;
+      close();
+    };
+    window.addEventListener('resize', close);
+    window.addEventListener('scroll', onScroll, true);
+    return () => {
+      window.removeEventListener('resize', close);
+      window.removeEventListener('scroll', onScroll, true);
+    };
+  }, [portal, open]);
+
   function openDropdown() {
+    measure();
     setOpen(true);
     setFocusedIndex(Math.max(0, options.findIndex((o) => o.value === value)));
   }
@@ -116,6 +188,9 @@ export function Select({
     }
   }
 
+  const renderPanel = (panel: React.ReactNode) =>
+    portal && typeof document !== 'undefined' ? createPortal(panel, document.body) : panel;
+
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Trigger */}
@@ -134,7 +209,9 @@ export function Select({
             aria-expanded={open}
             aria-label={ariaLabel}
             autoComplete="off"
-            className="w-full pl-3 pr-8 py-2.5 border border-input rounded-lg text-sm bg-card hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors placeholder:text-muted-foreground"
+            className={`w-full pl-3.5 pr-9 border border-input rounded-lg bg-card hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors placeholder:text-muted-foreground ${
+              size === 'sm' ? 'py-2 text-[13px]' : 'py-3 text-[15px]'
+            }`}
           />
           <svg
             className={`absolute right-3 top-1/2 -translate-y-1/2 flex-shrink-0 text-muted-foreground transition-transform duration-200 pointer-events-none ${open ? 'rotate-180' : ''}`}
@@ -159,10 +236,21 @@ export function Select({
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-label={ariaLabel}
-          className="w-full flex items-center justify-between gap-2 px-3 py-2.5 border border-input rounded-lg text-sm bg-card hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors text-left cursor-pointer"
+          className={[
+            'w-full flex items-center justify-between gap-2 border rounded-lg font-medium',
+            'hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30',
+            'transition-colors text-left cursor-pointer',
+            size === 'sm' ? 'px-2.5 py-2 text-[13px]' : 'px-3 py-2.5 text-[15px]',
+            tinted && selectedOption?.tone
+              ? TONE_TRIGGER[selectedOption.tone]
+              : 'bg-card border-input text-foreground',
+          ].join(' ')}
         >
-          <span className={`truncate ${selectedOption ? 'text-foreground' : 'text-muted-foreground'}`}>
-            {selectedOption?.label ?? placeholderLabel}
+          <span className="flex items-center gap-2 min-w-0">
+            {selectedOption?.tone && !tinted && <Dot tone={selectedOption.tone} />}
+            <span className={`truncate ${selectedOption ? '' : 'text-muted-foreground font-normal'}`}>
+              {selectedOption?.label ?? placeholderLabel}
+            </span>
           </span>
           {/* Chevron */}
           <svg
@@ -183,12 +271,26 @@ export function Select({
       )}
 
       {/* Dropdown panel */}
-      {open && (
+      {open && renderPanel(
         <div
           role="listbox"
           aria-label={ariaLabel}
           ref={listRef}
-          className="absolute z-50 top-full mt-1.5 w-full min-w-[200px] bg-card border border-border rounded-xl shadow-card-hover overflow-hidden"
+          style={
+            portal && rect
+              ? {
+                  position: 'fixed',
+                  top: rect.bottom + 6,
+                  left: rect.left,
+                  width: Math.max(rect.width, 220),
+                }
+              : undefined
+          }
+          className={
+            portal
+              ? 'z-50 bg-card border border-border rounded-xl shadow-card-hover overflow-hidden'
+              : 'absolute z-50 top-full mt-1.5 w-full min-w-[200px] bg-card border border-border rounded-xl shadow-card-hover overflow-hidden'
+          }
         >
           <div className="max-h-60 overflow-y-auto py-1">
             {filteredOptions.length === 0 && (
@@ -207,7 +309,7 @@ export function Select({
                   onMouseLeave={() => setFocusedIndex(-1)}
                   onClick={() => pick(option.value)}
                   className={[
-                    'flex items-center justify-between gap-2 px-3.5 py-2.5 text-sm cursor-pointer select-none transition-colors border-l-2',
+                    'flex items-center justify-between gap-2 px-3.5 py-3 text-[15px] cursor-pointer select-none transition-colors border-l-2',
                     isSelected
                       ? 'bg-secondary font-semibold text-primary border-l-gold'
                       : isFocused
@@ -218,7 +320,10 @@ export function Select({
                     .filter(Boolean)
                     .join(' ')}
                 >
-                  <span className="truncate">{option.label}</span>
+                  <span className="flex items-center gap-2.5 min-w-0">
+                    {option.tone && <Dot tone={option.tone} />}
+                    <span className="truncate">{option.label}</span>
+                  </span>
                   {isSelected && option.value !== '' && (
                     <svg
                       className="text-gold flex-shrink-0"
