@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Check, X } from 'lucide-react';
-import type { ColumnDef, ListEntry, Status, Tier } from '@/lib/data/list-types';
+import type { ColumnDef, FixedColumnId, ListEntry, Status, Tier } from '@/lib/data/list-types';
 import { STATUSES, TIERS } from '@/lib/data/list-types';
 import type { Scholarship } from '@/lib/data/scholarship-types';
 import { deadlineBadgeCls, semesterKey, type ResolvedDeadline } from '@/lib/data/deadline';
@@ -42,6 +42,32 @@ const STATUS_TONE: Record<Status, SelectTone> = {
   accepted: 'green',
   rejected: 'crimson',
 };
+
+/**
+ * Minimum widths belong to the table, not to the cell contents.
+ *
+ * In a table a column with a short value collapses and the header wraps, so
+ * each one needs a floor. The mobile card view has no columns at all — and a
+ * 13rem floor inside a two-up grid on a 375px phone is 208px of content in a
+ * 159px track, which pushes the whole card wider than the screen. So the table
+ * applies these to its `<td>`s and the cards simply do not.
+ */
+const COLUMN_MIN_WIDTH: Partial<Record<FixedColumnId, string>> = {
+  university: 'min-w-[12rem]',
+  tier: 'min-w-[8.5rem]',
+  status: 'min-w-[9.5rem]',
+  deadline: 'min-w-[11rem]',
+  tuition: 'min-w-[9rem]',
+  scholarships: 'min-w-[13rem]',
+  net_cost: 'min-w-[9rem]',
+  docs: 'min-w-[7rem]',
+  flags: 'min-w-[12rem]',
+  notes: 'min-w-[12rem]',
+};
+
+export function columnMinWidth(column: ColumnDef): string {
+  return column.kind === 'custom' ? 'min-w-[8rem]' : (COLUMN_MIN_WIDTH[column.id] ?? '');
+}
 
 const inputCls =
   'w-full bg-card border border-input rounded-lg px-3 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
@@ -137,7 +163,7 @@ export function Cell({
           const next = column.type === 'number' && raw !== '' ? Number(raw) : raw;
           onChange({ custom: { ...row.entry.custom, [column.id]: next } });
         }}
-        className={`${inputCls} min-w-[8rem] ${column.type === 'number' ? 'tabular-nums' : ''}`}
+        className={`${inputCls} ${column.type === 'number' ? 'tabular-nums' : ''}`}
       />
     );
   }
@@ -145,7 +171,7 @@ export function Cell({
   switch (column.id) {
     case 'university':
       return (
-        <div className="min-w-[12rem]">
+        <div>
           <Link
             href={`/${locale}/universities/${uni.slug}`}
             aria-label={t('view_university', { name })}
@@ -162,7 +188,7 @@ export function Cell({
     case 'tier': {
       const suggested = row.fit.tier;
       return (
-        <div className="min-w-[8.5rem]">
+        <div>
           <Select
             value={row.entry.tier ?? ''}
             onChange={(v) => onChange({ tier: (v || null) as Tier | null })}
@@ -189,7 +215,7 @@ export function Cell({
 
     case 'status':
       return (
-        <div className="min-w-[9.5rem]">
+        <div>
           <Select
             value={row.entry.status}
             onChange={(v) => onChange({ status: v as Status })}
@@ -213,7 +239,7 @@ export function Cell({
             (s.university_id === null && s.country === uni.country)),
       );
       return (
-        <div className="min-w-[13rem] space-y-2">
+        <div className="space-y-2">
           {linked.map((id) => {
             const s = scholarships.find((x) => x.id === id);
             if (!s) return null;
@@ -267,7 +293,7 @@ export function Cell({
           rows={2}
           maxLength={2000}
           onChange={(e) => onChange({ notes: e.target.value || null })}
-          className={`${inputCls} min-w-[12rem] resize-y leading-relaxed`}
+          className={`${inputCls} resize-y leading-relaxed`}
         />
       );
 
@@ -285,7 +311,7 @@ export function Cell({
       }
 
       return (
-        <div className="min-w-[11rem] space-y-2">
+        <div className="space-y-2">
           <Select
             value={row.entry.semester_key ?? ''}
             onChange={(v) => onChange({ semester_key: v || null })}
@@ -312,7 +338,7 @@ export function Cell({
     // is most of the table's width on its own.
     case 'tuition':
       return (
-        <div className="min-w-[9rem] leading-tight">
+        <div className="leading-tight">
           <span className="block text-[15px] font-semibold text-foreground tabular-nums">
             {usdText(uni.tuition_usd, uni.tuition_usd_max)}
           </span>
@@ -324,7 +350,7 @@ export function Cell({
 
     case 'net_cost':
       return (
-        <div className="min-w-[9rem] leading-tight">
+        <div className="leading-tight">
           <span className="block text-[15px] font-semibold text-foreground tabular-nums">
             {usdText(row.netCostMinUsd, row.netCostMaxUsd)}
           </span>
@@ -360,7 +386,7 @@ export function Cell({
         </>
       );
 
-      if (!onToggleDocs) return <div className="min-w-[7rem]">{bar}</div>;
+      if (!onToggleDocs) return <div>{bar}</div>;
 
       return (
         <button
@@ -369,7 +395,7 @@ export function Cell({
           aria-expanded={docsExpanded}
           aria-controls={`docs-${row.entry.university_id}`}
           aria-label={t('docs_toggle', { name })}
-          className="min-w-[7rem] w-full text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+          className="w-full text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
         >
           {bar}
         </button>
@@ -405,7 +431,7 @@ export function Cell({
       return row.fit.flags.length === 0 ? (
         <span className="text-[14px] text-muted-foreground">{t('flags_none')}</span>
       ) : (
-        <ul className="space-y-1.5 min-w-[12rem]">
+        <ul className="space-y-1.5">
           {row.fit.flags.map((flag, i) => (
             <li
               key={i}

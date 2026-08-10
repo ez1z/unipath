@@ -8,7 +8,7 @@ import { columnLabel, universityName, type ListRow, type RowContext } from '@/li
 import { isSortable, type ListView } from '@/lib/list/view';
 import type { DocItem } from '@/lib/docs/types';
 import { DocsChecklist } from '@/components/docs/DocsChecklist';
-import { Cell } from './cells';
+import { Cell, columnMinWidth } from './cells';
 
 type Props = {
   rows: ListRow[];
@@ -190,7 +190,7 @@ export function ListTable({
                 </td>
 
                 {columns.map((column) => (
-                  <td key={column.id} className="px-4 py-4">
+                  <td key={column.id} className={`px-4 py-4 ${columnMinWidth(column)}`}>
                     <Cell
                       column={column}
                       row={row}

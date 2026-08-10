@@ -11,6 +11,7 @@ import {
   reorderEntriesAction,
   setColumnsAction,
   setViewAction,
+  type ListActionResult,
 } from '@/lib/actions/list';
 
 /**
@@ -26,22 +27,32 @@ export type ListStore = {
   setView(view: ListView): Promise<void>;
 };
 
+/**
+ * Server actions report failure by returning `{ ok: false }` rather than
+ * throwing, so every one of these has to check. Awaiting without checking made
+ * a rejected write look like a successful one, and the save indicator said
+ * "Saved" over an edit that never left the browser.
+ */
+function assertSaved(result: ListActionResult): void {
+  if (!result.ok) throw new Error(result.error);
+}
+
 export function createServerStore(locale: string): ListStore {
   return {
     async upsert(entry) {
-      await upsertEntryAction(locale, entry);
+      assertSaved(await upsertEntryAction(locale, entry));
     },
     async remove(universityId) {
-      await removeEntryAction(locale, universityId);
+      assertSaved(await removeEntryAction(locale, universityId));
     },
     async reorder(ids) {
-      await reorderEntriesAction(locale, ids);
+      assertSaved(await reorderEntriesAction(locale, ids));
     },
     async setColumns(columns) {
-      await setColumnsAction(locale, columns);
+      assertSaved(await setColumnsAction(locale, columns));
     },
     async setView(view) {
-      await setViewAction(locale, view);
+      assertSaved(await setViewAction(locale, view));
     },
   };
 }

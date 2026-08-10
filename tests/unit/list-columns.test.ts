@@ -31,11 +31,11 @@ describe('normalizeColumns — empty and invalid input', () => {
 });
 
 describe('normalizeColumns — default visibility', () => {
-  it('starts with a readable subset visible, not all thirteen columns', () => {
+  it('starts with every column visible', () => {
     const visible = visibleColumns(normalizeColumns([]));
-    expect(visible.length).toBeLessThan(FIXED_COLUMN_IDS.length);
-    expect(visible.map((c) => c.id)).toContain('tier');
-    expect(visible.map((c) => c.id)).toContain('deadline');
+    expect(visible).toHaveLength(FIXED_COLUMN_IDS.length);
+    expect(visible.map((c) => c.id)).toContain('net_cost');
+    expect(visible.map((c) => c.id)).toContain('flags');
   });
 
   it('hides exactly the columns marked as hidden by default', () => {
@@ -45,13 +45,20 @@ describe('normalizeColumns — default visibility', () => {
     expect(new Set(hidden)).toEqual(DEFAULT_HIDDEN_COLUMNS);
   });
 
-  it('respects a user who explicitly turned a default-hidden column on', () => {
+  it('respects a user who explicitly hid a column', () => {
     const stored: ColumnDef[] = [
       { id: PINNED_COLUMN_ID, kind: 'fixed' },
-      { id: 'flags', kind: 'fixed', hidden: false },
+      { id: 'flags', kind: 'fixed', hidden: true },
     ];
     const flags = normalizeColumns(stored).find((c) => c.id === 'flags');
-    expect(flags?.hidden).toBe(false);
+    expect(flags?.hidden).toBe(true);
+  });
+
+  /** A column added after a layout was saved still follows the default. */
+  it('gives a newly introduced column the default visibility', () => {
+    const stored: ColumnDef[] = [{ id: PINNED_COLUMN_ID, kind: 'fixed' }];
+    const appended = normalizeColumns(stored).filter((c) => c.id !== PINNED_COLUMN_ID);
+    expect(appended.every((c) => c.hidden === DEFAULT_HIDDEN_COLUMNS.has(c.id as never))).toBe(true);
   });
 });
 

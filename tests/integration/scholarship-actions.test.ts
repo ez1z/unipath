@@ -14,7 +14,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import {
   createScholarshipAction,
-  updateScholarshipAction,
   deleteScholarshipAction,
   importScholarshipsAction,
 } from '@/app/admin/scholarships/actions';

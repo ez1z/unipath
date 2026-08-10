@@ -53,20 +53,18 @@ export type CustomColumn = {
 export type ColumnDef = FixedColumn | CustomColumn;
 
 /**
- * Columns that start hidden.
+ * Columns that start hidden — deliberately none.
  *
- * All thirteen at once produce a ~2400px table: everything is cramped, and the
- * student has to scroll sideways to reach the fields they actually edit. These
- * five answer questions that the university's own page answers better, so they
- * are one click away in the column manager instead of always on screen.
+ * Hiding five of the thirteen by default kept the table narrow, but it also
+ * meant a student never discovered the columns they were most likely to want:
+ * net cost, MoE approval and the fit check are the whole reason for keeping a
+ * list. The table scrolls sideways instead, which is a cost the student can
+ * see and the column manager can undo.
+ *
+ * Kept as an (empty) set rather than deleted so `normalizeColumns` still has
+ * one place to consult when a future column should start hidden.
  */
-export const DEFAULT_HIDDEN_COLUMNS: ReadonlySet<FixedColumnId> = new Set([
-  'net_cost',
-  'moe',
-  'ranking',
-  'acceptance',
-  'flags',
-]);
+export const DEFAULT_HIDDEN_COLUMNS: ReadonlySet<FixedColumnId> = new Set([]);
 
 export const DEFAULT_COLUMNS: ColumnDef[] = FIXED_COLUMN_IDS.map((id) => ({
   id,

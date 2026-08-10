@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { TRANSFER_CAP_USD, UNOFFICIAL_TMT_PER_USD, OLD_MANAT_MULTIPLIER } from '@/lib/constants';
+// The cap arrives as a prop so the server owns it; only the display-only rates
+// are read from constants here.
+import { UNOFFICIAL_TMT_PER_USD, OLD_MANAT_MULTIPLIER } from '@/lib/constants';
 
 type Props = { capUsd: number; ratePerUsd: number };
 

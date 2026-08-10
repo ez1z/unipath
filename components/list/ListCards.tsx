@@ -77,14 +77,19 @@ export function ListCards({
             key={universityId}
             className="bg-card border border-border rounded-xl p-5 shadow-card"
           >
+            {/* min-w-0 on the name, shrink-0 on the controls: without it the
+                university name refuses to wrap and pushes the buttons off a
+                narrow screen. */}
             <div className="flex items-start justify-between gap-2 pb-4 mb-4 border-b border-border">
-              <Cell
-                column={identity}
-                row={row}
-                ctx={ctx}
-                scholarships={scholarships}
-                onChange={(patch) => onChange(universityId, patch)}
-              />
+              <div className="min-w-0 flex-1">
+                <Cell
+                  column={identity}
+                  row={row}
+                  ctx={ctx}
+                  scholarships={scholarships}
+                  onChange={(patch) => onChange(universityId, patch)}
+                />
+              </div>
               <div className="flex items-center gap-0.5 shrink-0">
                 <button
                   type="button"
@@ -115,11 +120,18 @@ export function ListCards({
               </div>
             </div>
 
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-5">
+            {/* One field per row on a phone. Two-up only once there is room for
+                the widest controls — the scholarship picker and the semester
+                dropdown are ~13rem, which does not fit half of a 375px card. */}
+            <dl className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-x-4 gap-y-5">
               {fields.map((column) => (
                 <div
                   key={column.id}
-                  className={column.id === 'notes' || column.id === 'flags' ? 'col-span-2' : ''}
+                  className={`min-w-0 ${
+                    column.id === 'notes' || column.id === 'flags' || column.id === 'scholarships'
+                      ? 'min-[420px]:col-span-2'
+                      : ''
+                  }`}
                 >
                   <dt className="text-[10px] font-bold text-brand-dark/60 uppercase tracking-[0.12em] mb-2">
                     {columnLabel(column, t)}
