@@ -536,6 +536,8 @@
     "status_accepted": "Kabul edildi",
     "status_rejected": "Ret edildi",
     "flag_test_below_min": "{test} {yours} — talap edilýän {required} derejeden pes",
+    "flag_test_required_missing": "{test} {required} talap edilýär — balyňyz görkezilmedik",
+    "flag_test_required_missing_no_min": "{test} talap edilýär — balyňyz görkezilmedik",
     "flag_over_budget": "{tuition} töleg siziň {budget} býujetiňizden ýokary",
     "flag_not_moe_approved": "Oblono tassyklamadyk — resmi geçirim ýok",
     "flag_highly_selective": "Bäsdeşligi ýokary — {rate}% kabul edilýär",
