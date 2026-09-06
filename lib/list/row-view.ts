@@ -84,6 +84,16 @@ export function flagText(flag: FitFlag, t: Translate): string {
         yours: flag.yours,
         required: flag.required,
       });
+    case 'test_required_missing':
+      // Two wordings rather than one with an empty slot: a university that names
+      // a test without publishing a minimum is a real and common case, and
+      // "IELTS  required" with a hole in it reads as a bug.
+      return flag.required != null
+        ? t('flag_test_required_missing', {
+            test: flag.test.toUpperCase(),
+            required: flag.required,
+          })
+        : t('flag_test_required_missing_no_min', { test: flag.test.toUpperCase() });
     case 'over_budget':
       return t('flag_over_budget', {
         tuition: formatUsd(flag.required),
@@ -94,6 +104,22 @@ export function flagText(flag: FitFlag, t: Translate): string {
     case 'highly_selective':
       return t('flag_highly_selective', { rate: flag.rate });
   }
+}
+
+/**
+ * Whether a flag reports a problem with the application or a gap in the
+ * student's own profile.
+ *
+ * `test_required_missing` is the second kind: nothing is known to be wrong with
+ * the candidacy, we simply cannot judge it until a score exists. Painting it in
+ * the same alarm colour as "below the required score" would tell a student they
+ * had failed a bar they have not yet attempted — and the fix is one form field,
+ * not a different university.
+ */
+export type FlagSeverity = 'issue' | 'action';
+
+export function flagSeverity(flag: FitFlag): FlagSeverity {
+  return flag.code === 'test_required_missing' ? 'action' : 'issue';
 }
 
 /**

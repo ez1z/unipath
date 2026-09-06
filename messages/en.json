@@ -536,6 +536,8 @@
     "status_accepted": "Accepted",
     "status_rejected": "Rejected",
     "flag_test_below_min": "{test} {yours} — below the required {required}",
+    "flag_test_required_missing": "{test} {required} required — you have no score saved",
+    "flag_test_required_missing_no_min": "{test} required — you have no score saved",
     "flag_over_budget": "Tuition {tuition} is over your {budget} budget",
     "flag_not_moe_approved": "Not MoE-approved — no official transfer",
     "flag_highly_selective": "Highly selective — {rate}% accepted",

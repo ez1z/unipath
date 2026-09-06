@@ -536,6 +536,8 @@
     "status_accepted": "Зачислен",
     "status_rejected": "Отказ",
     "flag_test_below_min": "{test} {yours} — ниже требуемых {required}",
+    "flag_test_required_missing": "Требуется {test} {required} — у вас не указан балл",
+    "flag_test_required_missing_no_min": "Требуется {test} — у вас не указан балл",
     "flag_over_budget": "Стоимость {tuition} превышает ваш бюджет {budget}",
     "flag_not_moe_approved": "Не одобрен МОН — официальный перевод недоступен",
     "flag_highly_selective": "Высокий конкурс — зачисляют {rate}%",

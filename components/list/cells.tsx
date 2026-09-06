@@ -11,6 +11,7 @@ import { Select, type SelectTone } from '@/components/ui/Select';
 import {
   cellText,
   flagText,
+  flagSeverity,
   usdText,
   tmtText,
   universityName,
@@ -435,7 +436,11 @@ export function Cell({
           {row.fit.flags.map((flag, i) => (
             <li
               key={i}
-              className="text-[13px] leading-snug text-crimson-dark border-l-2 border-crimson/40 pl-2.5"
+              className={`text-[13px] leading-snug border-l-2 pl-2.5 ${
+                flagSeverity(flag) === 'action'
+                  ? 'text-gold-dark border-gold/50'
+                  : 'text-crimson-dark border-crimson/40'
+              }`}
             >
               {flagText(flag, t)}
             </li>

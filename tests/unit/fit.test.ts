@@ -43,6 +43,34 @@ describe('getTestEntries', () => {
   it('ignores a tests key that is not an array', () => {
     expect(getTestEntries({ tests: 'toefl 80' })).toEqual([]);
   });
+
+  it('drops entries that name no recognised test', () => {
+    // entrance_requirements arrives as admin-authored JSON with no shape
+    // validation on the CSV path, so these genuinely reach the database.
+    expect(getTestEntries({ tests: [{ foo: 1 }, null, 'ielts', { type: 'gre' }] })).toEqual([]);
+  });
+
+  it('keeps the good entries alongside the bad ones', () => {
+    const entries = getTestEntries({ tests: [{ foo: 1 }, { type: 'ielts', min_score: 6 }] });
+    expect(entries).toEqual([{ type: 'ielts', min_score: 6 }]);
+  });
+});
+
+describe('suggestTier — malformed requirements', () => {
+  it('raises no flag for an entry naming no recognised test', () => {
+    // Regression guard: a flag built from such an entry carries `test:
+    // undefined`, and rendering one calls `.toUpperCase()` on it — which would
+    // take down the whole list page for one bad import.
+    const school = withTests([{ foo: 1 }, { type: 'gre', min_score: 320 }]);
+    expect(suggestTier(school, {}).flags).toEqual([]);
+  });
+
+  it('still flags the valid entries beside a malformed one', () => {
+    const school = withTests([{ foo: 1 }, { type: 'toefl', min_score: 80 }]);
+    expect(suggestTier(school, {}).flags).toEqual([
+      { code: 'test_required_missing', test: 'toefl', required: 80 },
+    ]);
+  });
 });
 
 describe('suggestTier — thin data yields no verdict', () => {
@@ -154,5 +182,87 @@ describe('suggestTier — flags', () => {
     const school = withTests([{ type: 'toefl' }]);
     const result = suggestTier(school, { toefl_total: 10, budget_usd: 20000 });
     expect(result.flags).toEqual([]);
+  });
+});
+
+describe('suggestTier — a required test the student has no score for', () => {
+  it('flags the missing score with the minimum the university asks for', () => {
+    const school = withTests([{ type: 'toefl', min_score: 80 }]);
+    expect(suggestTier(school, { budget_usd: 20000 }).flags).toContainEqual({
+      code: 'test_required_missing',
+      test: 'toefl',
+      required: 80,
+    });
+  });
+
+  it('flags a test named without a published minimum, with a null requirement', () => {
+    const school = withTests([{ type: 'ielts' }]);
+    expect(suggestTier(school, { budget_usd: 20000 }).flags).toContainEqual({
+      code: 'test_required_missing',
+      test: 'ielts',
+      required: null,
+    });
+  });
+
+  it('reports the SAT requirement as one summed total', () => {
+    const school = withTests([{ type: 'sat', min_math: 600, min_verbal: 650 }]);
+    expect(suggestTier(school, { budget_usd: 20000 }).flags).toContainEqual({
+      code: 'test_required_missing',
+      test: 'sat',
+      required: 1250,
+    });
+  });
+
+  it('flags every required test the student is missing, not just the first', () => {
+    const school = withTests([
+      { type: 'toefl', min_score: 80 },
+      { type: 'sat', min_math: 600, min_verbal: 600 },
+    ]);
+    const codes = suggestTier(school, {}).flags.map((f) => f.code);
+    expect(codes).toEqual(['test_required_missing', 'test_required_missing']);
+  });
+
+  it('does not flag a test the student has a score for', () => {
+    const school = withTests([{ type: 'toefl', min_score: 80 }]);
+    const flags = suggestTier(school, { toefl_total: 100, budget_usd: 20000 }).flags;
+    expect(flags.some((f) => f.code === 'test_required_missing')).toBe(false);
+  });
+
+  it('is not a signal — a missing score cannot produce a tier on its own', () => {
+    // Two stated requirements and an acceptance rate would be two signals if
+    // absent scores counted; they must not, because nothing is known yet.
+    const school = withTests([
+      { type: 'toefl', min_score: 80 },
+      { type: 'ielts', min_score: 6.5 },
+    ]);
+    school.acceptance_rate_min = 60;
+    expect(suggestTier(school, {}).tier).toBeNull();
+  });
+
+  it('does not change the tier for a student who has the scores', () => {
+    const school = withTests([{ type: 'toefl', min_score: 70 }]);
+    school.acceptance_rate_min = 75;
+    expect(suggestTier(school, { toefl_total: 100, budget_usd: 20000 }).tier).toBe('safety');
+  });
+});
+
+describe('suggestTier — signed-out students', () => {
+  it('reports required tests with no profile at all', () => {
+    const school = withTests([{ type: 'toefl', min_score: 80 }]);
+    expect(suggestTier(school, null).flags).toContainEqual({
+      code: 'test_required_missing',
+      test: 'toefl',
+      required: 80,
+    });
+  });
+
+  it('still suggests no tier without a profile', () => {
+    const school = withTests([{ type: 'toefl', min_score: 80 }]);
+    school.acceptance_rate_min = 60;
+    expect(suggestTier(school, null).tier).toBeNull();
+  });
+
+  it('raises nothing for a university that states no tests', () => {
+    expect(suggestTier(uni(), null).flags).toEqual([]);
   });
 });
