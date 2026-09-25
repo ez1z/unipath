@@ -31,7 +31,7 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params: { locale, id } }: Props): Promise<Metadata> {
   const university = await getBySlug(id);
   if (!university) return {};
-  const name = university.name[locale] ?? university.name.en;
+  const name = university.name[locale] || university.name.en || university.slug;
   const t = await getTranslations({ locale, namespace: 'meta' });
   const title = `${name} — ${university.city}, ${university.country}`;
   const description = t('university_description', { name, city: university.city, country: university.country });
@@ -128,7 +128,7 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
   function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' });
   }
-  const name = university.name[locale] ?? university.name.en;
+  const name = university.name[locale] || university.name.en || university.slug;
 
   const breadcrumb = breadcrumbJsonLd([
     { name: tNav('home'), url: canonicalFor(locale, '') },

@@ -57,7 +57,7 @@ function formatDate(iso: string): string {
 export async function generateMetadata({ params: { locale, id } }: Props): Promise<Metadata> {
   const scholarship = await getBySlug(id);
   if (!scholarship) return {};
-  const name = scholarship.name[locale] ?? scholarship.name.en;
+  const name = scholarship.name[locale] || scholarship.name.en || scholarship.slug;
   const t = await getTranslations({ locale, namespace: 'meta' });
   const title = name;
   const description = t('scholarship_description', { name });
@@ -81,7 +81,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
   const t = await getTranslations('scholarships');
   const tCommon = await getTranslations('common');
   const tNav = await getTranslations('nav');
-  const name = scholarship.name[locale] ?? scholarship.name.en;
+  const name = scholarship.name[locale] || scholarship.name.en || scholarship.slug;
   const description = scholarship.description[locale] ?? scholarship.description.en;
 
   const TYPE_LABELS: Record<string, string> = {
