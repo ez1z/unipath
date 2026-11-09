@@ -6,7 +6,9 @@ import { getAll as getAllScholarships } from '@/lib/data/scholarships';
 
 const STATIC_PATHS = ['', '/universities', '/scholarships', '/compare', '/transfer', '/support', '/moe-approved'];
 
-export const dynamic = 'force-dynamic';
+// Rebuilt at most once a day. It lists every university and scholarship, so
+// rendering it per request was costly, and crawlers fetch it often.
+export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();

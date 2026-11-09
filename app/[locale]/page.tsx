@@ -26,7 +26,9 @@ function pickPopular<T extends { id: string }>(all: T[], ids: string[], n: numbe
   return picked.slice(0, n);
 }
 
-export const dynamic = 'force-dynamic';
+// Cached and refreshed at most hourly (ISR). The page has nothing personal on
+// it, so there is no reason to render it for every visit.
+export const revalidate = 3600;
 
 type Props = { params: { locale: Locale } };
 

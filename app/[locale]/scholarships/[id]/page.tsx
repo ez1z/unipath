@@ -10,13 +10,21 @@ import { getById as getUniversityById } from '@/lib/data/universities';
 import { getMessageCount } from '@/lib/data/discussions';
 import { formatTuitionRange, formatPercentRange } from '@/lib/format';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { BookmarkButton } from '@/components/profile/BookmarkButton';
-import { createClient } from '@/lib/supabase/server';
+import { DetailActions } from '@/components/viewer/DetailActions';
 import { EntityViewTracker } from '@/components/analytics/EntityViewTracker';
 import type { Locale } from '@/lib/constants';
 import type { Semester } from '@/lib/types/semester';
 
-export const dynamic = 'force-dynamic';
+// Cached and refreshed at most hourly (ISR), so crawlers and repeat visits are
+// served without rendering. Anything personal is filled in on the client.
+export const revalidate = 3600;
+
+// No pages are built ahead of time; each one is rendered on its first visit
+// and then served from the cache. Without this, Next renders the route on
+// every request.
+export function generateStaticParams() {
+  return [];
+}
 
 type Props = { params: { locale: Locale; id: string } };
 
@@ -97,19 +105,6 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
     stipend: t('coverage_stipend'),
     health: t('coverage_health'),
   };
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  let isSaved = false;
-  let isAdmin = false;
-  if (user) {
-    const [{ data: profileData }, { data: adminData }] = await Promise.all([
-      supabase.from('profiles').select('interested_scholarship_ids').eq('id', user.id).maybeSingle(),
-      supabase.from('admins').select('role').eq('user_id', user.id).maybeSingle(),
-    ]);
-    isSaved = (profileData?.interested_scholarship_ids ?? []).includes(scholarship.id);
-    isAdmin = !!adminData;
-  }
 
   const university = scholarship.university_id
     ? await getUniversityById(scholarship.university_id)
@@ -316,16 +311,12 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
-          {isAdmin && (
-            <a
-              href={`/admin/scholarships/${scholarship.id}/edit`}
-              className="flex-1 px-5 py-3 border-2 border-dashed border-muted-foreground/40 text-muted-foreground rounded-lg text-sm font-semibold text-center hover:border-primary hover:text-primary transition-colors"
-              aria-label="Edit in admin panel"
-            >
-              ✏ Edit
-            </a>
-          )}
-          <BookmarkButton type="scholarship" id={scholarship.id} initialSaved={isSaved} locale={locale} size="detail" />
+          <DetailActions
+            type="scholarship"
+            id={scholarship.id}
+            locale={locale}
+            editHref={`/admin/scholarships/${scholarship.id}/edit`}
+          />
           {scholarship.application_url && (
             <a
               href={scholarship.application_url}

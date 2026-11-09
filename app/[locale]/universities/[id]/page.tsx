@@ -12,21 +12,27 @@ import { EntranceRequirements } from '@/components/university/EntranceRequiremen
 import { TestRequirementsSummary } from '@/components/university/TestRequirementsSummary';
 import { ScholarshipSection } from '@/components/scholarship/ScholarshipSection';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { BookmarkButton } from '@/components/profile/BookmarkButton';
-import { DocumentChecklist } from '@/components/checklist/DocumentChecklist';
-import { createClient } from '@/lib/supabase/server';
+import { LiveDocumentChecklist } from '@/components/checklist/LiveDocumentChecklist';
+import { DetailActions } from '@/components/viewer/DetailActions';
 import { EntityViewTracker } from '@/components/analytics/EntityViewTracker';
 import { getByUniversity } from '@/lib/data/scholarships';
-import { getDocsDiffs } from '@/lib/data/docs';
 import type { Locale } from '@/lib/constants';
 import type { Semester } from '@/lib/types/semester';
 
 type Props = {
   params: { locale: Locale; id: string };
-  searchParams: { from?: string };
 };
 
-export const dynamic = 'force-dynamic';
+// Cached and refreshed at most hourly (ISR), so crawlers and repeat visits are
+// served without rendering. Anything personal is filled in on the client.
+export const revalidate = 3600;
+
+// No pages are built ahead of time; each one is rendered on its first visit
+// and then served from the cache. Without this, Next renders the route on
+// every request.
+export function generateStaticParams() {
+  return [];
+}
 
 export async function generateMetadata({ params: { locale, id } }: Props): Promise<Metadata> {
   const university = await getBySlug(id);
@@ -47,32 +53,14 @@ export async function generateMetadata({ params: { locale, id } }: Props): Promi
   };
 }
 
-export default async function UniversityDetailPage({ params: { locale, id }, searchParams }: Props) {
+export default async function UniversityDetailPage({ params: { locale, id } }: Props) {
   setRequestLocale(locale);
   const university = await getBySlug(id);
   if (!university) notFound();
 
-  // Rebuild the list URL the user came from so "back" restores their filters.
-  const backHref = searchParams.from
-    ? `/${locale}/universities?${searchParams.from}`
-    : `/${locale}/universities`;
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  let isSaved = false;
-  let isAdmin = false;
-  if (user) {
-    const [{ data: profileData }, { data: adminData }] = await Promise.all([
-      supabase.from('profiles').select('dream_university_ids').eq('id', user.id).maybeSingle(),
-      supabase.from('admins').select('role').eq('user_id', user.id).maybeSingle(),
-    ]);
-    isSaved = (profileData?.dream_university_ids ?? []).includes(university.id);
-    isAdmin = !!adminData;
-  }
-
-  // Guests get `{}` and fill their own progress in from localStorage after
-  // mount, so the checklist works signed out as well as signed in.
-  const docsDiffs = await getDocsDiffs([university.id]);
+  // The list filters the visitor came from are restored on the client
+  // (PageHeader keepListFilters), so this page doesn't read searchParams.
+  const backHref = `/${locale}/universities`;
 
   const scholarships = await getByUniversity(university.id, university.country);
   const discussionCount = await getMessageCount('university', university.id);
@@ -158,6 +146,7 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
         subtitle={`${university.city}, ${university.country}`}
         backHref={backHref}
         backLabel={t('back')}
+        keepListFilters
         badge={
           university.moe_approved || scholarships.length > 0 ? (
             <span className="flex items-center gap-1.5 flex-wrap">
@@ -397,12 +386,10 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
         {/* Document checklist — derived from this university's requirements,
             so it exists for signed-out visitors too */}
         <section className="mb-8">
-          <DocumentChecklist
+          <LiveDocumentChecklist
             universityId={university.id}
             locale={locale}
-            isSignedIn={Boolean(user)}
             entranceRequirements={university.entrance_requirements}
-            initialDiffs={docsDiffs}
           />
         </section>
 
@@ -425,21 +412,11 @@ export default async function UniversityDetailPage({ params: { locale, id }, sea
 
         {/* Action links */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
-          {isAdmin && (
-            <a
-              href={`/admin/universities/${university.id}/edit`}
-              className="flex-1 px-5 py-3 border-2 border-dashed border-muted-foreground/40 text-muted-foreground rounded-lg text-sm font-semibold text-center hover:border-primary hover:text-primary transition-colors"
-              aria-label="Edit in admin panel"
-            >
-              ✏ Edit
-            </a>
-          )}
-          <BookmarkButton
+          <DetailActions
             type="university"
             id={university.id}
-            initialSaved={isSaved}
             locale={locale}
-            size="detail"
+            editHref={`/admin/universities/${university.id}/edit`}
           />
           <a
             href={university.official_website}

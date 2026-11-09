@@ -1,25 +1,35 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { BACK_LINK_CLASS } from './back-link';
+import { FilterAwareBackLink } from './FilterAwareBackLink';
 
 type Props = {
   title: string;
   subtitle?: string;
   backHref?: string;
   backLabel?: string;
+  /** Restore the list filters from the `from` query param, read on the client. */
+  keepListFilters?: boolean;
   badge?: React.ReactNode;
   action?: React.ReactNode;
 };
 
-export function PageHeader({ title, subtitle, backHref, backLabel, badge, action }: Props) {
+export function PageHeader({ title, subtitle, backHref, backLabel, keepListFilters, badge, action }: Props) {
+  const plainBackLink = backHref ? (
+    <Link href={backHref} className={BACK_LINK_CLASS}>
+      ← {backLabel}
+    </Link>
+  ) : null;
+
   return (
     <div className="bg-white border-b border-border">
       <div className="container mx-auto px-5 pt-8 pb-0">
-        {backHref && (
-          <Link
-            href={backHref}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors mb-5"
-          >
-            ← {backLabel}
-          </Link>
+        {backHref && keepListFilters ? (
+          <Suspense fallback={plainBackLink}>
+            <FilterAwareBackLink href={backHref} label={backLabel} />
+          </Suspense>
+        ) : (
+          plainBackLink
         )}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
