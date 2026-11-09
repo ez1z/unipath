@@ -1,12 +1,17 @@
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import type { ScholarshipDbRow } from './scholarship-types';
 import { dbRowToScholarship } from './scholarship-types';
 
 export type { Scholarship } from './scholarship-types';
 export type { ScholarshipFilterParams } from './scholarship-types';
 
-async function queryAll() {
-  const supabase = await createClient();
+// Public reads use the cookie-less client so the pages that call them can be
+// cached (see lib/supabase/public.ts). `cache` makes repeat calls in one render
+// share a single fetch.
+const queryAll = cache(async () => {
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('scholarships')
     .select('*')
@@ -15,7 +20,7 @@ async function queryAll() {
     .order('name_en', { ascending: true });
   if (error) throw new Error(`Failed to fetch scholarships: ${error.message}`);
   return (data as ScholarshipDbRow[]).map(dbRowToScholarship);
-}
+});
 
 export async function getAll() {
   return queryAll();
@@ -34,7 +39,7 @@ export async function getById(id: string) {
 }
 
 export async function getBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('scholarships')
     .select('*')
@@ -47,7 +52,7 @@ export async function getBySlug(slug: string) {
 }
 
 export async function getByUniversity(universityId: string, country: string) {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const [uniResult, countryResult] = await Promise.all([
     supabase
       .from('scholarships')
