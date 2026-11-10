@@ -22,6 +22,8 @@ function revalidateUniversityPaths() {
     revalidatePath(`/${locale}/universities`);
     revalidatePath(`/${locale}`);
   }
+  // Detail pages are cached (ISR); refresh them so an edit shows right away.
+  revalidatePath('/[locale]/universities/[id]', 'page');
 }
 
 export async function importUniversitiesAction(

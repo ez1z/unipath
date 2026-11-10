@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Locale } from '@/lib/constants';
 import type { DiscussionMessageDbRow, EntityType } from './discussion-types';
@@ -77,7 +78,7 @@ export async function getMessageCount(
   entityType: EntityType,
   entityId: string | null,
 ): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   let q = supabase
     .from('discussion_messages')
     .select('id', { count: 'exact', head: true })

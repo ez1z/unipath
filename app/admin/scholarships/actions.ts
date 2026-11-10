@@ -33,7 +33,11 @@ async function generateScholarshipSlug(
 function revalidateScholarshipPaths() {
   for (const locale of SUPPORTED_LOCALES) {
     revalidatePath(`/${locale}/scholarships`);
+    revalidatePath(`/${locale}`);
   }
+  // Detail pages are cached (ISR); refresh them so an edit shows right away.
+  revalidatePath('/[locale]/scholarships/[id]', 'page');
+  revalidatePath('/[locale]/universities/[id]', 'page');
 }
 
 export async function createScholarshipAction(

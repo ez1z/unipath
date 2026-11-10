@@ -1,35 +1,16 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import type { Locale } from '@/lib/constants';
-import { createClient } from '@/lib/supabase/server';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
-import { MobileMenu } from '@/components/MobileMenu';
-import { NavBarAuthButtons } from '@/components/NavBarAuthButtons';
-import type { User } from '@supabase/supabase-js';
+import { NavBarAccount } from '@/components/NavBarAccount';
 
 type Props = { locale: Locale };
 
 export async function NavBar({ locale }: Props) {
   const t = await getTranslations({ locale, namespace: 'nav' });
 
-  let user: User | null = null;
-  let isAdmin = false;
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
-    if (user) {
-      const { data: adminRow } = await supabase
-        .from('admins')
-        .select('role')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      isAdmin = !!adminRow;
-    }
-  } catch {
-    // Supabase unreachable — render unauthenticated state
-  }
-
+  // Who is signed in is read in the browser (NavBarAccount): reading cookies
+  // here, in the layout, made every page dynamic.
   return (
     <nav
       className="bg-brand-dark border-b border-white/10 sticky top-0 z-40"
@@ -69,9 +50,9 @@ export async function NavBar({ locale }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <MobileMenu locale={locale} user={user} isAdmin={isAdmin} />
-          <LocaleSwitcher currentLocale={locale} />
-          <NavBarAuthButtons locale={locale} user={user} isAdmin={isAdmin} />
+          <NavBarAccount locale={locale}>
+            <LocaleSwitcher currentLocale={locale} />
+          </NavBarAccount>
         </div>
       </div>
     </nav>
