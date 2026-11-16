@@ -6,7 +6,7 @@ vi.mock('@/lib/supabase/service', () => ({
     from: vi.fn().mockReturnValue({ insert: vi.fn().mockResolvedValue({}) }),
   })),
 }));
-vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn(), revalidateTag: vi.fn() }));
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
 
 import { createClient } from '@/lib/supabase/server';

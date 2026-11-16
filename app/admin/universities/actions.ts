@@ -1,6 +1,7 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { UNIVERSITIES_TAG } from '@/lib/data/cache-tags';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { requireAdmin, logAction } from '@/lib/admin/auth';
@@ -18,6 +19,7 @@ function friendlyDbError(error: { code?: string; message: string }): string {
 }
 
 function revalidateUniversityPaths() {
+  revalidateTag(UNIVERSITIES_TAG);
   for (const locale of SUPPORTED_LOCALES) {
     revalidatePath(`/${locale}/universities`);
     revalidatePath(`/${locale}`);
