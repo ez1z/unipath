@@ -377,7 +377,9 @@
     "old_manat_label": "Köne manat deňi",
     "million": "million",
     "thousand": "müň",
-    "not_found_desc": "Gözleýän sahypaňyz ýok ýa-da oňa girmegiňiz çäklendirildi."
+    "not_found_desc": "Gözleýän sahypaňyz ýok ýa-da oňa girmegiňiz çäklendirildi.",
+    "active_filters": "Işjeň filtrler",
+    "remove_filter": "Filtri aýyr: {label}"
   },
   "auth": {
     "signin_title": "Giriş",

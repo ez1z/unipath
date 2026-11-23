@@ -12,6 +12,7 @@ import { UniversityCard } from './UniversityCard';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import { FilterSheet } from '@/components/ui/FilterSheet';
+import { ActiveFilterChips } from '@/components/ui/ActiveFilterChips';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Locale } from '@/lib/constants';
 
@@ -61,6 +62,7 @@ export function UniversityListClient({
   userScores,
 }: Props) {
   const t = useTranslations('universities');
+  const tc = useTranslations('common');
 
   // Filters are mirrored to the URL query string so the exact filtered view is
   // preserved across navigation. When the user opens a university and presses
@@ -224,6 +226,18 @@ export function UniversityListClient({
     setSortBy('name');
   }
 
+  function clearSheetFilters() {
+    setCountry('');
+    setLanguage('');
+    setMajor('');
+    setMoeOnly(false);
+    setRankedOnly(false);
+    setMaxTuition('');
+    setDeadlineStatus('');
+    setPrefsActive(false);
+    setScoresActive(false);
+  }
+
   const hasFilters =
     query || country || language || major || moeOnly || rankedOnly ||
     maxTuition || deadlineStatus || sortBy !== 'name';
@@ -253,6 +267,41 @@ export function UniversityListClient({
     { value: 'upcoming', label: t('filter_deadline_upcoming') },
     { value: 'passed', label: t('filter_deadline_passed') },
   ];
+  const filterChips: { key: string; label: string }[] = [];
+  if (country) filterChips.push({ key: 'country', label: country });
+  if (language) filterChips.push({ key: 'language', label: language.toUpperCase() });
+  if (major) filterChips.push({ key: 'major', label: major });
+  if (maxTuition) {
+    filterChips.push({
+      key: 'maxTuition',
+      label: `${t('filter_max_tuition')}: $${Number(maxTuition).toLocaleString('en-US')}`,
+    });
+  }
+  if (deadlineStatus) {
+    filterChips.push({
+      key: 'deadline',
+      label: deadlineStatusOptions.find((o) => o.value === deadlineStatus)?.label ?? deadlineStatus,
+    });
+  }
+  if (moeOnly) filterChips.push({ key: 'moe', label: t('filter_moe') });
+  if (rankedOnly) filterChips.push({ key: 'ranked', label: t('filter_ranked_only') });
+  if (prefsActive) filterChips.push({ key: 'prefs', label: t('filter_my_preferences') });
+  if (scoresActive) filterChips.push({ key: 'scores', label: t('filter_my_results') });
+
+  function removeChip(key: string) {
+    switch (key) {
+      case 'country': setCountry(''); break;
+      case 'language': setLanguage(''); break;
+      case 'major': setMajor(''); break;
+      case 'maxTuition': setMaxTuition(''); break;
+      case 'deadline': setDeadlineStatus(''); break;
+      case 'moe': setMoeOnly(false); break;
+      case 'ranked': setRankedOnly(false); break;
+      case 'prefs': setPrefsActive(false); break;
+      case 'scores': setScoresActive(false); break;
+    }
+  }
+
   const sortOptions: { value: UniversitySortBy; label: string }[] = [
     { value: 'name', label: t('sort_name') },
     { value: 'ranking', label: t('sort_ranking') },
@@ -457,6 +506,15 @@ export function UniversityListClient({
         )}
       </FilterSheet>
 
+      <ActiveFilterChips
+        chips={filterChips}
+        onRemove={removeChip}
+        onClearAll={clearSheetFilters}
+        removeLabel={(label) => tc('remove_filter', { label })}
+        clearAllLabel={t('filters_clear_all')}
+        ariaLabel={tc('active_filters')}
+      />
+
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
         <span>{t('results_count', { count: sorted.length })}</span>
       </div>
@@ -477,6 +535,15 @@ export function UniversityListClient({
             <circle cx="50" cy="50" r="5.5" fill="currentColor" />
           </svg>
           <p className="text-muted-foreground mt-4">{t('no_results')}</p>
+          {(hasFilters || hasActivePersonalization) && (
+            <button
+              type="button"
+              onClick={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
+              className="mt-4 inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold border border-border hover:border-primary hover:text-primary transition-colors"
+            >
+              {t('clear_filters')}
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

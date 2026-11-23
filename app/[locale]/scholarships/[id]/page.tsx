@@ -145,6 +145,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
         subtitle={scholarship.country}
         backHref={`/${locale}/scholarships`}
         backLabel={t('title')}
+        keepListFilters
         badge={
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${TYPE_STYLES[scholarship.type] ?? TYPE_STYLES.partial}`}>
             {TYPE_LABELS[scholarship.type] ?? scholarship.type}

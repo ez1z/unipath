@@ -1,16 +1,20 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { trackEvent } from '@/lib/analytics/track';
 import type { Scholarship } from '@/lib/data/scholarships';
 import { filterScholarships } from '@/lib/data/filter-scholarships';
 import type { ScholarshipSortBy } from '@/lib/data/scholarship-types';
+import { buildScholarshipFiltersQuery, parseScholarshipFilters } from '@/lib/data/scholarship-filter-query';
 import { getNextDeadline } from '@/lib/types/semester';
 import { ScholarshipCard } from './ScholarshipCard';
 import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import { FilterSheet } from '@/components/ui/FilterSheet';
+import { ActiveFilterChips } from '@/components/ui/ActiveFilterChips';
+import { formatUsd } from '@/lib/format';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Locale } from '@/lib/constants';
 
@@ -38,20 +42,55 @@ export function ScholarshipListClient({
   qualifiedUniversityIds,
 }: Props) {
   const t = useTranslations('scholarships');
-  const [query, setQuery] = useState('');
-  const [country, setCountry] = useState('');
-  const [type, setType] = useState('');
-  const [coverage, setCoverage] = useState('');
-  const [hasAmount, setHasAmount] = useState(false);
-  const [minAmount, setMinAmount] = useState('');
-  const [deadlineStatus, setDeadlineStatus] = useState('');
-  const [sortBy, setSortBy] = useState<ScholarshipSortBy>('name');
-  const [prefsActive, setPrefsActive] = useState(false);
-  const [scoresActive, setScoresActive] = useState(false);
+  const tc = useTranslations('common');
+
+  // Filters are mirrored to the URL query string (same pattern as the
+  // universities list), so pressing "back" from a scholarship or opening a
+  // shared link restores the exact filtered view.
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [initialFilters] = useState(() => parseScholarshipFilters(searchParams));
+
+  const [query, setQuery] = useState(initialFilters.query);
+  const [country, setCountry] = useState(initialFilters.country);
+  const [type, setType] = useState(initialFilters.type);
+  const [coverage, setCoverage] = useState(initialFilters.coverage);
+  const [hasAmount, setHasAmount] = useState(initialFilters.hasAmount);
+  const [minAmount, setMinAmount] = useState(initialFilters.minAmount);
+  const [deadlineStatus, setDeadlineStatus] = useState<string>(initialFilters.deadlineStatus);
+  const [sortBy, setSortBy] = useState<ScholarshipSortBy>(initialFilters.sortBy);
+  const [prefsActive, setPrefsActive] = useState(initialFilters.prefs);
+  const [scoresActive, setScoresActive] = useState(initialFilters.scores);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // Log search terms (debounced) for the admin analytics dashboard.
-  const lastLoggedQuery = useRef('');
+  // Single source of truth for the active filters as a query string, reused for
+  // the URL sync below and the per-card links.
+  const filtersQuery = useMemo(
+    () =>
+      buildScholarshipFiltersQuery({
+        query,
+        country,
+        type,
+        coverage,
+        hasAmount,
+        minAmount,
+        deadlineStatus: deadlineStatus === 'upcoming' || deadlineStatus === 'passed' ? deadlineStatus : '',
+        sortBy,
+        prefs: prefsActive,
+        scores: scoresActive,
+      }),
+    [query, country, type, coverage, hasAmount, minAmount, deadlineStatus, sortBy, prefsActive, scoresActive],
+  );
+
+  // History API rather than router.replace, so typing in the search box doesn't
+  // trigger a server round-trip on every keystroke (filtering is client-side).
+  useEffect(() => {
+    window.history.replaceState(null, '', filtersQuery ? `${pathname}?${filtersQuery}` : pathname);
+  }, [filtersQuery, pathname]);
+
+  // Log search terms (debounced) for the admin analytics dashboard. Seeded from
+  // the initial query so opening a shared link doesn't log a search on load.
+  const lastLoggedQuery = useRef(query.trim().toLowerCase());
   useEffect(() => {
     const term = query.trim();
     if (term.length < 2 || term.toLowerCase() === lastLoggedQuery.current) return;
@@ -201,6 +240,53 @@ export function ScholarshipListClient({
     { value: 'upcoming', label: t('filter_deadline_upcoming') },
     { value: 'passed', label: t('filter_deadline_passed') },
   ];
+
+  // Removable chips for the filters hidden inside the sheet, so students can
+  // see (and undo) what is narrowing the list without reopening it.
+  const filterChips: { key: string; label: string }[] = [];
+  if (country) filterChips.push({ key: 'country', label: country });
+  if (type) filterChips.push({ key: 'type', label: TYPE_LABELS[type] ?? type });
+  if (coverage) filterChips.push({ key: 'coverage', label: COVERAGE_LABELS[coverage] ?? coverage });
+  if (minAmount) {
+    filterChips.push({
+      key: 'minAmount',
+      label: `${t('filter_min_amount')}: ${formatUsd(Number(minAmount))}`,
+    });
+  }
+  if (deadlineStatus) {
+    filterChips.push({
+      key: 'deadline',
+      label: deadlineStatusOptions.find((o) => o.value === deadlineStatus)?.label ?? deadlineStatus,
+    });
+  }
+  if (hasAmount) filterChips.push({ key: 'amount', label: t('filter_has_amount') });
+  if (prefsActive) filterChips.push({ key: 'prefs', label: t('filter_my_preferences') });
+  if (scoresActive) filterChips.push({ key: 'scores', label: t('filter_my_results') });
+
+  function removeChip(key: string) {
+    switch (key) {
+      case 'country': setCountry(''); break;
+      case 'type': setType(''); break;
+      case 'coverage': setCoverage(''); break;
+      case 'minAmount': setMinAmount(''); break;
+      case 'deadline': setDeadlineStatus(''); break;
+      case 'amount': setHasAmount(false); break;
+      case 'prefs': setPrefsActive(false); break;
+      case 'scores': setScoresActive(false); break;
+    }
+  }
+
+  // Resets only the sheet filters (keeps the search text and sort order).
+  function clearSheetFilters() {
+    setCountry('');
+    setType('');
+    setCoverage('');
+    setHasAmount(false);
+    setMinAmount('');
+    setDeadlineStatus('');
+    setPrefsActive(false);
+    setScoresActive(false);
+  }
 
   const sortOptions: { value: ScholarshipSortBy; label: string }[] = [
     { value: 'name', label: t('sort_name') },
@@ -392,6 +478,15 @@ export function ScholarshipListClient({
         )}
       </FilterSheet>
 
+      <ActiveFilterChips
+        chips={filterChips}
+        onRemove={removeChip}
+        onClearAll={clearSheetFilters}
+        removeLabel={(label) => tc('remove_filter', { label })}
+        clearAllLabel={t('filters_clear_all')}
+        ariaLabel={tc('active_filters')}
+      />
+
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
         <span>{t('results_count', { count: sorted.length })}</span>
       </div>
@@ -412,6 +507,15 @@ export function ScholarshipListClient({
             <circle cx="50" cy="50" r="5.5" fill="currentColor" />
           </svg>
           <p className="text-muted-foreground mt-4">{t('no_results')}</p>
+          {(hasFilters || hasActivePersonalization) && (
+            <button
+              type="button"
+              onClick={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
+              className="mt-4 inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold border border-border hover:border-primary hover:text-primary transition-colors"
+            >
+              {t('clear_filters')}
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -420,6 +524,7 @@ export function ScholarshipListClient({
               key={s.id}
               scholarship={s}
               locale={locale}
+              filtersQuery={filtersQuery}
               bookmarkSlot={
                 <BookmarkButton
                   type="scholarship"

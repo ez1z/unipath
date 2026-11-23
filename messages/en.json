@@ -377,7 +377,9 @@
     "old_manat_label": "Old Manat equivalent",
     "million": "million",
     "thousand": "thousand",
-    "not_found_desc": "The page you're looking for doesn't exist or you don't have access to it."
+    "not_found_desc": "The page you're looking for doesn't exist or you don't have access to it.",
+    "active_filters": "Active filters",
+    "remove_filter": "Remove filter: {label}"
   },
   "auth": {
     "signin_title": "Sign in",

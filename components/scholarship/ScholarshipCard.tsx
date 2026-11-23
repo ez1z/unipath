@@ -11,6 +11,8 @@ type Props = {
   universityName?: string;
   compact?: boolean;
   bookmarkSlot?: React.ReactNode;
+  /** Active list filters, so the detail page can offer a "back" link that restores them. */
+  filtersQuery?: string;
 };
 
 const TYPE_STYLES: Record<string, string> = {
@@ -20,9 +22,12 @@ const TYPE_STYLES: Record<string, string> = {
   partial: 'bg-secondary text-secondary-foreground border-border',
 };
 
-export function ScholarshipCard({ scholarship: s, locale, universityName, compact = false, bookmarkSlot }: Props) {
+export function ScholarshipCard({ scholarship: s, locale, universityName, compact = false, bookmarkSlot, filtersQuery }: Props) {
   const t = useTranslations('scholarships');
   const name = s.name[locale] ?? s.name.en;
+  const detailHref = filtersQuery
+    ? `/${locale}/scholarships/${s.slug}?from=${encodeURIComponent(filtersQuery)}`
+    : `/${locale}/scholarships/${s.slug}`;
 
   const TYPE_LABELS: Record<string, string> = {
     government: t('type_government'),
@@ -50,7 +55,7 @@ export function ScholarshipCard({ scholarship: s, locale, universityName, compac
       className="relative bg-white rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 flex flex-col group overflow-hidden"
     >
       <Link
-        href={`/${locale}/scholarships/${s.slug}`}
+        href={detailHref}
         className="absolute inset-0 z-0"
         aria-label={name}
       />
