@@ -21,9 +21,9 @@ Daily log of the unattended AI dev team (CEO + Researcher / Senior SWE / Junior 
 - `npx tsc --noEmit`: pass. `npx eslint . --max-warnings=0`: pass. `npx vitest run`: 31 files, 514 tests pass (26 new).
 - `next build`: compiles and type-checks; prerender of `/[locale]` fails only because there are no Supabase credentials in the agent sandbox (that page is not touched by this change). Vercel preview on the PR is the real build check.
 - Chip text contrast (`text-primary` on `bg-primary/10`): 9.77:1 (WCAG AA needs 4.5:1). Chips ≥32px tall, wrap at 360px, every button has an accessible name.
-- No screenshots: pages need live Supabase data, which the sandbox doesn't have.
+- Ran the production build + `next start` against a local stub Supabase API with sample rows: build passes, and Playwright at 375px confirmed chips render and wrap (no horizontal scroll), removing a chip updates the URL and keeps keyboard focus on a neighbouring chip, card links carry `?from=`, the detail page back link restores the filters, and `?maxTuition=abc` is ignored.
 - Local `next build` against a stub Supabase API (returns empty lists): **passes** (exit 0, only the pre-existing Edge-runtime warning from supabase-js in middleware).
-- **Vercel and Netlify preview deploys on PR #28 both failed**; logs need a login the agents don't have. Earlier branches (Nov 9, Nov 16) deployed fine on both. Not diagnosed — PR left as draft for Eziz to check the deploy logs.
+- **Vercel and Netlify preview deploys on PR #28 both failed**; logs need a login the agents don't have. Earlier branches (Nov 9, Nov 16) deployed fine on both. The same code builds with sample data locally, so the cause is most likely in the hosting build environment (e.g. build-time data fetch), but that is unconfirmed. PR left as draft for Eziz to check the deploy logs.
 
 **Backlog / ideas for later runs**
 - Universities list: `sort` and `deadline` URL params are cast without validation (bad values silently fall back in the switch, but the select shows nothing). Reuse the scholarship parse pattern.
