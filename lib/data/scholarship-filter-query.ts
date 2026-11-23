@@ -1,5 +1,6 @@
 import { COVERAGE_ITEMS } from './scholarship-types';
 import type { CoverageItem, ScholarshipSortBy, ScholarshipType } from './scholarship-types';
+import { parseNonNegativeNumberParam } from './query-params';
 
 export type ScholarshipListFilters = {
   query: string;
@@ -34,12 +35,6 @@ function oneOf<T extends string>(value: string | null, allowed: readonly T[]): T
   return allowed.find((v) => v === value);
 }
 
-function parseMinAmount(value: string | null): string {
-  if (!value || value.trim() === '') return '';
-  const n = Number(value);
-  return Number.isFinite(n) && n >= 0 ? value : '';
-}
-
 /**
  * Reads the scholarship list filters from a query string (e.g. `useSearchParams()`).
  * Unknown or malformed values fall back to the defaults, so a hand-edited or
@@ -52,7 +47,7 @@ export function parseScholarshipFilters(params: { get(name: string): string | nu
     type: oneOf(params.get('type'), TYPE_VALUES) ?? '',
     coverage: oneOf<CoverageItem>(params.get('coverage'), COVERAGE_ITEMS) ?? '',
     hasAmount: params.get('amount') === '1',
-    minAmount: parseMinAmount(params.get('minAmount')),
+    minAmount: parseNonNegativeNumberParam(params.get('minAmount')),
     deadlineStatus: oneOf(params.get('deadline'), ['upcoming', 'passed'] as const) ?? '',
     sortBy: oneOf(params.get('sort'), SORT_VALUES) ?? 'name',
     prefs: params.get('prefs') === '1',

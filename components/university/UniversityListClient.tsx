@@ -13,6 +13,8 @@ import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import { FilterSheet } from '@/components/ui/FilterSheet';
 import { ActiveFilterChips } from '@/components/ui/ActiveFilterChips';
+import { buildUniversityFilterChips } from '@/lib/data/filter-chips';
+import { parseNonNegativeNumberParam } from '@/lib/data/query-params';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Locale } from '@/lib/constants';
 
@@ -77,7 +79,7 @@ export function UniversityListClient({
   const [major, setMajor] = useState(() => searchParams.get('major') ?? '');
   const [moeOnly, setMoeOnly] = useState(() => searchParams.get('moe') === '1');
   const [rankedOnly, setRankedOnly] = useState(() => searchParams.get('ranked') === '1');
-  const [maxTuition, setMaxTuition] = useState(() => searchParams.get('maxTuition') ?? '');
+  const [maxTuition, setMaxTuition] = useState(() => parseNonNegativeNumberParam(searchParams.get('maxTuition')));
   const [deadlineStatus, setDeadlineStatus] = useState(() => searchParams.get('deadline') ?? '');
   const [sortBy, setSortBy] = useState<UniversitySortBy>(
     () => (searchParams.get('sort') as UniversitySortBy) || 'name',
@@ -85,6 +87,7 @@ export function UniversityListClient({
   const [prefsActive, setPrefsActive] = useState(() => searchParams.get('prefs') === '1');
   const [scoresActive, setScoresActive] = useState(() => searchParams.get('scores') === '1');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const filtersButtonRef = useRef<HTMLButtonElement>(null);
 
   // Single source of truth for the active filters as a query string. Reused for
   // both the URL sync below and the per-card links, so opening a university and
@@ -226,6 +229,15 @@ export function UniversityListClient({
     setSortBy('name');
   }
 
+  // Everything, including search, sort and personalisation (sheet "Clear all",
+  // empty-state button).
+  function resetAll() {
+    clearFilters();
+    setPrefsActive(false);
+    setScoresActive(false);
+  }
+
+  // Resets only the sheet filters (keeps the search text and sort order).
   function clearSheetFilters() {
     setCountry('');
     setLanguage('');
@@ -243,12 +255,17 @@ export function UniversityListClient({
     maxTuition || deadlineStatus || sortBy !== 'name';
   const hasActivePersonalization = prefsActive || scoresActive;
 
+  // Personalisation from a shared link only counts when this viewer actually
+  // has preferences / scores; otherwise it filters nothing and has no toggle.
+  const prefsApplied = prefsActive && hasPrefs;
+  const scoresApplied = scoresActive && hasScores;
+
   // Fields that live inside the filter sheet (excludes search + sort, which
   // stay on the visible bar) — drives the badge count on the filter icon.
   const sheetFilterCount =
     [country, language, major, maxTuition, deadlineStatus].filter(Boolean).length +
     (moeOnly ? 1 : 0) + (rankedOnly ? 1 : 0) +
-    (prefsActive ? 1 : 0) + (scoresActive ? 1 : 0);
+    (prefsApplied ? 1 : 0) + (scoresApplied ? 1 : 0);
 
   const countryOptions = [
     { value: '', label: t('filter_all_countries'), muted: true },
@@ -267,26 +284,20 @@ export function UniversityListClient({
     { value: 'upcoming', label: t('filter_deadline_upcoming') },
     { value: 'passed', label: t('filter_deadline_passed') },
   ];
-  const filterChips: { key: string; label: string }[] = [];
-  if (country) filterChips.push({ key: 'country', label: country });
-  if (language) filterChips.push({ key: 'language', label: language.toUpperCase() });
-  if (major) filterChips.push({ key: 'major', label: major });
-  if (maxTuition) {
-    filterChips.push({
-      key: 'maxTuition',
-      label: `${t('filter_max_tuition')}: $${Number(maxTuition).toLocaleString('en-US')}`,
-    });
-  }
-  if (deadlineStatus) {
-    filterChips.push({
-      key: 'deadline',
-      label: deadlineStatusOptions.find((o) => o.value === deadlineStatus)?.label ?? deadlineStatus,
-    });
-  }
-  if (moeOnly) filterChips.push({ key: 'moe', label: t('filter_moe') });
-  if (rankedOnly) filterChips.push({ key: 'ranked', label: t('filter_ranked_only') });
-  if (prefsActive) filterChips.push({ key: 'prefs', label: t('filter_my_preferences') });
-  if (scoresActive) filterChips.push({ key: 'scores', label: t('filter_my_results') });
+  const filterChips = buildUniversityFilterChips(
+    {
+      country,
+      language,
+      major,
+      maxTuition,
+      deadlineStatus,
+      moeOnly,
+      rankedOnly,
+      prefs: prefsApplied,
+      scores: scoresApplied,
+    },
+    t,
+  );
 
   function removeChip(key: string) {
     switch (key) {
@@ -343,6 +354,7 @@ export function UniversityListClient({
         </div>
 
         <button
+          ref={filtersButtonRef}
           type="button"
           onClick={() => setSheetOpen(true)}
           aria-label={t('filters_button')}
@@ -373,7 +385,7 @@ export function UniversityListClient({
         closeLabel={t('filters_close')}
         clearLabel={t('filters_clear_all')}
         applyLabel={t('filters_show_results', { count: sorted.length })}
-        onClear={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
+        onClear={resetAll}
         hasFilters={Boolean(hasFilters || hasActivePersonalization)}
       >
         <Select
@@ -511,12 +523,13 @@ export function UniversityListClient({
         onRemove={removeChip}
         onClearAll={clearSheetFilters}
         removeLabel={(label) => tc('remove_filter', { label })}
-        clearAllLabel={t('filters_clear_all')}
+        clearAllLabel={t('clear_filters')}
         ariaLabel={tc('active_filters')}
+        fallbackFocusRef={filtersButtonRef}
       />
 
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
-        <span>{t('results_count', { count: sorted.length })}</span>
+        <span aria-live="polite">{t('results_count', { count: sorted.length })}</span>
       </div>
 
       {sorted.length === 0 ? (
@@ -538,7 +551,7 @@ export function UniversityListClient({
           {(hasFilters || hasActivePersonalization) && (
             <button
               type="button"
-              onClick={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
+              onClick={resetAll}
               className="mt-4 inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold border border-border hover:border-primary hover:text-primary transition-colors"
             >
               {t('clear_filters')}

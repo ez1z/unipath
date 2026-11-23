@@ -14,7 +14,7 @@ import { BookmarkButton } from '@/components/profile/BookmarkButton';
 import { Select } from '@/components/ui/Select';
 import { FilterSheet } from '@/components/ui/FilterSheet';
 import { ActiveFilterChips } from '@/components/ui/ActiveFilterChips';
-import { formatUsd } from '@/lib/format';
+import { buildScholarshipFilterChips } from '@/lib/data/filter-chips';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Locale } from '@/lib/constants';
 
@@ -62,6 +62,7 @@ export function ScholarshipListClient({
   const [prefsActive, setPrefsActive] = useState(initialFilters.prefs);
   const [scoresActive, setScoresActive] = useState(initialFilters.scores);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const filtersButtonRef = useRef<HTMLButtonElement>(null);
 
   // Single source of truth for the active filters as a query string, reused for
   // the URL sync below and the per-card links.
@@ -187,6 +188,19 @@ export function ScholarshipListClient({
     setSortBy('name');
   }
 
+  // Everything, including search, sort and personalisation (sheet "Clear all",
+  // empty-state button).
+  function resetAll() {
+    clearFilters();
+    setPrefsActive(false);
+    setScoresActive(false);
+  }
+
+  // Personalisation from a shared link only counts when this viewer actually
+  // has preferences / scores; otherwise it filters nothing and has no toggle.
+  const prefsApplied = prefsActive && hasPrefs;
+  const scoresApplied = scoresActive && hasScores;
+
   const hasFilters =
     query || country || type || coverage || hasAmount || minAmount ||
     deadlineStatus || sortBy !== 'name';
@@ -197,7 +211,7 @@ export function ScholarshipListClient({
   const sheetFilterCount =
     [country, type, coverage, minAmount, deadlineStatus].filter(Boolean).length +
     (hasAmount ? 1 : 0) +
-    (prefsActive ? 1 : 0) + (scoresActive ? 1 : 0);
+    (prefsApplied ? 1 : 0) + (scoresApplied ? 1 : 0);
 
   const countryOptions = [
     { value: '', label: t('filter_all_countries'), muted: true },
@@ -243,25 +257,19 @@ export function ScholarshipListClient({
 
   // Removable chips for the filters hidden inside the sheet, so students can
   // see (and undo) what is narrowing the list without reopening it.
-  const filterChips: { key: string; label: string }[] = [];
-  if (country) filterChips.push({ key: 'country', label: country });
-  if (type) filterChips.push({ key: 'type', label: TYPE_LABELS[type] ?? type });
-  if (coverage) filterChips.push({ key: 'coverage', label: COVERAGE_LABELS[coverage] ?? coverage });
-  if (minAmount) {
-    filterChips.push({
-      key: 'minAmount',
-      label: `${t('filter_min_amount')}: ${formatUsd(Number(minAmount))}`,
-    });
-  }
-  if (deadlineStatus) {
-    filterChips.push({
-      key: 'deadline',
-      label: deadlineStatusOptions.find((o) => o.value === deadlineStatus)?.label ?? deadlineStatus,
-    });
-  }
-  if (hasAmount) filterChips.push({ key: 'amount', label: t('filter_has_amount') });
-  if (prefsActive) filterChips.push({ key: 'prefs', label: t('filter_my_preferences') });
-  if (scoresActive) filterChips.push({ key: 'scores', label: t('filter_my_results') });
+  const filterChips = buildScholarshipFilterChips(
+    {
+      country,
+      type,
+      coverage,
+      minAmount,
+      deadlineStatus,
+      hasAmount,
+      prefs: prefsApplied,
+      scores: scoresApplied,
+    },
+    t,
+  );
 
   function removeChip(key: string) {
     switch (key) {
@@ -328,6 +336,7 @@ export function ScholarshipListClient({
         </div>
 
         <button
+          ref={filtersButtonRef}
           type="button"
           onClick={() => setSheetOpen(true)}
           aria-label={t('filters_button')}
@@ -358,7 +367,7 @@ export function ScholarshipListClient({
         closeLabel={t('filters_close')}
         clearLabel={t('filters_clear_all')}
         applyLabel={t('filters_show_results', { count: sorted.length })}
-        onClear={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
+        onClear={resetAll}
         hasFilters={Boolean(hasFilters || hasActivePersonalization)}
       >
         <Select
@@ -483,12 +492,13 @@ export function ScholarshipListClient({
         onRemove={removeChip}
         onClearAll={clearSheetFilters}
         removeLabel={(label) => tc('remove_filter', { label })}
-        clearAllLabel={t('filters_clear_all')}
+        clearAllLabel={t('clear_filters')}
         ariaLabel={tc('active_filters')}
+        fallbackFocusRef={filtersButtonRef}
       />
 
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
-        <span>{t('results_count', { count: sorted.length })}</span>
+        <span aria-live="polite">{t('results_count', { count: sorted.length })}</span>
       </div>
 
       {sorted.length === 0 ? (
@@ -510,7 +520,7 @@ export function ScholarshipListClient({
           {(hasFilters || hasActivePersonalization) && (
             <button
               type="button"
-              onClick={() => { clearFilters(); setPrefsActive(false); setScoresActive(false); }}
+              onClick={resetAll}
               className="mt-4 inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold border border-border hover:border-primary hover:text-primary transition-colors"
             >
               {t('clear_filters')}
