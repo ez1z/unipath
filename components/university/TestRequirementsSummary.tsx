@@ -1,22 +1,14 @@
 import { useTranslations } from 'next-intl';
 import { getTestEntries, type TestEntry } from '@/lib/data/fit';
+import { summarizeTests, testLabelText } from '@/lib/data/test-labels';
 
 export { getTestEntries };
 
 type SummaryItem = { key: string; text: string };
 
 function buildItems(tests: TestEntry[], t: ReturnType<typeof useTranslations>): SummaryItem[] {
-  return tests.map((test) => {
-    const abbr = t(`test_abbr_${test.type}` as Parameters<typeof t>[0]);
-    let score: string | null = null;
-    if (test.type === 'sat') {
-      const total = (test.min_math ?? 0) + (test.min_verbal ?? 0);
-      score = total > 0 ? String(total) : null;
-    } else if (test.min_score != null) {
-      score = String(test.min_score);
-    }
-    return { key: test.type, text: score ? `${abbr} ${score}` : abbr };
-  });
+  const tr = (key: string) => t(key as Parameters<typeof t>[0]);
+  return summarizeTests(tests, (d) => testLabelText(d, tr)).map((text, i) => ({ key: `${i}-${text}`, text }));
 }
 
 type Props = {
@@ -32,6 +24,7 @@ export function TestRequirementsSummary({ requirements, variant = 'card', showLa
   const tests = getTestEntries(requirements);
   if (tests.length === 0) return null;
   const items = buildItems(tests, t);
+  if (items.length === 0) return null;
 
   if (variant === 'inline') {
     return (

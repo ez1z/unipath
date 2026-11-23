@@ -1,14 +1,30 @@
 import type { University } from '@/lib/data/university-types';
 import type { Tier } from '@/lib/data/list-types';
 
+/** The tests the student profile records and the fit calculation scores. */
 export type TestType = 'toefl' | 'ielts' | 'sat' | 'duolingo';
 
+const SCORED_TESTS: readonly string[] = ['toefl', 'ielts', 'sat', 'duolingo'];
+
+export function isScoredTest(type: unknown): type is TestType {
+  return typeof type === 'string' && SCORED_TESTS.includes(type);
+}
+
+/**
+ * One entry of a `tests` array as the import job writes it. `type` is free
+ * text ("pte", "cambridge c2 proficiency", "other", …) — only the four
+ * `TestType` values are scored; see lib/data/test-labels.ts for display.
+ */
 export type TestEntry = {
-  type: TestType;
-  format?: 'ibt' | 'pbt';
-  min_score?: number;
-  min_math?: number;
-  min_verbal?: number;
+  type: string;
+  /** 'ibt' | 'pbt' for TOEFL; the data also has e.g. 'academic', 'ibt/home edition'. */
+  format?: string | null;
+  min_score?: number | null;
+  min_math?: number | null;
+  min_verbal?: number | null;
+  /** CEFR-style minimum ("B1") for exams graded by level. */
+  min_level?: string | null;
+  note?: string | null;
 };
 
 /** Pull the standardized-test entries out of an entrance_requirements / requirements blob. */
@@ -89,6 +105,7 @@ export function suggestTier(uni: University, profile: FitProfile | null): FitRes
   let missedTest = false;
 
   for (const test of getTestEntries(uni.entrance_requirements)) {
+    if (!isScoredTest(test.type)) continue;
     const required = minimumFor(test);
     const yours = scoreFor(test.type, profile);
     if (required == null || yours == null) continue;

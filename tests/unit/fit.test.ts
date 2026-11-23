@@ -156,3 +156,33 @@ describe('suggestTier — flags', () => {
     expect(result.flags).toEqual([]);
   });
 });
+
+describe('suggestTier — tests the profile does not record', () => {
+  const profile: FitProfile = { toefl_total: 60, ielts_overall: 5, sat_total: 900, duolingo_score: 80 };
+
+  it('never scores or flags exams outside TOEFL/IELTS/SAT/Duolingo', () => {
+    const school = withTests([
+      { type: 'pte', min_score: 59 },
+      { type: 'toefl_essentials', min_score: 7.5 },
+      { type: 'cambridge c2 proficiency', min_score: 180 },
+      { type: 'other', min_score: 56 },
+    ]);
+    const result = suggestTier(school, profile);
+    expect(result.flags).toEqual([]);
+    // No test signal and nothing else to go on: no tier, exactly as with no tests.
+    expect(result.tier).toBeNull();
+  });
+
+  it('still scores the core tests listed alongside them', () => {
+    const school = withTests([
+      { type: 'pte', min_score: 59 },
+      { type: 'toefl', format: 'ibt', min_score: 80 },
+    ]);
+    expect(suggestTier(school, profile).flags).toContainEqual({
+      code: 'test_below_min',
+      test: 'toefl',
+      required: 80,
+      yours: 60,
+    });
+  });
+});

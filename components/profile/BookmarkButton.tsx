@@ -14,7 +14,7 @@ type Props = {
   id: string;
   initialSaved: boolean;
   locale: Locale;
-  /** 'card' = icon only; 'detail' = icon + label */
+  /** 'card' = icon only; 'detail' = icon + label (icon-only square on mobile, label sr-only) */
   size?: 'card' | 'detail';
 };
 
@@ -55,14 +55,14 @@ export function BookmarkButton({ type, id, initialSaved, locale, size = 'card' }
         onClick={handleClick}
         disabled={isPending}
         aria-label={saved ? removeLabel : addLabel}
-        className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold border-2 transition-colors disabled:opacity-50 ${
+        className={`inline-flex shrink-0 items-center justify-center w-11 min-h-[44px] sm:w-auto sm:min-h-0 sm:gap-2 sm:px-5 sm:py-3 rounded-lg text-sm font-semibold border-2 transition-colors disabled:opacity-50 ${
           saved
             ? 'bg-gold/10 border-gold text-gold-dark hover:bg-gold/20'
             : 'border-border text-foreground hover:border-gold hover:text-gold-dark'
         }`}
       >
         <HeartIcon filled={saved} />
-        {saved ? savedText : addText}
+        <span className="sr-only sm:not-sr-only">{saved ? savedText : addText}</span>
       </button>
     );
   }

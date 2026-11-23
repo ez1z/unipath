@@ -310,7 +310,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+        <div className="flex flex-row items-stretch gap-2 sticky bottom-0 z-30 -mx-4 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-background/95 backdrop-blur border-t border-border sm:static sm:mx-0 sm:px-0 sm:pb-0 sm:bg-transparent sm:backdrop-blur-none sm:gap-3 sm:pt-4">
           <DetailActions
             type="scholarship"
             id={scholarship.id}
@@ -322,7 +322,7 @@ export default async function ScholarshipDetailPage({ params: { locale, id } }: 
               href={scholarship.application_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-full sm:w-auto px-8 py-3 bg-tk-green text-white rounded-lg text-sm font-semibold text-center hover:opacity-90 transition-opacity shadow-sm justify-center"
+              className="inline-flex flex-1 sm:flex-none items-center min-h-[44px] px-4 sm:px-8 py-3 bg-tk-green text-white rounded-lg text-sm font-semibold text-center hover:opacity-90 transition-opacity shadow-sm justify-center"
               aria-label={`${t('apply')} (opens in new tab)`}
             >
               {t('apply')} ↗

@@ -1,4 +1,6 @@
 import { useTranslations } from 'next-intl';
+import { getTestEntries } from '@/lib/data/fit';
+import { describeTest, humanizeTestType, isEmptyTestEntry, testLabelText } from '@/lib/data/test-labels';
 
 type EssayType =
   | 'personal_statement'
@@ -9,18 +11,11 @@ type EssayType =
   | 'open_prompt';
 
 type EssayEntry = {
-  essay_type: EssayType;
+  /** Usually an EssayType, but imported data has free text ("letter of motivation"). */
+  essay_type: EssayType | string;
   length?: number;
   length_unit?: 'words' | 'characters';
   description?: string;
-};
-
-type TestEntry = {
-  type: 'toefl' | 'ielts' | 'sat' | 'duolingo';
-  format?: 'ibt' | 'pbt';
-  min_score?: number;
-  min_math?: number;
-  min_verbal?: number;
 };
 
 type Requirement = {
@@ -46,7 +41,10 @@ const COUNTRY_KEYS = ['turkey', 'russia', 'uk', 'usa'];
 export function EntranceRequirements({ requirements }: Props) {
   const t = useTranslations('university');
 
-  const tests = Array.isArray(requirements.tests) ? (requirements.tests as TestEntry[]) : [];
+  const tr = (key: string) => t(key as Parameters<typeof t>[0]);
+  const tests = getTestEntries(requirements)
+    .map((test) => ({ test, d: describeTest(test) }))
+    .filter(({ d }) => !isEmptyTestEntry(d));
   const essays = Array.isArray(requirements.essays) ? (requirements.essays as EssayEntry[]) : [];
   const countryEntries = Object.entries(requirements).filter(([k]) => COUNTRY_KEYS.includes(k));
   const docRequirements = Array.isArray(requirements.document_requirements)
@@ -55,8 +53,10 @@ export function EntranceRequirements({ requirements }: Props) {
 
   if (tests.length === 0 && essays.length === 0 && countryEntries.length === 0 && docRequirements.length === 0) return null;
 
-  const essayTypeKey = (type: EssayType) =>
-    `essay_type_${type}` as Parameters<typeof t>[0];
+  const essayTypeLabel = (type: string) => {
+    const key = `essay_type_${String(type).trim().toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '_')}`;
+    return t.has(key as Parameters<typeof t>[0]) ? tr(key) : humanizeTestType(type);
+  };
 
   return (
     <div className="space-y-3">
@@ -67,10 +67,11 @@ export function EntranceRequirements({ requirements }: Props) {
             {t('tests_title')}
           </h3>
           <ul className="space-y-1.5 text-sm">
-            {tests.map((test, i) => (
-              <li key={i} className="flex items-center gap-2 text-foreground">
+            {tests.map(({ test, d }, i) => d.isCore ? (
+              <li key={i} className="text-sm">
+                <div className="flex items-center gap-2 text-foreground">
                 <span className="text-tk-green font-bold">✓</span>
-                {test.type === 'toefl' && (
+                {d.key === 'toefl' && (
                   <>
                     {test.format === 'pbt' ? t('toefl_pbt') : t('toefl_ibt')}
                     {test.min_score != null && (
@@ -80,7 +81,7 @@ export function EntranceRequirements({ requirements }: Props) {
                     )}
                   </>
                 )}
-                {test.type === 'ielts' && (
+                {d.key === 'ielts' && (
                   <>
                     {t('ielts')}
                     {test.min_score != null && (
@@ -90,20 +91,24 @@ export function EntranceRequirements({ requirements }: Props) {
                     )}
                   </>
                 )}
-                {test.type === 'sat' && (
+                {d.key === 'sat' && (
                   <>
                     {t('sat_test')}
-                    {(test.min_math != null || test.min_verbal != null) && (
+                    {test.min_math != null || test.min_verbal != null ? (
                       <span className="text-muted-foreground">
                         {[
                           test.min_math != null ? t('sat_math_suffix', { score: test.min_math }) : null,
                           test.min_verbal != null ? t('sat_verbal_suffix', { score: test.min_verbal }) : null,
                         ].filter(Boolean).join(' · ')}
                       </span>
+                    ) : d.score != null && (
+                      <span className="text-muted-foreground">
+                        {t('min_score_only_suffix', { score: d.score })}
+                      </span>
                     )}
                   </>
                 )}
-                {test.type === 'duolingo' && (
+                {d.key === 'duolingo' && (
                   <>
                     {t('duolingo')}
                     {test.min_score != null && (
@@ -113,6 +118,25 @@ export function EntranceRequirements({ requirements }: Props) {
                     )}
                   </>
                 )}
+                </div>
+                {/* The import job's caveats ("NOT accepted by …", "no minimum published") live here. */}
+                {d.note && <p className="mt-1 ml-5 text-muted-foreground">{d.note}</p>}
+              </li>
+            ) : (
+              // Every other exam (and the odd non-test entry): readable name, the
+              // minimum exactly as the data gives it — no invented scale — and the
+              // import job's note, which often carries the real detail.
+              <li key={i} className="text-sm">
+                <div className="flex items-center gap-2 text-foreground">
+                  <span className="text-tk-green font-bold">✓</span>
+                  {testLabelText(d, tr)}
+                  {d.score != null && (
+                    <span className="text-muted-foreground">
+                      {t('min_score_only_suffix', { score: d.score })}
+                    </span>
+                  )}
+                </div>
+                {d.note && <p className="mt-1 ml-5 text-muted-foreground">{d.note}</p>}
               </li>
             ))}
           </ul>
@@ -130,7 +154,7 @@ export function EntranceRequirements({ requirements }: Props) {
               <li key={i} className="text-sm">
                 <div className="flex items-center gap-2 text-foreground font-medium">
                   <span className="text-tk-green font-bold">✓</span>
-                  {t(essayTypeKey(essay.essay_type))}
+                  {essayTypeLabel(essay.essay_type)}
                   {essay.length != null && (
                     <span className="text-muted-foreground font-normal">
                       — {t('essay_length', {

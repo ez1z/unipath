@@ -411,7 +411,7 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
         </div>
 
         {/* Action links */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+        <div className="flex flex-row items-stretch gap-2 sticky bottom-0 z-30 -mx-4 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-background/95 backdrop-blur border-t border-border sm:static sm:mx-0 sm:px-0 sm:pb-0 sm:bg-transparent sm:backdrop-blur-none sm:gap-3 sm:pt-4">
           <DetailActions
             type="university"
             id={university.id}
@@ -422,7 +422,7 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
             href={university.official_website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 px-5 py-3 border-2 border-primary text-primary rounded-lg text-sm font-semibold text-center hover:bg-primary hover:text-primary-foreground transition-colors"
+            className="flex-1 flex items-center justify-center min-h-[44px] px-3 py-3 sm:px-5 border-2 border-primary text-primary rounded-lg text-sm font-semibold text-center hover:bg-primary hover:text-primary-foreground transition-colors"
             aria-label={`${t('website')} (opens in new tab)`}
           >
             {t('website')} ↗
@@ -431,7 +431,7 @@ export default async function UniversityDetailPage({ params: { locale, id } }: P
             href={university.application_portal_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 px-5 py-3 bg-gold text-white rounded-lg text-sm font-semibold text-center hover:bg-gold-dark transition-colors shadow-sm"
+            className="flex-1 flex items-center justify-center min-h-[44px] px-3 py-3 sm:px-5 bg-gold text-white rounded-lg text-sm font-semibold text-center hover:bg-gold-dark transition-colors shadow-sm"
             aria-label={`${t('apply')} (opens in new tab)`}
           >
             {t('apply')} ↗

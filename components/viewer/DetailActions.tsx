@@ -56,7 +56,7 @@ export function DetailActions({ type, id, locale, editHref }: Props) {
       {isAdmin && (
         <a
           href={editHref}
-          className="flex-1 px-5 py-3 border-2 border-dashed border-muted-foreground/40 text-muted-foreground rounded-lg text-sm font-semibold text-center hover:border-primary hover:text-primary transition-colors"
+          className="hidden sm:block flex-1 px-5 py-3 border-2 border-dashed border-muted-foreground/40 text-muted-foreground rounded-lg text-sm font-semibold text-center hover:border-primary hover:text-primary transition-colors"
           aria-label="Edit in admin panel"
         >
           ✏ Edit
