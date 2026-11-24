@@ -5,6 +5,7 @@ import { getScholarshipEligibleUniversityIds } from '@/lib/data/scholarships';
 import { UniversityListClient } from '@/components/university/UniversityListClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Suspense } from 'react';
+import { orEmptyAtBuild } from '@/lib/data/build-fallback';
 import { canonicalFor, localeAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/constants';
 
@@ -30,14 +31,20 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
 export default async function UniversitiesPage({ params: { locale } }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations('universities');
-  const [universities, countries, languages, majors] = await Promise.all([
-    getAll(),
-    getUniqueCountries(),
-    getUniqueLanguages(),
-    getUniqueMajors(),
-  ]);
-
-  const scholarshipEligibleIds = await getScholarshipEligibleUniversityIds(universities);
+  const { universities, countries, languages, majors, scholarshipEligibleIds } = await orEmptyAtBuild(
+    'Universities page',
+    async () => {
+      const [universities, countries, languages, majors] = await Promise.all([
+        getAll(),
+        getUniqueCountries(),
+        getUniqueLanguages(),
+        getUniqueMajors(),
+      ]);
+      const scholarshipEligibleIds = await getScholarshipEligibleUniversityIds(universities);
+      return { universities, countries, languages, majors, scholarshipEligibleIds };
+    },
+    { universities: [], countries: [], languages: [], majors: [], scholarshipEligibleIds: [] },
+  );
 
   return (
     <>

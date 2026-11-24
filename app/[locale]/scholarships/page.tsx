@@ -5,6 +5,7 @@ import { getAll as getAllUniversities } from '@/lib/data/universities';
 import { ScholarshipListClient } from '@/components/scholarship/ScholarshipListClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Suspense } from 'react';
+import { orEmptyAtBuild } from '@/lib/data/build-fallback';
 import { testsOf } from '@/lib/data/test-requirements';
 import { canonicalFor, localeAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/constants';
@@ -31,12 +32,11 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
 export default async function ScholarshipsPage({ params: { locale } }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations('scholarships');
-  const [scholarships, countries, types, universities] = await Promise.all([
-    getAll(),
-    getUniqueCountries(),
-    getUniqueTypes(),
-    getAllUniversities(),
-  ]);
+  const [scholarships, countries, types, universities] = await orEmptyAtBuild(
+    'Scholarships page',
+    () => Promise.all([getAll(), getUniqueCountries(), getUniqueTypes(), getAllUniversities()]),
+    [[], [], [], []],
+  );
 
   // Only universities that list tests matter; the rest always qualify.
   const universityTests = universities
