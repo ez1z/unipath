@@ -24,8 +24,12 @@ export function useViewerProfile<T extends Record<string, unknown>>(columns: str
       .eq('id', viewer.userId)
       .maybeSingle()
       .then(
-        ({ data }) => {
-          if (alive) setProfile(((data as unknown) as T | null) ?? ({} as T));
+        ({ data, error }) => {
+          // On a failed read keep the guest view rather than showing a
+          // signed-in user an empty profile (their saved hearts would look
+          // unsaved and a tap would remove them).
+          if (!alive || error) return;
+          setProfile(((data as unknown) as T | null) ?? ({} as T));
         },
         () => {
           // Leave the guest view.

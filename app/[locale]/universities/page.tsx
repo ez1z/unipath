@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAll, getUniqueCountries, getUniqueLanguages, getUniqueMajors } from '@/lib/data/universities';
 import { getScholarshipEligibleUniversityIds } from '@/lib/data/scholarships';
 import { UniversityListClient } from '@/components/university/UniversityListClient';
+import { UniversityCard } from '@/components/university/UniversityCard';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Suspense } from 'react';
 import { orEmptyAtBuild } from '@/lib/data/build-fallback';
@@ -46,13 +47,29 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
     { universities: [], countries: [], languages: [], majors: [], scholarshipEligibleIds: [] },
   );
 
+  const eligible = new Set(scholarshipEligibleIds);
+
   return (
     <>
       <PageHeader title={t('title')} />
       <div className="container mx-auto px-4 py-8">
         {/* The list reads its filters from the URL, which a cached page only
-            knows in the browser. */}
-        <Suspense fallback={null}>
+            knows in the browser. Until it loads, the HTML carries the
+            unfiltered cards, so crawlers and slow connections still see them. */}
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {universities.map((u) => (
+                <UniversityCard
+                  key={u.id}
+                  university={u}
+                  locale={locale}
+                  hasScholarships={eligible.has(u.id)}
+                />
+              ))}
+            </div>
+          }
+        >
           <UniversityListClient
             universities={universities}
             locale={locale}

@@ -81,6 +81,11 @@ export async function getBySlug(slug: string) {
   return cached ?? fetchOne('slug', slug);
 }
 
+/** One-row lookup without the catalog, for pages that render on every request. */
+export async function getBySlugDirect(slug: string) {
+  return fetchOne('slug', slug);
+}
+
 export async function getUniqueCountries(): Promise<string[]> {
   const all = await queryAll();
   return [...new Set(all.map((u) => u.country))].sort();

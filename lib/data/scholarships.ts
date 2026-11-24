@@ -55,7 +55,11 @@ export async function getById(id: string) {
 // query the database for a slug it doesn't know yet.
 export async function getBySlug(slug: string) {
   const cached = (await queryAll()).find((s) => s.slug === slug);
-  if (cached) return cached;
+  return cached ?? getBySlugDirect(slug);
+}
+
+/** One-row lookup without the catalog, for pages that render on every request. */
+export async function getBySlugDirect(slug: string) {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('scholarships')
