@@ -13,17 +13,30 @@ import { Select } from '@/components/ui/Select';
 import { FilterSheet } from '@/components/ui/FilterSheet';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Locale } from '@/lib/constants';
+import { hasAnyScore, meetsTests, type TestEntry, type UserScores } from '@/lib/data/test-requirements';
+import { useViewerProfile } from '@/lib/viewer/useViewerProfile';
 
-type UserPrefs = { countries: string[] };
+type ListProfile = {
+  interested_scholarship_ids?: string[] | null;
+  desired_countries?: string[] | null;
+  toefl_total?: number | null;
+  ielts_overall?: number | null;
+  sat_total?: number | null;
+  duolingo_score?: number | null;
+};
+
+const PROFILE_COLUMNS =
+  'interested_scholarship_ids, desired_countries, toefl_total, ielts_overall, sat_total, duolingo_score';
+
+/** Entrance tests of each university that lists any, for the "meets my scores" filter. */
+export type UniversityTests = { id: string; tests: TestEntry[] };
 
 type Props = {
   scholarships: Scholarship[];
   locale: Locale;
   countries: string[];
   types: string[];
-  savedScholarshipIds: string[];
-  userPrefs: UserPrefs | null;
-  qualifiedUniversityIds: string[] | null;
+  universityTests: UniversityTests[];
 };
 
 const COVERAGE_FILTER_OPTIONS = ['tuition', 'accommodation', 'flights', 'stipend', 'health'];
@@ -33,11 +46,29 @@ export function ScholarshipListClient({
   locale,
   countries,
   types,
-  savedScholarshipIds,
-  userPrefs,
-  qualifiedUniversityIds,
+  universityTests,
 }: Props) {
   const t = useTranslations('scholarships');
+
+  // Personal data loads in the browser so the page itself can be cached.
+  const profile = useViewerProfile<ListProfile>(PROFILE_COLUMNS);
+  const savedScholarshipIds = useMemo(() => profile?.interested_scholarship_ids ?? [], [profile]);
+  const userPrefs = useMemo(
+    () => (profile ? { countries: profile.desired_countries ?? [] } : null),
+    [profile],
+  );
+  const userScores = useMemo<UserScores | null>(
+    () =>
+      profile
+        ? {
+            toefl: profile.toefl_total ?? null,
+            ielts: profile.ielts_overall ?? null,
+            sat: profile.sat_total ?? null,
+            duolingo: profile.duolingo_score ?? null,
+          }
+        : null,
+    [profile],
+  );
   const [query, setQuery] = useState('');
   const [country, setCountry] = useState('');
   const [type, setType] = useState('');
@@ -63,11 +94,16 @@ export function ScholarshipListClient({
   }, [query, locale]);
 
   const hasPrefs = userPrefs !== null && userPrefs.countries.length > 0;
-  const hasScores = qualifiedUniversityIds !== null;
+  const hasScores = hasAnyScore(userScores);
 
-  const qualifiedSet = useMemo(
-    () => (qualifiedUniversityIds ? new Set(qualifiedUniversityIds) : null),
-    [qualifiedUniversityIds],
+  // Universities whose listed tests the user's scores don't meet. Universities
+  // that list no tests always qualify.
+  const unqualifiedSet = useMemo(
+    () =>
+      hasAnyScore(userScores)
+        ? new Set(universityTests.filter((u) => !meetsTests(u.tests, userScores)).map((u) => u.id))
+        : null,
+    [universityTests, userScores],
   );
 
   const basePool = useMemo(() => {
@@ -77,11 +113,11 @@ export function ScholarshipListClient({
         userPrefs.countries.length === 0 || userPrefs.countries.includes(s.country),
       );
     }
-    if (scoresActive && qualifiedSet) {
-      pool = pool.filter((s) => s.university_id === null || qualifiedSet.has(s.university_id));
+    if (scoresActive && unqualifiedSet) {
+      pool = pool.filter((s) => s.university_id === null || !unqualifiedSet.has(s.university_id));
     }
     return pool;
-  }, [scholarships, prefsActive, userPrefs, scoresActive, qualifiedSet]);
+  }, [scholarships, prefsActive, userPrefs, scoresActive, unqualifiedSet]);
 
   const filtered = useMemo(
     () =>
@@ -422,6 +458,7 @@ export function ScholarshipListClient({
               locale={locale}
               bookmarkSlot={
                 <BookmarkButton
+                  key={savedScholarshipIds.includes(s.id) ? 'saved' : 'not-saved'}
                   type="scholarship"
                   id={s.id}
                   initialSaved={savedScholarshipIds.includes(s.id)}

@@ -4,7 +4,9 @@ import { getSiteUrl, localeAlternates } from '@/lib/seo';
 import { getAll as getAllUniversities } from '@/lib/data/universities';
 import { getAll as getAllScholarships } from '@/lib/data/scholarships';
 
-const STATIC_PATHS = ['', '/universities', '/scholarships', '/compare', '/transfer', '/support', '/moe-approved'];
+// /compare is left out: it's each visitor's own list, empty for a crawler, and
+// rendering it loads the whole catalog.
+const STATIC_PATHS = ['', '/universities', '/scholarships', '/transfer', '/support', '/moe-approved'];
 
 // Rebuilt at most once a day. It lists every university and scholarship, so
 // rendering it per request was costly, and crawlers fetch it often.

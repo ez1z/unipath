@@ -55,28 +55,35 @@ export async function getAll() {
   return queryAll();
 }
 
-export async function getById(id: string) {
+// Detail lookups read the cached catalog first, so a detail page render needs
+// no database call of its own (and still works while the database is
+// unreachable). Only a slug the catalog doesn't know yet, such as a university
+// added in the last few hours, falls through to a direct query.
+async function fetchOne(column: 'id' | 'slug', value: string) {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('universities')
     .select('*')
-    .eq('id', id)
+    .eq(column, value)
     .maybeSingle();
   if (error) throw new Error(`Failed to fetch university: ${error.message}`);
   if (!data) return undefined;
   return dbRowToUniversity(data as UniversityDbRow);
 }
 
+export async function getById(id: string) {
+  const cached = (await queryAll()).find((u) => u.id === id);
+  return cached ?? fetchOne('id', id);
+}
+
 export async function getBySlug(slug: string) {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from('universities')
-    .select('*')
-    .eq('slug', slug)
-    .maybeSingle();
-  if (error) throw new Error(`Failed to fetch university: ${error.message}`);
-  if (!data) return undefined;
-  return dbRowToUniversity(data as UniversityDbRow);
+  const cached = (await queryAll()).find((u) => u.slug === slug);
+  return cached ?? fetchOne('slug', slug);
+}
+
+/** One-row lookup without the catalog, for pages that render on every request. */
+export async function getBySlugDirect(slug: string) {
+  return fetchOne('slug', slug);
 }
 
 export async function getUniqueCountries(): Promise<string[]> {

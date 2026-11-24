@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { getBySlug } from '@/lib/data/universities';
+import { getBySlugDirect as getBySlug } from '@/lib/data/universities';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DiscussionSection } from '@/components/discussion/DiscussionSection';
 import type { Locale } from '@/lib/constants';

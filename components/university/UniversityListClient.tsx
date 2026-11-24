@@ -14,28 +14,21 @@ import { Select } from '@/components/ui/Select';
 import { FilterSheet } from '@/components/ui/FilterSheet';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Locale } from '@/lib/constants';
+import { meetsTestRequirements, type UserScores } from '@/lib/data/test-requirements';
+import { useViewerProfile } from '@/lib/viewer/useViewerProfile';
 
-type UserPrefs = { countries: string[]; majors: string[] };
-type UserScores = { toefl: number | null; ielts: number | null; sat: number | null; duolingo: number | null };
+type ListProfile = {
+  dream_university_ids?: string[] | null;
+  desired_countries?: string[] | null;
+  desired_majors?: string[] | null;
+  toefl_total?: number | null;
+  ielts_overall?: number | null;
+  sat_total?: number | null;
+  duolingo_score?: number | null;
+};
 
-type TestEntry = { type: string; min_score?: number; min_math?: number; min_verbal?: number };
-
-function meetsTestRequirements(university: University, scores: UserScores): boolean {
-  const tests = Array.isArray(university.entrance_requirements?.tests)
-    ? (university.entrance_requirements.tests as TestEntry[])
-    : [];
-  if (tests.length === 0) return true;
-  return tests.some((test) => {
-    if (test.type === 'toefl') return scores.toefl != null && scores.toefl >= (test.min_score ?? 0);
-    if (test.type === 'ielts') return scores.ielts != null && scores.ielts >= (test.min_score ?? 0);
-    if (test.type === 'sat') {
-      if (scores.sat == null) return false;
-      return scores.sat >= (test.min_math ?? 0) + (test.min_verbal ?? 0);
-    }
-    if (test.type === 'duolingo') return scores.duolingo != null && scores.duolingo >= (test.min_score ?? 0);
-    return false;
-  });
-}
+const PROFILE_COLUMNS =
+  'dream_university_ids, desired_countries, desired_majors, toefl_total, ielts_overall, sat_total, duolingo_score';
 
 type Props = {
   universities: University[];
@@ -43,10 +36,7 @@ type Props = {
   countries: string[];
   languages: string[];
   majors: string[];
-  savedUniversityIds: string[];
   scholarshipEligibleIds: string[];
-  userPrefs: UserPrefs | null;
-  userScores: UserScores | null;
 };
 
 export function UniversityListClient({
@@ -55,12 +45,32 @@ export function UniversityListClient({
   countries,
   languages,
   majors,
-  savedUniversityIds,
   scholarshipEligibleIds,
-  userPrefs,
-  userScores,
 }: Props) {
   const t = useTranslations('universities');
+
+  // Personal data loads in the browser so the page itself can be cached.
+  const profile = useViewerProfile<ListProfile>(PROFILE_COLUMNS);
+  const savedUniversityIds = useMemo(() => profile?.dream_university_ids ?? [], [profile]);
+  const userPrefs = useMemo(
+    () =>
+      profile
+        ? { countries: profile.desired_countries ?? [], majors: profile.desired_majors ?? [] }
+        : null,
+    [profile],
+  );
+  const userScores = useMemo<UserScores | null>(
+    () =>
+      profile
+        ? {
+            toefl: profile.toefl_total ?? null,
+            ielts: profile.ielts_overall ?? null,
+            sat: profile.sat_total ?? null,
+            duolingo: profile.duolingo_score ?? null,
+          }
+        : null,
+    [profile],
+  );
 
   // Filters are mirrored to the URL query string so the exact filtered view is
   // preserved across navigation. When the user opens a university and presses
@@ -489,6 +499,7 @@ export function UniversityListClient({
               hasScholarships={scholarshipSet.has(u.id)}
               bookmarkSlot={
                 <BookmarkButton
+                  key={savedUniversityIds.includes(u.id) ? 'saved' : 'not-saved'}
                   type="university"
                   id={u.id}
                   initialSaved={savedUniversityIds.includes(u.id)}

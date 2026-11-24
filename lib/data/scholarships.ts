@@ -51,7 +51,15 @@ export async function getById(id: string) {
   return dbRowToScholarship(data as ScholarshipDbRow);
 }
 
+// Like universities, detail lookups read the cached catalog first and only
+// query the database for a slug it doesn't know yet.
 export async function getBySlug(slug: string) {
+  const cached = (await queryAll()).find((s) => s.slug === slug);
+  return cached ?? getBySlugDirect(slug);
+}
+
+/** One-row lookup without the catalog, for pages that render on every request. */
+export async function getBySlugDirect(slug: string) {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('scholarships')
@@ -64,30 +72,14 @@ export async function getBySlug(slug: string) {
   return dbRowToScholarship(data as ScholarshipDbRow);
 }
 
+// Scholarships linked to the university, then nationwide ones for its country,
+// each group by name (the catalog is ordered by country, then name).
 export async function getByUniversity(universityId: string, country: string) {
-  const supabase = createPublicClient();
-  const [uniResult, countryResult] = await Promise.all([
-    supabase
-      .from('scholarships')
-      .select('*')
-      .eq('university_id', universityId)
-      .eq('is_active', true)
-      .order('name_en'),
-    supabase
-      .from('scholarships')
-      .select('*')
-      .is('university_id', null)
-      .eq('country', country)
-      .eq('is_active', true)
-      .order('name_en'),
-  ]);
-  if (uniResult.error) throw new Error(uniResult.error.message);
-  if (countryResult.error) throw new Error(countryResult.error.message);
-  const all = [
-    ...(uniResult.data as ScholarshipDbRow[]),
-    ...(countryResult.data as ScholarshipDbRow[]),
+  const all = await queryAll();
+  return [
+    ...all.filter((s) => s.university_id === universityId),
+    ...all.filter((s) => s.university_id === null && s.country === country),
   ];
-  return all.map(dbRowToScholarship);
 }
 
 // Returns the ids of universities that have at least one scholarship available

@@ -4,34 +4,16 @@ import { getAll, getUniqueCountries, getUniqueTypes } from '@/lib/data/scholarsh
 import { getAll as getAllUniversities } from '@/lib/data/universities';
 import { ScholarshipListClient } from '@/components/scholarship/ScholarshipListClient';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { createClient } from '@/lib/supabase/server';
+import { Suspense } from 'react';
+import { orEmptyAtBuild } from '@/lib/data/build-fallback';
+import { testsOf } from '@/lib/data/test-requirements';
 import { canonicalFor, localeAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/constants';
-import type { University } from '@/lib/data/university-types';
 
-type TestEntry = { type: string; min_score?: number; min_math?: number; min_verbal?: number };
-
-function meetsTestRequirements(
-  university: University,
-  scores: { toefl: number | null; ielts: number | null; sat: number | null; duolingo: number | null },
-): boolean {
-  const tests = Array.isArray(university.entrance_requirements?.tests)
-    ? (university.entrance_requirements.tests as TestEntry[])
-    : [];
-  if (tests.length === 0) return true;
-  return tests.some((test) => {
-    if (test.type === 'toefl') return scores.toefl != null && scores.toefl >= (test.min_score ?? 0);
-    if (test.type === 'ielts') return scores.ielts != null && scores.ielts >= (test.min_score ?? 0);
-    if (test.type === 'sat') {
-      if (scores.sat == null) return false;
-      return scores.sat >= (test.min_math ?? 0) + (test.min_verbal ?? 0);
-    }
-    if (test.type === 'duolingo') return scores.duolingo != null && scores.duolingo >= (test.min_score ?? 0);
-    return false;
-  });
-}
-
-export const dynamic = 'force-dynamic';
+// Cached and refreshed at most hourly (ISR): crawlers and repeat visits no
+// longer render the full list on Vercel. Saved scholarships, preferences and
+// the "meets my scores" filter are worked out in the browser.
+export const revalidate = 3600;
 
 type Props = { params: { locale: Locale } };
 
@@ -50,58 +32,32 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
 export default async function ScholarshipsPage({ params: { locale } }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations('scholarships');
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [scholarships, countries, types, universities] = await orEmptyAtBuild(
+    'Scholarships page',
+    () => Promise.all([getAll(), getUniqueCountries(), getUniqueTypes(), getAllUniversities()]),
+    [[], [], [], []],
+  );
 
-  const [scholarships, countries, types, profileResult, universities] = await Promise.all([
-    getAll(),
-    getUniqueCountries(),
-    getUniqueTypes(),
-    user
-      ? supabase
-          .from('profiles')
-          .select('interested_scholarship_ids, desired_countries, toefl_total, ielts_overall, sat_total, duolingo_score')
-          .eq('id', user.id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-    getAllUniversities(),
-  ]);
-
-  const savedScholarshipIds: string[] = profileResult.data?.interested_scholarship_ids ?? [];
-  const userPrefs = user
-    ? { countries: (profileResult.data?.desired_countries as string[] | null) ?? [] }
-    : null;
-
-  const userScores = user
-    ? {
-        toefl: (profileResult.data?.toefl_total as number | null) ?? null,
-        ielts: (profileResult.data?.ielts_overall as number | null) ?? null,
-        sat: (profileResult.data?.sat_total as number | null) ?? null,
-        duolingo: (profileResult.data?.duolingo_score as number | null) ?? null,
-      }
-    : null;
-
-  const hasAnyScore = userScores !== null &&
-    (userScores.toefl != null || userScores.ielts != null ||
-      userScores.sat != null || userScores.duolingo != null);
-
-  const qualifiedUniversityIds = hasAnyScore && userScores
-    ? universities.filter((u) => meetsTestRequirements(u, userScores)).map((u) => u.id)
-    : null;
+  // Only universities that list tests matter; the rest always qualify.
+  const universityTests = universities
+    .map((u) => ({ id: u.id, tests: testsOf(u) }))
+    .filter((u) => u.tests.length > 0);
 
   return (
     <>
       <PageHeader title={t('title')} />
       <div className="container mx-auto px-4 py-8">
-        <ScholarshipListClient
-          scholarships={scholarships}
-          locale={locale}
-          countries={countries}
-          types={types}
-          savedScholarshipIds={savedScholarshipIds}
-          userPrefs={userPrefs}
-          qualifiedUniversityIds={qualifiedUniversityIds}
-        />
+        {/* Ready for filters read from the URL, which a cached page only
+            knows in the browser. */}
+        <Suspense fallback={null}>
+          <ScholarshipListClient
+            scholarships={scholarships}
+            locale={locale}
+            countries={countries}
+            types={types}
+            universityTests={universityTests}
+          />
+        </Suspense>
       </div>
     </>
   );
