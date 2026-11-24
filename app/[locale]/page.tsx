@@ -26,6 +26,20 @@ function pickPopular<T extends { id: string }>(all: T[], ids: string[], n: numbe
   return picked.slice(0, n);
 }
 
+// If Supabase is down or restricted during `next build`, render the page with
+// empty lists instead of failing the whole deploy. ISR refills it once the
+// database answers again. Outside the build, errors still surface.
+async function loadHomeData() {
+  try {
+    return await Promise.all([getAll(), getAllScholarships(), loadPopularIds(6)]);
+  } catch (err) {
+    if (process.env.NEXT_PHASE !== 'phase-production-build') throw err;
+    console.warn('Home page: catalog unavailable at build time, prerendering empty.', err);
+    const empty: Awaited<ReturnType<typeof loadPopularIds>> = { universityIds: [], scholarshipIds: [] };
+    return [[] as Awaited<ReturnType<typeof getAll>>, [] as Awaited<ReturnType<typeof getAllScholarships>>, empty] as const;
+  }
+}
+
 // Cached and refreshed at most hourly (ISR). The page has nothing personal on
 // it, so there is no reason to render it for every visit.
 export const revalidate = 3600;
@@ -48,11 +62,7 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
 export default async function HomePage({ params: { locale } }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("home");
-  const [universities, scholarships, popular] = await Promise.all([
-    getAll(),
-    getAllScholarships(),
-    loadPopularIds(6),
-  ]);
+  const [universities, scholarships, popular] = await loadHomeData();
   const moeCount = universities.filter((u) => u.moe_approved).length;
   const countryCount = new Set(universities.map((u) => u.country)).size;
 
