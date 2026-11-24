@@ -1,176 +1,70 @@
 'use client';
 
 import { useState } from 'react';
-
-// ── Types ────────────────────────────────────────────────────────────────────
-
-type ToeflFormat = 'ibt' | 'pbt';
-
-type ToeflEntry = { id: string; type: 'toefl'; format: ToeflFormat; min_score: string };
-type IeltsEntry = { id: string; type: 'ielts'; min_score: string };
-type SatEntry = { id: string; type: 'sat'; min_math: string; min_verbal: string };
-type DuolingoEntry = { id: string; type: 'duolingo'; min_score: string };
-type TestEntry = ToeflEntry | IeltsEntry | SatEntry | DuolingoEntry;
-
-type EssayType =
-  | 'personal_statement'
-  | 'statement_of_purpose'
-  | 'why_school'
-  | 'supplemental'
-  | 'short_answer'
-  | 'open_prompt';
-
-type EssayLengthUnit = 'words' | 'characters';
-
-type EssayEntry = {
-  id: string;
-  essay_type: EssayType;
-  length: string;
-  length_unit: EssayLengthUnit;
-  description: string;
-};
-
-type CountryReqs = {
-  yos: boolean;
-  ege: boolean;
-  ucas: boolean;
-  common_app: boolean;
-  quota: boolean;
-};
-
-const EMPTY_COUNTRY: CountryReqs = { yos: false, ege: false, ucas: false, common_app: false, quota: false };
-
-type CountryKey = 'turkey' | 'russia' | 'uk' | 'usa';
-
-type EditorState = {
-  tests: TestEntry[];
-  essays: EssayEntry[];
-  turkey: CountryReqs;
-  russia: CountryReqs;
-  uk: CountryReqs;
-  usa: CountryReqs;
-  docRequirements: string[];
-};
-
-// ── Parsing ──────────────────────────────────────────────────────────────────
-
-function parseCountry(raw: unknown): CountryReqs {
-  if (!raw || typeof raw !== 'object') return { ...EMPTY_COUNTRY };
-  const d = raw as Record<string, unknown>;
-  return {
-    yos: !!d.yos,
-    ege: !!d.ege,
-    ucas: !!d.ucas,
-    common_app: !!d.common_app,
-    quota: !!d.quota,
-  };
-}
-
-function parseTests(raw: unknown): TestEntry[] {
-  if (!Array.isArray(raw)) return [];
-  const tests: TestEntry[] = [];
-  let i = 0;
-  for (const t of raw) {
-    if (!t || typeof t !== 'object') continue;
-    const id = String(i++);
-    const r = t as Record<string, unknown>;
-    if (r.type === 'toefl') {
-      tests.push({ id, type: 'toefl', format: r.format === 'pbt' ? 'pbt' : 'ibt', min_score: r.min_score != null ? String(r.min_score) : '' });
-    } else if (r.type === 'ielts') {
-      tests.push({ id, type: 'ielts', min_score: r.min_score != null ? String(r.min_score) : '' });
-    } else if (r.type === 'sat') {
-      tests.push({ id, type: 'sat', min_math: r.min_math != null ? String(r.min_math) : '', min_verbal: r.min_verbal != null ? String(r.min_verbal) : '' });
-    } else if (r.type === 'duolingo') {
-      tests.push({ id, type: 'duolingo', min_score: r.min_score != null ? String(r.min_score) : '' });
-    }
-  }
-  return tests;
-}
-
-const VALID_ESSAY_TYPES: EssayType[] = [
-  'personal_statement', 'statement_of_purpose', 'why_school',
-  'supplemental', 'short_answer', 'open_prompt',
-];
-
-function parseEssays(raw: unknown): EssayEntry[] {
-  if (!Array.isArray(raw)) return [];
-  const essays: EssayEntry[] = [];
-  let i = 0;
-  for (const e of raw) {
-    if (!e || typeof e !== 'object') continue;
-    const r = e as Record<string, unknown>;
-    const essay_type = VALID_ESSAY_TYPES.includes(r.essay_type as EssayType)
-      ? (r.essay_type as EssayType)
-      : 'personal_statement';
-    essays.push({
-      id: String(i++),
-      essay_type,
-      length: r.length != null ? String(r.length) : '',
-      length_unit: r.length_unit === 'characters' ? 'characters' : 'words',
-      description: typeof r.description === 'string' ? r.description : '',
-    });
-  }
-  return essays;
-}
-
-function parseState(jsonStr: string): EditorState {
-  let raw: Record<string, unknown> = {};
-  try { raw = JSON.parse(jsonStr || '{}'); } catch { /* invalid JSON — keep empty default */ }
-  return {
-    tests: parseTests(raw.tests),
-    essays: parseEssays(raw.essays),
-    turkey: parseCountry(raw.turkey),
-    russia: parseCountry(raw.russia),
-    uk: parseCountry(raw.uk),
-    usa: parseCountry(raw.usa),
-    docRequirements: Array.isArray(raw.document_requirements) ? (raw.document_requirements as string[]) : [],
-  };
-}
-
-// ── Serialization ────────────────────────────────────────────────────────────
-
-function serializeTest(t: TestEntry): Record<string, unknown> {
-  if (t.type === 'toefl') return { type: 'toefl', format: t.format, ...(t.min_score !== '' ? { min_score: Number(t.min_score) } : {}) };
-  if (t.type === 'ielts') return { type: 'ielts', ...(t.min_score !== '' ? { min_score: Number(t.min_score) } : {}) };
-  if (t.type === 'sat') return { type: 'sat', ...(t.min_math !== '' ? { min_math: Number(t.min_math) } : {}), ...(t.min_verbal !== '' ? { min_verbal: Number(t.min_verbal) } : {}) };
-  return { type: 'duolingo', ...(t.min_score !== '' ? { min_score: Number(t.min_score) } : {}) };
-}
-
-function serializeEssay(e: EssayEntry): Record<string, unknown> {
-  return {
-    essay_type: e.essay_type,
-    ...(e.length !== '' ? { length: Number(e.length), length_unit: e.length_unit } : {}),
-    ...(e.description.trim() ? { description: e.description.trim() } : {}),
-  };
-}
-
-function serializeCountry(r: CountryReqs): Record<string, boolean> | null {
-  const entries = (Object.entries(r) as [string, boolean][]).filter(([, v]) => v);
-  if (entries.length === 0) return null;
-  return Object.fromEntries(entries);
-}
-
-function serializeState(s: EditorState): string {
-  const obj: Record<string, unknown> = {};
-  if (s.tests.length > 0) obj.tests = s.tests.map(serializeTest);
-  if (s.essays.length > 0) obj.essays = s.essays.map(serializeEssay);
-  const tc = serializeCountry(s.turkey);
-  const rc = serializeCountry(s.russia);
-  const uc = serializeCountry(s.uk);
-  const uc2 = serializeCountry(s.usa);
-  if (tc) obj.turkey = tc;
-  if (rc) obj.russia = rc;
-  if (uc) obj.uk = uc;
-  if (uc2) obj.usa = uc2;
-  if (s.docRequirements.length > 0) obj.document_requirements = s.docRequirements;
-  return Object.keys(obj).length > 0 ? JSON.stringify(obj) : '';
-}
+import {
+  editCountry,
+  editEssay,
+  editTest,
+  parseState,
+  serializeState,
+  type CountryFlags,
+  type CountryKey,
+  type CountryReqs,
+  type EditorState,
+  type EssayEntry,
+  type EssayItem,
+  type EssayLengthUnit,
+  type EssayType,
+  type TestEntry,
+  type TestItem,
+} from '@/lib/admin/entrance-requirements-state';
 
 // ── Shared styles ────────────────────────────────────────────────────────────
 
 const inputClass =
   'w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:opacity-50 transition-shadow';
 const miniLabel = 'block text-xs font-medium text-muted-foreground mb-1';
+
+// ── Read-only row (entries kept as imported) ─────────────────────────────────
+
+function ReadOnlyRow({
+  label,
+  detail,
+  disabled,
+  onRemove,
+  removeLabel,
+}: {
+  label: string;
+  detail?: string;
+  disabled: boolean;
+  onRemove: () => void;
+  removeLabel: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-muted/20 p-4">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-foreground">{label}</span>
+        <button
+          type="button"
+          onClick={onRemove}
+          disabled={disabled}
+          aria-label={removeLabel}
+          className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+        >
+          Remove
+        </button>
+      </div>
+      {detail && <p className="text-sm text-foreground mt-1">{detail}</p>}
+      <p className="text-xs text-muted-foreground mt-1">Kept as imported — not editable here</p>
+    </div>
+  );
+}
+
+function rawString(raw: unknown, key: string): string | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const v = (raw as Record<string, unknown>)[key];
+  return typeof v === 'string' && v !== '' ? v : null;
+}
 
 // ── Test card ────────────────────────────────────────────────────────────────
 
@@ -189,8 +83,7 @@ function TestCard({
 }: {
   test: TestEntry;
   disabled: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onChange: (id: string, updates: Record<string, any>) => void;
+  onChange: (id: string, updates: Record<string, string>) => void;
   onRemove: (id: string) => void;
 }) {
   return (
@@ -221,21 +114,24 @@ function TestCard({
               >
                 <option value="ibt">iBT — new format (0–120)</option>
                 <option value="pbt">PBT — old format (0–6)</option>
+                {test.format !== 'ibt' && test.format !== 'pbt' && (
+                  <option value={test.format}>{test.format}</option>
+                )}
               </select>
             </div>
             <div>
               <label className={miniLabel}>
-                Minimum score (max {test.format === 'ibt' ? '120' : '6'})
+                Minimum score (max {test.format === 'pbt' ? '6' : '120'})
               </label>
               <input
                 type="number"
                 min={0}
-                max={test.format === 'ibt' ? 120 : 6}
-                step={test.format === 'ibt' ? 1 : 0.5}
+                max={test.format === 'pbt' ? 6 : 120}
+                step={test.format === 'pbt' ? 0.5 : 1}
                 value={test.min_score}
                 onChange={e => onChange(test.id, { min_score: e.target.value })}
                 disabled={disabled}
-                placeholder={test.format === 'ibt' ? '80' : '4'}
+                placeholder={test.format === 'pbt' ? '4' : '80'}
                 className={inputClass}
               />
             </div>
@@ -426,9 +322,9 @@ function CountrySection({
   label: string;
   countryKey: CountryKey;
   reqs: CountryReqs;
-  fields: { key: keyof CountryReqs; label: string }[];
+  fields: { key: keyof CountryFlags; label: string }[];
   disabled: boolean;
-  onChange: (country: CountryKey, field: keyof CountryReqs, value: boolean) => void;
+  onChange: (country: CountryKey, field: keyof CountryFlags, value: boolean) => void;
 }) {
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4">
@@ -456,23 +352,25 @@ function CountrySection({
 export function EntranceRequirementsEditor({
   defaultValue = '',
   name,
-  disabled = false,
+  disabled: disabledProp = false,
 }: {
   defaultValue?: string;
   name: string;
   disabled?: boolean;
 }) {
   const [state, setState] = useState<EditorState>(() => parseState(defaultValue));
+  // Unparseable stored JSON is kept unchanged, so the inputs are locked.
+  const disabled = disabledProp || state.invalidJson !== null;
   const [newDoc, setNewDoc] = useState('');
 
   // Tests
   function addTest(type: TestEntry['type']) {
     const id = String(Date.now());
     let t: TestEntry;
-    if (type === 'toefl') t = { id, type: 'toefl', format: 'ibt', min_score: '' };
-    else if (type === 'ielts') t = { id, type: 'ielts', min_score: '' };
-    else if (type === 'sat') t = { id, type: 'sat', min_math: '', min_verbal: '' };
-    else t = { id, type: 'duolingo', min_score: '' };
+    if (type === 'toefl') t = { id, type: 'toefl', format: 'ibt', min_score: '', rest: {} };
+    else if (type === 'ielts') t = { id, type: 'ielts', min_score: '', rest: {} };
+    else if (type === 'sat') t = { id, type: 'sat', min_math: '', min_verbal: '', rest: {} };
+    else t = { id, type: 'duolingo', min_score: '', rest: {} };
     setState(s => ({ ...s, tests: [...s.tests, t] }));
   }
 
@@ -480,11 +378,10 @@ export function EntranceRequirementsEditor({
     setState(s => ({ ...s, tests: s.tests.filter(t => t.id !== id) }));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function updateTest(id: string, updates: Record<string, any>) {
+  function updateTest(id: string, updates: Record<string, string>) {
     setState(s => ({
       ...s,
-      tests: s.tests.map(t => (t.id === id ? ({ ...t, ...updates } as TestEntry) : t)),
+      tests: s.tests.map(t => (t.id === id && t.type !== '__other' ? editTest(t, updates) : t)),
     }));
   }
 
@@ -493,7 +390,7 @@ export function EntranceRequirementsEditor({
     const id = String(Date.now());
     setState(s => ({
       ...s,
-      essays: [...s.essays, { id, essay_type: 'personal_statement', length: '', length_unit: 'words', description: '' }],
+      essays: [...s.essays, { id, essay_type: 'personal_statement', length: '', length_unit: 'words', description: '', rest: {} }],
     }));
   }
 
@@ -504,13 +401,13 @@ export function EntranceRequirementsEditor({
   function updateEssay(id: string, updates: Partial<EssayEntry>) {
     setState(s => ({
       ...s,
-      essays: s.essays.map(e => (e.id === id ? { ...e, ...updates } : e)),
+      essays: s.essays.map(e => (e.id === id && e.essay_type !== '__other' ? editEssay(e, updates) : e)),
     }));
   }
 
   // Country
-  function setCountryField(country: CountryKey, field: keyof CountryReqs, value: boolean) {
-    setState(s => ({ ...s, [country]: { ...s[country], [field]: value } }));
+  function setCountryField(country: CountryKey, field: keyof CountryFlags, value: boolean) {
+    setState(s => ({ ...s, [country]: editCountry(s[country], field, value) }));
   }
 
   // Documents
@@ -531,19 +428,40 @@ export function EntranceRequirementsEditor({
 
   return (
     <div className="space-y-6">
+      {state.invalidJson !== null && (
+        <p role="alert" className="text-sm text-destructive">
+          Stored requirements JSON is invalid; it will be kept unchanged.
+        </p>
+      )}
+
       {/* Standardized tests */}
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3">Standardized tests</h3>
         <div className="space-y-3">
-          {state.tests.map(test => (
-            <TestCard
-              key={test.id}
-              test={test}
-              disabled={disabled}
-              onChange={updateTest}
-              onRemove={removeTest}
-            />
-          ))}
+          {state.tests.map((test: TestItem) =>
+            test.type === '__other' ? (
+              <ReadOnlyRow
+                key={test.id}
+                label={rawString(test.raw, 'type') ?? 'Unknown entry'}
+                detail={
+                  test.raw && typeof test.raw === 'object' && (test.raw as Record<string, unknown>).min_score != null
+                    ? `Minimum score: ${String((test.raw as Record<string, unknown>).min_score)}`
+                    : undefined
+                }
+                disabled={disabled}
+                onRemove={() => removeTest(test.id)}
+                removeLabel={`Remove ${rawString(test.raw, 'type') ?? 'unknown entry'}`}
+              />
+            ) : (
+              <TestCard
+                key={test.id}
+                test={test}
+                disabled={disabled}
+                onChange={updateTest}
+                onRemove={removeTest}
+              />
+            ),
+          )}
           {availableTests.length > 0 && (
             <div className="flex gap-2 flex-wrap">
               {availableTests.map(type => (
@@ -566,16 +484,26 @@ export function EntranceRequirementsEditor({
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3">Essays</h3>
         <div className="space-y-3">
-          {state.essays.map((essay, i) => (
-            <EssayCard
-              key={essay.id}
-              essay={essay}
-              index={i}
-              disabled={disabled}
-              onChange={updateEssay}
-              onRemove={removeEssay}
-            />
-          ))}
+          {state.essays.map((essay: EssayItem, i) =>
+            essay.essay_type === '__other' ? (
+              <ReadOnlyRow
+                key={essay.id}
+                label={`Essay ${i + 1} — ${rawString(essay.raw, 'essay_type') ?? 'Unknown entry'}`}
+                disabled={disabled}
+                onRemove={() => removeEssay(essay.id)}
+                removeLabel={`Remove essay ${i + 1}`}
+              />
+            ) : (
+              <EssayCard
+                key={essay.id}
+                essay={essay}
+                index={i}
+                disabled={disabled}
+                onChange={updateEssay}
+                onRemove={removeEssay}
+              />
+            ),
+          )}
           <button
             type="button"
             disabled={disabled}
