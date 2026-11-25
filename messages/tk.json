@@ -163,7 +163,9 @@
     "filters_title": "Filtrler",
     "filters_close": "Filtrleri ýap",
     "filters_clear_all": "Ählisini arassala",
-    "filters_show_results": "{count} netije görkez"
+    "filters_show_results": "{count} netije görkez",
+    "show_more": "Ýene görkez",
+    "showing_count": "Görkezilýär: {shown} / {total}"
   },
   "university": {
     "moe_badge": "Oblono Tassyklady",

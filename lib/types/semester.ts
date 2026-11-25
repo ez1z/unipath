@@ -36,7 +36,7 @@ export function parseSemestersJson(raw: unknown): Semester[] {
     });
 }
 
-export function getNextDeadline(semesters: Semester[]): string | null {
+export function getNextDeadline(semesters: readonly Pick<Semester, 'deadline'>[]): string | null {
   const today = new Date().toISOString().split('T')[0];
   const futures = semesters
     .filter((s) => s.deadline !== null && s.deadline! >= today)

@@ -163,7 +163,9 @@
     "filters_title": "Filters",
     "filters_close": "Close filters",
     "filters_clear_all": "Clear all",
-    "filters_show_results": "Show {count} results"
+    "filters_show_results": "Show {count} results",
+    "show_more": "Show more",
+    "showing_count": "Showing {shown} of {total}"
   },
   "university": {
     "moe_badge": "MoE Approved",

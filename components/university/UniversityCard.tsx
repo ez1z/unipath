@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import type { University } from '@/lib/data/universities';
+import type { UniversityCardData } from '@/lib/data/university-list-item';
 import { computeTuitionBreakdown, formatRange, formatUsd, formatTmt, formatOldManatRange, formatPercentRange } from '@/lib/format';
 import { MoeBadge } from './MoeBadge';
 import { ScholarshipBadge } from './ScholarshipBadge';
@@ -8,7 +8,8 @@ import { TestRequirementsSummary } from './TestRequirementsSummary';
 import type { Locale } from '@/lib/constants';
 
 type Props = {
-  university: University;
+  /** A full `University` or a slim list item; the card only reads these fields. */
+  university: UniversityCardData;
   locale: Locale;
   bookmarkSlot?: React.ReactNode;
   /** Active list filters, so the detail page can offer a "back" link that restores them. */
@@ -41,7 +42,8 @@ export function UniversityCard({ university, locale, bookmarkSlot, filtersQuery,
     <div data-testid="university-card" className="relative bg-white rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 flex flex-col gap-0 group overflow-hidden">
       <Link
         href={detailHref}
-        className="absolute inset-0 z-0"
+        // Inset ring: the card clips overflow, which would hide a normal outline.
+        className="absolute inset-0 z-0 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
         aria-label={`${t('view_details')}: ${name}`}
       />
 

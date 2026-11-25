@@ -7,6 +7,8 @@ import { UniversityCard } from '@/components/university/UniversityCard';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Suspense } from 'react';
 import { orEmptyAtBuild } from '@/lib/data/build-fallback';
+import { toUniversityListItem } from '@/lib/data/university-list-item';
+import { LIST_PAGE_SIZE } from '@/lib/data/list-pagination';
 import { canonicalFor, localeAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/constants';
 
@@ -48,18 +50,26 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
   );
 
   const eligible = new Set(scholarshipEligibleIds);
+  // Only the fields the list uses go to the browser (the full rows were most
+  // of the page's weight).
+  const listItems = universities.map(toUniversityListItem);
+  // The first page in the list's default (name) order, for the fallback HTML.
+  const firstPage = [...listItems]
+    .sort((a, b) => a.name.en.localeCompare(b.name.en))
+    .slice(0, LIST_PAGE_SIZE);
 
   return (
     <>
       <PageHeader title={t('title')} />
       <div className="container mx-auto px-4 py-8">
         {/* The list reads its filters from the URL, which a cached page only
-            knows in the browser. Until it loads, the HTML carries the
-            unfiltered cards, so crawlers and slow connections still see them. */}
+            knows in the browser. Until it loads, the HTML carries the first
+            page of unfiltered cards, so crawlers and slow connections still
+            see them. Every detail page is also listed in app/sitemap.ts. */}
         <Suspense
           fallback={
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {universities.map((u) => (
+              {firstPage.map((u) => (
                 <UniversityCard
                   key={u.id}
                   university={u}
@@ -71,7 +81,7 @@ export default async function UniversitiesPage({ params: { locale } }: Props) {
           }
         >
           <UniversityListClient
-            universities={universities}
+            universities={listItems}
             locale={locale}
             countries={countries}
             languages={languages}

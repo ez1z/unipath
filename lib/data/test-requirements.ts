@@ -9,7 +9,10 @@ export type UserScores = {
   duolingo: number | null;
 };
 
-export function testsOf(university: University): TestEntry[] {
+/** Anything with entrance requirements: a full `University` or a slim list item. */
+type WithRequirements = Pick<University, 'entrance_requirements'>;
+
+export function testsOf(university: WithRequirements): TestEntry[] {
   return Array.isArray(university.entrance_requirements?.tests)
     ? (university.entrance_requirements.tests as TestEntry[])
     : [];
@@ -30,7 +33,7 @@ export function meetsTests(tests: TestEntry[], scores: UserScores): boolean {
   });
 }
 
-export function meetsTestRequirements(university: University, scores: UserScores): boolean {
+export function meetsTestRequirements(university: WithRequirements, scores: UserScores): boolean {
   return meetsTests(testsOf(university), scores);
 }
 

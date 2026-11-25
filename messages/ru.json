@@ -163,7 +163,9 @@
     "filters_title": "Фильтры",
     "filters_close": "Закрыть фильтры",
     "filters_clear_all": "Сбросить всё",
-    "filters_show_results": "Показать {count} результатов"
+    "filters_show_results": "Показать {count} результатов",
+    "show_more": "Показать ещё",
+    "showing_count": "Показано {shown} из {total}"
   },
   "university": {
     "moe_badge": "Одобрено МОН",

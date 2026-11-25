@@ -4,7 +4,8 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { trackEvent } from '@/lib/analytics/track';
-import type { University } from '@/lib/data/universities';
+import type { UniversityListItem } from '@/lib/data/university-list-item';
+import { LIST_PAGE_SIZE, clampShowCount, nextShowCount, parseShowParam, showParamValue } from '@/lib/data/list-pagination';
 import { filterUniversities } from '@/lib/data/filter-universities';
 import type { UniversitySortBy } from '@/lib/data/university-types';
 import { getNextDeadline } from '@/lib/types/semester';
@@ -31,7 +32,7 @@ const PROFILE_COLUMNS =
   'dream_university_ids, desired_countries, desired_majors, toefl_total, ielts_overall, sat_total, duolingo_score';
 
 type Props = {
-  universities: University[];
+  universities: UniversityListItem[];
   locale: Locale;
   countries: string[];
   languages: string[];
@@ -94,10 +95,10 @@ export function UniversityListClient({
   const [scoresActive, setScoresActive] = useState(() => searchParams.get('scores') === '1');
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // Single source of truth for the active filters as a query string. Reused for
-  // both the URL sync below and the per-card links, so opening a university and
-  // pressing "back" returns to the exact filtered view.
-  const filtersQuery = useMemo(() => {
+  // The active filters as a query string. Together with the visible count
+  // (`show`) it makes up filtersQuery below, which drives both the URL sync and
+  // the per-card links.
+  const baseQuery = useMemo(() => {
     const params = new URLSearchParams();
     if (query) params.set('q', query);
     if (country) params.set('country', country);
@@ -113,13 +114,11 @@ export function UniversityListClient({
     return params.toString();
   }, [query, country, language, major, moeOnly, rankedOnly, maxTuition, deadlineStatus, sortBy, prefsActive, scoresActive]);
 
-  // Keep the URL in sync with the active filters. We use the native History API
-  // (integrated with the Next.js router in 14.2+) rather than router.replace so
-  // that typing in the search box doesn't trigger a server round-trip on every
-  // keystroke — the list is already filtered entirely on the client.
-  useEffect(() => {
-    window.history.replaceState(null, '', filtersQuery ? `${pathname}?${filtersQuery}` : pathname);
-  }, [filtersQuery, pathname]);
+  // How many results are rendered ("Show more" adds a page). Remembered with
+  // the filters it was reached under: any change to the filters, search, sort
+  // or personalisation starts again from one page.
+  const [show, setShow] = useState(() => ({ key: baseQuery, count: parseShowParam(searchParams.get('show')) }));
+  if (show.key !== baseQuery) setShow({ key: baseQuery, count: LIST_PAGE_SIZE });
 
   // Log search terms (debounced) for the admin analytics dashboard. Filtering is
   // client-side, so this is the only place a query is observable server-side.
@@ -221,6 +220,43 @@ export function UniversityListClient({
         return arr.sort((a, b) => a.name.en.localeCompare(b.name.en));
     }
   }, [filtered, sortBy]);
+
+  const visibleCount = show.key === baseQuery ? clampShowCount(show.count, sorted.length) : LIST_PAGE_SIZE;
+  const visible = useMemo(() => sorted.slice(0, visibleCount), [sorted, visibleCount]);
+
+  // Single source of truth for the list state as a query string. Reused for
+  // both the URL sync below and the per-card links, so opening a university and
+  // pressing "back" returns to the exact filtered view, as deep as it was.
+  const filtersQuery = useMemo(() => {
+    const params = new URLSearchParams(baseQuery);
+    const showValue = showParamValue(visibleCount);
+    if (showValue) params.set('show', showValue);
+    return params.toString();
+  }, [baseQuery, visibleCount]);
+
+  // Keep the URL in sync with the active filters. We use the native History API
+  // (integrated with the Next.js router in 14.2+) rather than router.replace so
+  // that typing in the search box doesn't trigger a server round-trip on every
+  // keystroke — the list is already filtered entirely on the client.
+  useEffect(() => {
+    window.history.replaceState(null, '', filtersQuery ? `${pathname}?${filtersQuery}` : pathname);
+  }, [filtersQuery, pathname]);
+
+  // After "Show more", keyboard and screen reader users continue from the
+  // first newly shown card instead of staying on the button.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const focusIndexRef = useRef<number | null>(null);
+  useEffect(() => {
+    const index = focusIndexRef.current;
+    if (index === null) return;
+    focusIndexRef.current = null;
+    gridRef.current?.children[index]?.querySelector<HTMLAnchorElement>('a[href]')?.focus();
+  }, [visibleCount]);
+
+  function showMore() {
+    focusIndexRef.current = visibleCount;
+    setShow({ key: baseQuery, count: nextShowCount(visibleCount, sorted.length) });
+  }
 
   function clearFilters() {
     setQuery('');
@@ -468,7 +504,7 @@ export function UniversityListClient({
       </FilterSheet>
 
       <div className="flex items-center mb-4 text-sm text-muted-foreground">
-        <span>{t('results_count', { count: sorted.length })}</span>
+        <p aria-live="polite">{t('results_count', { count: sorted.length })}</p>
       </div>
 
       {sorted.length === 0 ? (
@@ -489,27 +525,46 @@ export function UniversityListClient({
           <p className="text-muted-foreground mt-4">{t('no_results')}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {sorted.map((u) => (
-            <UniversityCard
-              key={u.id}
-              university={u}
-              locale={locale}
-              filtersQuery={filtersQuery}
-              hasScholarships={scholarshipSet.has(u.id)}
-              bookmarkSlot={
-                <BookmarkButton
-                  key={savedUniversityIds.includes(u.id) ? 'saved' : 'not-saved'}
-                  type="university"
-                  id={u.id}
-                  initialSaved={savedUniversityIds.includes(u.id)}
-                  locale={locale}
-                  size="card"
-                />
-              }
-            />
-          ))}
-        </div>
+        <>
+          <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {visible.map((u) => (
+              <UniversityCard
+                key={u.id}
+                university={u}
+                locale={locale}
+                filtersQuery={filtersQuery}
+                hasScholarships={scholarshipSet.has(u.id)}
+                bookmarkSlot={
+                  <BookmarkButton
+                    key={savedUniversityIds.includes(u.id) ? 'saved' : 'not-saved'}
+                    type="university"
+                    id={u.id}
+                    initialSaved={savedUniversityIds.includes(u.id)}
+                    locale={locale}
+                    size="card"
+                  />
+                }
+              />
+            ))}
+          </div>
+
+          {sorted.length > LIST_PAGE_SIZE && (
+            <div className="flex flex-col items-center gap-3 mt-8">
+              <p className="text-sm text-muted-foreground">
+                {t('showing_count', { shown: visible.length, total: sorted.length })}
+              </p>
+              {visible.length < sorted.length && (
+                <button
+                  type="button"
+                  onClick={showMore}
+                  className="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 border border-input rounded-lg text-sm font-semibold bg-card hover:border-primary/40 hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary"
+                >
+                  {t('show_more')}
+                </button>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

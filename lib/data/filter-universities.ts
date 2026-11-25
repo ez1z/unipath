@@ -1,7 +1,13 @@
 import type { University, FilterParams } from './university-types';
-import { getNextDeadline } from '@/lib/types/semester';
+import { getNextDeadline, type Semester } from '@/lib/types/semester';
 
-export function filterUniversities(universities: University[], params: FilterParams): University[] {
+/** The fields filtering reads. Both `University` and `UniversityListItem` have them. */
+export type FilterableUniversity = Pick<
+  University,
+  'name' | 'country' | 'city' | 'tuition_usd' | 'moe_approved' | 'ranking_qs' | 'languages' | 'majors'
+> & { semesters: readonly Pick<Semester, 'deadline'>[] };
+
+export function filterUniversities<T extends FilterableUniversity>(universities: T[], params: FilterParams): T[] {
   let result = universities;
 
   if (params.moeOnly) {
