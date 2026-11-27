@@ -1,40 +1,8 @@
-import { readFileSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
-
-const LANGS = ['tk', 'ru', 'en'] as const;
-type Lang = (typeof LANGS)[number];
-
-const messages = Object.fromEntries(
-  LANGS.map((lang) => [
-    lang,
-    JSON.parse(
-      readFileSync(new URL(`../../src/i18n/${lang}.json`, import.meta.url), 'utf8'),
-    ) as Record<string, string>,
-  ]),
-) as Record<Lang, Record<string, string>>;
-
-/** A UI string from the message files; fails the test if the key is missing. */
-function msg(lang: Lang, key: string): string {
-  const text = messages[lang][key];
-  if (text === undefined) throw new Error(`Missing message ${lang}:${key}`);
-  return text;
-}
+import { expect, test } from '@playwright/test';
+import { hasNoHorizontalOverflow, isPhone, LANGS, mainNav, msg } from './helpers';
 
 const SURFACE = { light: 'rgb(250, 243, 227)', dark: 'rgb(17, 27, 22)' } as const;
 const INK = { light: 'rgb(22, 38, 29)', dark: 'rgb(243, 236, 221)' } as const;
-
-const isPhone = (projectName: string) => projectName === 'phone';
-
-/** The nav that is visible at this width: header nav on desktop, bottom bar on phone. */
-function mainNav(page: Page, projectName: string) {
-  return page.locator(isPhone(projectName) ? '.bottom-bar' : '.header-nav');
-}
-
-async function hasNoHorizontalOverflow(page: Page) {
-  return page.evaluate(
-    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-  );
-}
 
 test.describe('Home in every language and theme', () => {
   for (const lang of LANGS) {

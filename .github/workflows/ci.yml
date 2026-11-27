@@ -52,7 +52,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      # The pages read the local D1 (.wrangler/state on the runner): load the demo seed.
+      - run: pnpm db:migrate && pnpm db:seed
       - run: pnpm e2e
+      - name: Lighthouse, Slow 3G phone (performance 90+, first content < 2 s)
+        run: |
+          pnpm preview --port 4321 &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:4321/tk && break; sleep 1; done
+          pnpm lighthouse
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
