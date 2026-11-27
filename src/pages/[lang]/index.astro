@@ -6,6 +6,7 @@ import { getTranslations, isLang } from '../../i18n';
 import AppShell from '../../layouts/AppShell.astro';
 import { getCountries, searchScholarships } from '../../lib/db/catalog';
 import { getDb, today } from '../../lib/server';
+import { parseScholarshipFilters } from '../../lib/search/filters';
 
 // Home reads the database, so it renders on the server (cached 5 minutes).
 export const prerender = false;
@@ -19,11 +20,11 @@ const db = getDb();
 
 const [countries, deadlines] = await Promise.all([
   getCountries(db, lang),
-  searchScholarships(
-    db,
-    { countries: [], coverages: [], includeClosed: false, page: 1 },
-    { lang, today: today(), pageSize: 4 },
-  ),
+  searchScholarships(db, parseScholarshipFilters(new URLSearchParams()), {
+    lang,
+    today: today(),
+    pageSize: 4,
+  }),
 ]);
 const popular = countries.filter((c) => c.popularRank !== null).slice(0, 4);
 ---

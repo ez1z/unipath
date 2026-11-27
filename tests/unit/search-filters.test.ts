@@ -151,20 +151,31 @@ describe('search text', () => {
 });
 
 describe('scholarship filters from the URL', () => {
-  test('country, coverage and closed; closed hidden by default', () => {
+  test('country, coverage, pre-year, Turkmen and closed; closed hidden by default', () => {
     const none = parseScholarshipFilters(new URLSearchParams(''));
-    expect(none).toEqual({ countries: [], coverages: [], includeClosed: false, page: 1 });
+    expect(none).toEqual({
+      countries: [],
+      coverages: [],
+      includeClosed: false,
+      coversPreYear: false,
+      openToTurkmen: false,
+      page: 1,
+    });
     const f = parseScholarshipFilters(
-      new URLSearchParams('coverage=partial&coverage=full&coverage=half&country=tr&closed=1'),
+      new URLSearchParams(
+        'coverage=partial&coverage=full&coverage=half&country=tr&closed=1&pre_year=1&turkmen=1',
+      ),
     );
     expect(f).toEqual({
       countries: ['TR'],
       coverages: ['full', 'partial'],
       includeClosed: true,
+      coversPreYear: true,
+      openToTurkmen: true,
       page: 1,
     });
     expect(parseScholarshipFilters(serializeScholarshipFilters(f))).toEqual(f);
-    expect(countScholarshipFilters(f)).toBe(4);
+    expect(countScholarshipFilters(f)).toBe(6);
   });
 });
 

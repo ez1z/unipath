@@ -156,6 +156,18 @@ export function scholarshipFilterGroups(
     },
     {
       kind: 'checkbox',
+      name: PARAM.preYear,
+      legend: t('summary.preYear'),
+      options: [option('1', t('filter.coversPreYear'), f.coversPreYear)],
+    },
+    {
+      kind: 'checkbox',
+      name: PARAM.turkmen,
+      legend: t('filter.whoCanApply'),
+      options: [option('1', t('filter.openToTurkmen'), f.openToTurkmen)],
+    },
+    {
+      kind: 'checkbox',
       name: PARAM.closed,
       legend: t('deadline.closed'),
       options: [option('1', t('filter.closed'), f.includeClosed)],

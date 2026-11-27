@@ -137,6 +137,14 @@ describe('searchScholarships', () => {
     expect(await ids('coverage=partial&closed=1')).toEqual([3, 4]);
     expect(await ids('country=TR')).toEqual([1]);
   });
+
+  test('"covers the pre-year" and "open to Turkmen" keep confirmed ones only', async () => {
+    // 3 doesn't cover the pre-year; 4 is "not confirmed" (and closed).
+    expect(await ids('pre_year=1&closed=1')).toEqual([2, 1]);
+    // 3 is "not confirmed" for Turkmen citizens, so it is hidden.
+    expect(await ids('turkmen=1')).toEqual([2, 1]);
+    expect(await ids('turkmen=1&closed=1')).toEqual([2, 1, 4]);
+  });
 });
 
 describe('getComparePage', () => {

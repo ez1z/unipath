@@ -482,6 +482,8 @@ export function scholarshipSearchQuery(
         f.includeClosed ? undefined : open,
         f.countries.length > 0 ? inArray(s.countryCode, f.countries) : undefined,
         f.coverages.length > 0 ? inArray(s.coverage, f.coverages) : undefined,
+        f.coversPreYear ? eq(s.coversPreYear, 'yes') : undefined,
+        f.openToTurkmen ? eq(s.openToTurkmen, 'yes') : undefined,
       ),
     )
     .orderBy(

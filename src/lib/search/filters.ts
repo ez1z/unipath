@@ -61,6 +61,10 @@ export interface ScholarshipFilters {
   coverages: Coverage[];
   /** Closed scholarships are hidden unless asked for. */
   includeClosed: boolean;
+  /** Only scholarships confirmed to pay for the foundation or language year. */
+  coversPreYear: boolean;
+  /** Only scholarships confirmed open to Turkmen citizens; "not confirmed" is hidden. */
+  openToTurkmen: boolean;
   page: number;
 }
 
@@ -83,6 +87,8 @@ export const PARAM = {
   foundation: 'foundation',
   coverage: 'coverage',
   closed: 'closed',
+  preYear: 'pre_year',
+  turkmen: 'turkmen',
   tab: 'tab',
 } as const;
 
@@ -175,6 +181,8 @@ export function parseScholarshipFilters(params: URLSearchParams): ScholarshipFil
     countries: list(params, PARAM.country, countryCode),
     coverages: list(params, PARAM.coverage, z.enum(COVERAGES), COVERAGES),
     includeClosed: one(params, PARAM.closed, flag) !== null,
+    coversPreYear: one(params, PARAM.preYear, flag) !== null,
+    openToTurkmen: one(params, PARAM.turkmen, flag) !== null,
     page: one(params, PARAM.page, page) ?? 1,
   };
 }
@@ -214,6 +222,8 @@ export function serializeScholarshipFilters(filters: ScholarshipFilters): URLSea
   for (const v of filters.countries) params.append(PARAM.country, v);
   for (const v of filters.coverages) params.append(PARAM.coverage, v);
   if (filters.includeClosed) params.set(PARAM.closed, '1');
+  if (filters.coversPreYear) params.set(PARAM.preYear, '1');
+  if (filters.openToTurkmen) params.set(PARAM.turkmen, '1');
   if (filters.page !== 1) params.set(PARAM.page, String(filters.page));
   return params;
 }
@@ -244,7 +254,13 @@ export function countUniversityFilters(f: UniversityFilters): number {
 }
 
 export function countScholarshipFilters(f: ScholarshipFilters): number {
-  return f.countries.length + f.coverages.length + (f.includeClosed ? 1 : 0);
+  return (
+    f.countries.length +
+    f.coverages.length +
+    (f.includeClosed ? 1 : 0) +
+    (f.coversPreYear ? 1 : 0) +
+    (f.openToTurkmen ? 1 : 0)
+  );
 }
 
 // ---------------------------------------------------------------------------
