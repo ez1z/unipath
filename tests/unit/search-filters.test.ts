@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
 import {
+  compareKey,
   countProgramFilters,
+  countScholarshipFilters,
+  parseCompareIds,
+  parseScholarshipFilters,
+  serializeCompareIds,
+  serializeScholarshipFilters,
   countUniversityFilters,
   parseProgramFilters,
   parseUniversityFilters,
@@ -12,6 +18,7 @@ import {
 const parse = (query: string) => parseProgramFilters(new URLSearchParams(query));
 
 const EMPTY: ProgramFilters = {
+  q: null,
   countries: [],
   levels: [],
   fields: [],
@@ -39,6 +46,7 @@ describe('program filters from the URL', () => {
           '&approved=1&scholarships=1&sort=tuition&page=2',
       ),
     ).toEqual({
+      q: null,
       countries: ['GB', 'TR'],
       levels: ['bachelor', 'foundation'],
       fields: ['computing'],
@@ -62,6 +70,8 @@ describe('program filters from the URL', () => {
       ),
     ).toEqual(EMPTY);
     expect(parse('page=999999').page).toBe(1);
+    expect(parse('page=11').page).toBe(1);
+    expect(parse('page=10').page).toBe(10);
     expect(parse('max_tuition=2000000').tuitionMax).toBeNull();
   });
 
@@ -108,6 +118,7 @@ describe('university filters from the URL', () => {
       new URLSearchParams('country=hu&status=unchecked&status=approved&status=bogus&foundation=1'),
     );
     expect(f).toEqual({
+      q: null,
       countries: ['HU'],
       statuses: ['approved', 'unchecked'],
       hasFoundationYear: true,
@@ -122,5 +133,63 @@ describe('university filters from the URL', () => {
     const query = new URLSearchParams('country=TR&scholarships=1&level=bachelor');
     expect(parseUniversityFilters(query).countries).toEqual(parseProgramFilters(query).countries);
     expect(parseUniversityFilters(query).hasScholarships).toBe(true);
+  });
+});
+
+describe('search text', () => {
+  test('is trimmed, spaces collapsed, capped at 100 characters, and empty means none', () => {
+    expect(parse('q=%20%20computer%20%20%20science%20').q).toBe('computer science');
+    expect(parse('q=%20%20').q).toBeNull();
+    expect(parse('q=' + 'a'.repeat(150)).q).toHaveLength(100);
+  });
+
+  test('is kept in the canonical query but not counted as a filter', () => {
+    const f = parse('q=Law&country=GB');
+    expect(serializeProgramFilters(f).toString()).toBe('q=Law&country=GB');
+    expect(countProgramFilters(f)).toBe(1);
+  });
+});
+
+describe('scholarship filters from the URL', () => {
+  test('country, coverage and closed; closed hidden by default', () => {
+    const none = parseScholarshipFilters(new URLSearchParams(''));
+    expect(none).toEqual({ countries: [], coverages: [], includeClosed: false, page: 1 });
+    const f = parseScholarshipFilters(
+      new URLSearchParams('coverage=partial&coverage=full&coverage=half&country=tr&closed=1'),
+    );
+    expect(f).toEqual({
+      countries: ['TR'],
+      coverages: ['full', 'partial'],
+      includeClosed: true,
+      page: 1,
+    });
+    expect(parseScholarshipFilters(serializeScholarshipFilters(f))).toEqual(f);
+    expect(countScholarshipFilters(f)).toBe(4);
+  });
+});
+
+describe('compare ids', () => {
+  const compare = (query: string) => parseCompareIds(new URLSearchParams(query));
+
+  test('a bachelor’s alone, or pre-year then bachelor’s', () => {
+    expect(compare('ids=101,203-201')).toEqual([
+      { bachelorId: 101, preYearId: null },
+      { bachelorId: 201, preYearId: 203 },
+    ]);
+  });
+
+  test('drops invalid parts and duplicates, keeps at most three in order', () => {
+    expect(compare('ids=abc,0,1-2-3,-5,101,101,203-201,402,601').map(compareKey)).toEqual([
+      '101',
+      '203-201',
+      '402',
+    ]);
+    expect(compare('')).toEqual([]);
+  });
+
+  test('round-trips through the URL', () => {
+    const items = compare('ids=802-801,702');
+    expect(serializeCompareIds(items).toString()).toBe('ids=802-801%2C702');
+    expect(parseCompareIds(serializeCompareIds(items))).toEqual(items);
   });
 });

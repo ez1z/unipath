@@ -72,12 +72,17 @@ const publishNeedsSource = (
 // Catalogue
 // ---------------------------------------------------------------------------
 
-export const countries = sqliteTable('countries', {
-  /** ISO 3166-1 alpha-2, upper case. Names come from `translations`. */
-  code: text('code').primaryKey(),
-  /** Lower is more popular; null = not in the popular list. */
-  popularRank: integer('popular_rank'),
-});
+export const countries = sqliteTable(
+  'countries',
+  {
+    /** ISO 3166-1 alpha-2, upper case. Names come from `translations`. */
+    code: text('code').primaryKey(),
+    /** Lower is more popular; null = not in the popular list. */
+    popularRank: integer('popular_rank'),
+  },
+  // Covers the Home tiles and the country filter list, so neither reads the table.
+  (t) => [index('countries_popular_idx').on(t.popularRank, t.code)],
+);
 
 export const universities = sqliteTable(
   'universities',

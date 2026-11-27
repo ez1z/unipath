@@ -8,6 +8,7 @@ import { getTableColumns, inArray, sql } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type { Db } from '../src/lib/db/client.ts';
+import { rebuildSearchIndex } from '../src/lib/db/search-index.ts';
 import {
   countries,
   pathwayColleges,
@@ -93,8 +94,12 @@ export async function loadDemoData(db: Db, data: DemoData): Promise<Record<strin
 
   const [first, ...rest] = statements;
   if (first) await db.batch([first, ...rest]);
+  const indexed = await rebuildSearchIndex(db);
 
-  return Object.fromEntries(
-    Object.entries(data).map(([name, rows]) => [name, (rows as unknown[]).length]),
-  );
+  return {
+    ...Object.fromEntries(
+      Object.entries(data).map(([name, rows]) => [name, (rows as unknown[]).length]),
+    ),
+    searchIndexRows: indexed.programs + indexed.universities,
+  };
 }

@@ -29,6 +29,7 @@ describe('migrations', () => {
       await rows<{ name: string }>(
         `select name from sqlite_master where type = 'table'
          and name not like 'sqlite_%' and name not like '_cf_%' and name <> 'd1_migrations'
+         and name not glob '*_search_*'
          order by name`,
       )
     ).map((r) => r.name);
@@ -62,6 +63,9 @@ describe('migrations', () => {
         'mistake_reports',
         'settings',
         'audit_log',
+        // FTS5 search indexes (migration 0002); their shadow tables are filtered out above.
+        'program_search',
+        'university_search',
       ].sort(),
     );
   });

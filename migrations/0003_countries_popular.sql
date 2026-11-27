@@ -1,0 +1,1 @@
+CREATE INDEX `countries_popular_idx` ON `countries` (`popular_rank`,`code`);

@@ -202,14 +202,16 @@ describe('searchPrograms', () => {
     });
   });
 
-  test('pages through results with a total', async () => {
+  test('"Show more": page n holds the first n pages, with a total', async () => {
     const first = await programs('', 'en', 5);
+    const second = await programs('page=2', 'en', 5);
     const fifth = await programs('page=5', 'en', 5);
-    expect([first.items.length, first.total, fifth.items.length, fifth.total]).toEqual([
-      5, 22, 2, 22,
-    ]);
+    expect([first.items.length, first.total, first.hasMore]).toEqual([5, 22, true]);
+    expect([second.items.length, second.hasMore]).toEqual([10, true]);
+    expect([fifth.items.length, fifth.total, fifth.hasMore]).toEqual([22, 22, false]);
     const all = await programs('', 'en', 100);
-    expect(ids(fifth)).toEqual(ids(all).slice(20));
+    expect(ids(second)).toEqual(ids(all).slice(0, 10));
+    expect(ids(fifth)).toEqual(ids(all));
   });
 
   test('names come in the page language, with English as a marked fallback', async () => {

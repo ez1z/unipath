@@ -8,7 +8,16 @@ import {
   translationsQuery,
   universitySearchQuery,
 } from '../../../src/lib/db/queries.ts';
-import { parseProgramFilters, parseUniversityFilters } from '../../../src/lib/search/filters.ts';
+import {
+  countriesQuery,
+  scholarshipSearchQuery,
+  studyLanguagesQuery,
+} from '../../../src/lib/db/catalog.ts';
+import {
+  parseProgramFilters,
+  parseScholarshipFilters,
+  parseUniversityFilters,
+} from '../../../src/lib/search/filters.ts';
 import { createTestDb, TODAY, type TestDb } from './test-db.ts';
 
 let t: TestDb;
@@ -30,14 +39,16 @@ async function fullScans(query: {
   expect(plan.results.length).toBeGreaterThan(0);
   // "SCAN programs" is a full scan. Not scans of a table: "SEARCH … USING INDEX",
   // "SCAN … USING COVERING INDEX", "SCAN (subquery-n)" (the count window) and
-  // "SCAN json_each VIRTUAL TABLE" (walking the one bound list of ids).
+  // "SCAN json_each VIRTUAL TABLE" (walking the one bound list of ids) and
+  // "SCAN program_search VIRTUAL TABLE INDEX …" (an FTS5 MATCH, which uses its own index).
   return plan.results
     .map((row) => row.detail)
     .filter(
       (detail) =>
         /^SCAN (?!\(subquery)/.test(detail) &&
         !detail.includes('USING') &&
-        !detail.startsWith('SCAN json_each VIRTUAL TABLE'),
+        !detail.startsWith('SCAN json_each VIRTUAL TABLE') &&
+        !/^SCAN \w+_search VIRTUAL TABLE INDEX/.test(detail),
     );
 }
 
@@ -69,6 +80,35 @@ describe('query plans use indexes', () => {
       expect(await fullScans(universitySearchQuery(t.db, filters, TODAY))).toEqual([]);
     },
   );
+
+  test.each(['q=economics', 'q=medicine&level=bachelor&sort=tuition', 'q=türk dili'])(
+    'program text search ?%s uses the FTS index',
+    async (query) => {
+      const filters = parseProgramFilters(new URLSearchParams(query));
+      expect(await fullScans(programSearchQuery(t.db, filters, TODAY))).toEqual([]);
+    },
+  );
+
+  test('university text search uses the FTS index', async () => {
+    const filters = parseUniversityFilters(new URLSearchParams('q=demo&country=TR'));
+    expect(await fullScans(universitySearchQuery(t.db, filters, TODAY))).toEqual([]);
+  });
+
+  test.each(['', 'coverage=full', 'country=TR&coverage=partial', 'closed=1', 'page=3'])(
+    'scholarship search ?%s',
+    async (query) => {
+      const filters = parseScholarshipFilters(new URLSearchParams(query));
+      expect(await fullScans(scholarshipSearchQuery(t.db, filters, TODAY))).toEqual([]);
+    },
+  );
+
+  test('countries for Home and the Country filter', async () => {
+    expect(await fullScans(countriesQuery(t.db))).toEqual([]);
+  });
+
+  test('study languages for the Language filter', async () => {
+    expect(await fullScans(studyLanguagesQuery(t.db))).toEqual([]);
+  });
 
   test('translations lookup', async () => {
     const query = translationsQuery(

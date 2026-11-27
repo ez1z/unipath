@@ -34,6 +34,7 @@ import {
 } from '../paths.ts';
 import type { ProgramFilters, UniversityFilters } from '../search/filters.ts';
 import type { Db } from './client.ts';
+import { toFtsQuery } from './search-index.ts';
 import {
   pathwayColleges,
   pathways,
@@ -107,11 +108,13 @@ export interface ProgramCard extends ProgramSummary {
   shortestTotalYears: number | null;
 }
 
+/** Page n holds the first n × pageSize results ("Show more"). */
 export interface SearchPage<T> {
   items: T[];
   total: number;
   page: number;
   pageSize: number;
+  hasMore: boolean;
 }
 
 export interface UniversityCard {
@@ -205,22 +208,25 @@ export interface ScholarshipPage {
 }
 
 // ---------------------------------------------------------------------------
-// SQL building blocks
+// SQL building blocks (also used by catalog.ts)
 // ---------------------------------------------------------------------------
 
-function all(...conds: (SQL | undefined)[]): SQL {
+export function all(...conds: (SQL | undefined)[]): SQL {
   return and(...conds) ?? sql`1`;
 }
 
-function any(...conds: (SQL | undefined)[]): SQL {
+export function any(...conds: (SQL | undefined)[]): SQL {
   return or(...conds) ?? sql`0`;
 }
 
-function pick<T extends object, K extends keyof T>(source: T, keys: readonly K[]): Pick<T, K> {
+export function pick<T extends object, K extends keyof T>(
+  source: T,
+  keys: readonly K[],
+): Pick<T, K> {
   return Object.fromEntries(keys.map((key) => [key, source[key]])) as Pick<T, K>;
 }
 
-const PROGRAM_KEYS = [
+export const PROGRAM_KEYS = [
   'id',
   'slug',
   'level',
@@ -235,7 +241,7 @@ const PROGRAM_KEYS = [
   'lastChecked',
   'sourceUrl',
 ] as const;
-const UNIVERSITY_KEYS = [
+export const UNIVERSITY_KEYS = [
   'id',
   'slug',
   'name',
@@ -248,34 +254,37 @@ const UNIVERSITY_KEYS = [
   'rankingArwu',
   'rankingMoscow',
 ] as const;
-const COLLEGE_KEYS = ['id', 'slug', 'name', 'city', 'countryCode', 'website'] as const;
+export const COLLEGE_KEYS = ['id', 'slug', 'name', 'city', 'countryCode', 'website'] as const;
 
-type ProgramRow = Pick<typeof programs.$inferSelect, (typeof PROGRAM_KEYS)[number]>;
-type UniversityRow = Pick<typeof universities.$inferSelect, (typeof UNIVERSITY_KEYS)[number]>;
-type CollegeRow = Pick<typeof pathwayColleges.$inferSelect, (typeof COLLEGE_KEYS)[number]>;
+export type ProgramRow = Pick<typeof programs.$inferSelect, (typeof PROGRAM_KEYS)[number]>;
+export type UniversityRow = Pick<
+  typeof universities.$inferSelect,
+  (typeof UNIVERSITY_KEYS)[number]
+>;
+export type CollegeRow = Pick<typeof pathwayColleges.$inferSelect, (typeof COLLEGE_KEYS)[number]>;
 
 // Aliases for the "other" program of a pathway and its provider.
-const pw = alias(pathways, 'pw');
-const pre = alias(programs, 'pre');
-const preU = alias(universities, 'pre_u');
-const preC = alias(pathwayColleges, 'pre_c');
-const bach = alias(programs, 'bach');
-const bachU = alias(universities, 'bach_u');
-const bachC = alias(pathwayColleges, 'bach_c');
-const sch = alias(scholarships, 'sch');
-const sp = alias(scholarshipPrograms, 'sp');
-const su = alias(scholarshipUniversities, 'su');
+export const pw = alias(pathways, 'pw');
+export const pre = alias(programs, 'pre');
+export const preU = alias(universities, 'pre_u');
+export const preC = alias(pathwayColleges, 'pre_c');
+export const bach = alias(programs, 'bach');
+export const bachU = alias(universities, 'bach_u');
+export const bachC = alias(pathwayColleges, 'bach_c');
+export const sch = alias(scholarships, 'sch');
+export const sp = alias(scholarshipPrograms, 'sp');
+export const su = alias(scholarshipUniversities, 'su');
 
 /** A program is visible when it and its provider (university or college) are published. */
-const programVisible = (
+export const programVisible = (
   program: { published: AnySQLiteColumn },
   uni: { published: AnySQLiteColumn },
   college: { published: AnySQLiteColumn },
 ) => all(eq(program.published, true), sql`coalesce(${uni.published}, ${college.published}) = 1`);
 
-const mainVisible = programVisible(programs, universities, pathwayColleges);
-const preVisible = programVisible(pre, preU, preC);
-const bachVisible = programVisible(bach, bachU, bachC);
+export const mainVisible = programVisible(programs, universities, pathwayColleges);
+export const preVisible = programVisible(pre, preU, preC);
+export const bachVisible = programVisible(bach, bachU, bachC);
 
 /** QS, else THE, else ARWU, else Moscow. Matches rankingPosition(). */
 function rankingSql(u: {
@@ -298,7 +307,7 @@ export function rankingPosition(u: {
   return u.rankingQs ?? u.rankingThe ?? u.rankingArwu ?? u.rankingMoscow ?? null;
 }
 
-function openScholarship(today: string): SQL {
+export function openScholarship(today: string): SQL {
   return all(
     eq(sch.published, true),
     any(eq(sch.rolling, true), isNull(sch.deadline), gte(sch.deadline, today)),
@@ -434,9 +443,9 @@ function scholarshipCondition(db: Db, today: string): SQL {
 // Translations
 // ---------------------------------------------------------------------------
 
-type TextRequest = Partial<Record<EntityType, readonly (string | number)[]>>;
+export type TextRequest = Partial<Record<EntityType, readonly (string | number)[]>>;
 
-interface Texts {
+export interface Texts {
   /** Translated text, else English (translation or base column) marked as fallback. */
   get(type: EntityType, id: string | number, field: string, base: string | null): LocalText | null;
   /** Like get() for a name, which always exists. */
@@ -464,7 +473,7 @@ export function translationsQuery(db: Db, lang: Lang, wanted: TextRequest, field
     );
 }
 
-async function loadTexts(
+export async function loadTexts(
   db: Db,
   lang: Lang,
   wanted: TextRequest,
@@ -494,7 +503,7 @@ async function loadTexts(
 // Row mapping
 // ---------------------------------------------------------------------------
 
-function toProvider(
+export function toProvider(
   uni: UniversityRow | null,
   college: CollegeRow | null,
   texts: Texts,
@@ -531,7 +540,7 @@ function toProvider(
   throw new Error('Program without a provider');
 }
 
-function toSummary(
+export function toSummary(
   row: ProgramRow,
   uni: UniversityRow | null,
   college: CollegeRow | null,
@@ -557,7 +566,7 @@ function toSummary(
 }
 
 /** Ids to translate for a set of program rows. */
-function textRequest(
+export function textRequest(
   rows: { program: { id: number }; university: UniversityRow | null; college: CollegeRow | null }[],
 ): TextRequest {
   return {
@@ -571,7 +580,7 @@ function textRequest(
   };
 }
 
-function mergeRequests(...requests: TextRequest[]): TextRequest {
+export function mergeRequests(...requests: TextRequest[]): TextRequest {
   const merged: Partial<Record<EntityType, (string | number)[]>> = {};
   for (const request of requests) {
     for (const [type, ids] of Object.entries(request) as [EntityType, (string | number)[]][]) {
@@ -607,8 +616,23 @@ export interface SearchOptions {
   pageSize?: number;
 }
 
+/** Matches the full-text index; rowid is the record's id. */
+function textMatch(
+  table: 'program_search' | 'university_search',
+  id: AnySQLiteColumn,
+  fts: string,
+) {
+  return sql`${id} in (select rowid from ${sql.identifier(table)} where ${sql.identifier(table)} match ${fts})`;
+}
+
+/** bm25 rank of a matched row (lower is better). */
+function textRank(table: 'program_search' | 'university_search', id: AnySQLiteColumn, fts: string) {
+  return sql`(select rank from ${sql.identifier(table)} where ${sql.identifier(table)} match ${fts} and rowid = ${id})`;
+}
+
 /** The program search as a query builder (not yet run), so tests can read its plan. */
 export function programSearchQuery(db: Db, f: ProgramFilters, today: string, pageSize = PAGE_SIZE) {
+  const fts = toFtsQuery(f.q);
   const country = sql`coalesce(${universities.countryCode}, ${pathwayColleges.countryCode})`;
   const shortestPre = db
     .select({ years: sql`min(${pre.durationYears})` })
@@ -627,6 +651,7 @@ export function programSearchQuery(db: Db, f: ProgramFilters, today: string, pag
 
   const where = all(
     eq(programs.published, true),
+    fts ? textMatch('program_search', programs.id, fts) : undefined,
     f.levels.length > 0 ? inArray(programs.level, f.levels) : undefined,
     mainVisible,
     f.countries.length > 0 ? inArray(country, f.countries) : undefined,
@@ -643,8 +668,9 @@ export function programSearchQuery(db: Db, f: ProgramFilters, today: string, pag
   const ranking = rankingSql(universities);
   const deadline = programs.applicationDeadline;
   const order: SQL[] = {
-    // Without a text query: Ministry-approved first, then the most recently checked.
+    // Best text match first (with a query), then Ministry-approved, then the most recently checked.
     relevance: [
+      ...(fts ? [asc(textRank('program_search', programs.id, fts))] : []),
       desc(sql`coalesce(${universities.ministryStatus} = 'approved', 0)`),
       desc(programs.lastChecked),
     ],
@@ -668,8 +694,7 @@ export function programSearchQuery(db: Db, f: ProgramFilters, today: string, pag
     .leftJoin(pathwayColleges, eq(pathwayColleges.id, programs.collegeId))
     .where(where)
     .orderBy(...order, asc(programs.id))
-    .limit(pageSize)
-    .offset((f.page - 1) * pageSize);
+    .limit(pageSize * f.page);
 }
 
 export async function searchPrograms(
@@ -687,6 +712,7 @@ export async function searchPrograms(
     total: rows[0]?.total ?? 0,
     page: f.page,
     pageSize,
+    hasMore: (rows[0]?.total ?? 0) > rows.length,
   };
 }
 
@@ -756,6 +782,7 @@ export function universitySearchQuery(
     ),
   );
 
+  const fts = toFtsQuery(f.q);
   const ranking = rankingSql(universities);
   return db
     .select({
@@ -772,6 +799,7 @@ export function universitySearchQuery(
     .where(
       all(
         eq(universities.published, true),
+        fts ? textMatch('university_search', universities.id, fts) : undefined,
         f.statuses.length > 0 ? inArray(universities.ministryStatus, f.statuses) : undefined,
         f.countries.length > 0 ? inArray(universities.countryCode, f.countries) : undefined,
         f.hasFoundationYear ? hasFoundation : undefined,
@@ -779,14 +807,14 @@ export function universitySearchQuery(
       ),
     )
     .orderBy(
+      ...(fts ? [asc(textRank('university_search', universities.id, fts))] : []),
       desc(sql`${universities.ministryStatus} = 'approved'`),
       asc(sql`${ranking} is null`),
       asc(ranking),
       asc(universities.name),
       asc(universities.id),
     )
-    .limit(pageSize)
-    .offset((f.page - 1) * pageSize);
+    .limit(pageSize * f.page);
 }
 
 export async function searchUniversities(
@@ -828,6 +856,7 @@ export async function searchUniversities(
     total: rows[0]?.total ?? 0,
     page: f.page,
     pageSize,
+    hasMore: (rows[0]?.total ?? 0) > rows.length,
   };
 }
 
@@ -835,7 +864,7 @@ export async function searchUniversities(
 // Program page: program, its paths with total years, and its scholarships
 // ---------------------------------------------------------------------------
 
-const scholarshipSummaryKeys = [
+export const scholarshipSummaryKeys = [
   'id',
   'slug',
   'name',
@@ -848,9 +877,26 @@ const scholarshipSummaryKeys = [
   'openToTurkmen',
 ] as const;
 
-export async function getProgramWithPathways(
+export function getProgramWithPathways(
   db: Db,
   slug: string,
+  options: Omit<SearchOptions, 'pageSize'>,
+): Promise<ProgramPage | null> {
+  return loadProgramPage(db, eq(programs.slug, slug), options);
+}
+
+/** The same page by id (Compare). */
+export function getProgramPageById(
+  db: Db,
+  id: number,
+  options: Omit<SearchOptions, 'pageSize'>,
+): Promise<ProgramPage | null> {
+  return loadProgramPage(db, eq(programs.id, id), options);
+}
+
+async function loadProgramPage(
+  db: Db,
+  match: SQL,
   { lang, today }: Omit<SearchOptions, 'pageSize'>,
 ): Promise<ProgramPage | null> {
   const [row] = await db
@@ -862,7 +908,7 @@ export async function getProgramWithPathways(
     .from(programs)
     .leftJoin(universities, eq(universities.id, programs.universityId))
     .leftJoin(pathwayColleges, eq(pathwayColleges.id, programs.collegeId))
-    .where(all(eq(programs.slug, slug), mainVisible))
+    .where(all(match, mainVisible))
     .limit(1);
   if (!row) return null;
   const { program } = row;
