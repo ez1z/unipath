@@ -1,0 +1,174 @@
+---
+import { env } from 'cloudflare:workers';
+import NotFound from '../../components/NotFound.astro';
+import Text from '../../components/Text.astro';
+import { getTranslations, isLang, type MessageKey } from '../../i18n';
+import AppShell from '../../layouts/AppShell.astro';
+import { findReportTarget, type ReportTarget } from '../../lib/db/catalog';
+import {
+  MESSAGE_MAX,
+  MESSAGE_MIN,
+  reportTargetSchema,
+  submitReport,
+  type ReportResult,
+} from '../../lib/report';
+import { clientIp, getDb } from '../../lib/server';
+
+// A form page: rendered per request, never cached. Astro's origin check guards the POST.
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+
+let result: ReportResult | null = null;
+let message = '';
+let target: ReportTarget | null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const input = Object.fromEntries(
+    [...form].filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
+  );
+  message = input['message'] ?? '';
+  const ip = clientIp(Astro.request);
+  result = await submitReport(input, {
+    db,
+    lang,
+    allow: async () => (await env.REPORT_LIMITER.limit({ key: `report:${ip}` })).success,
+  });
+  target = result.target;
+  if (!result.ok) Astro.response.status = result.error === 'rate' ? 429 : 400;
+} else {
+  const parsed = reportTargetSchema.safeParse({
+    type: Astro.url.searchParams.get('type'),
+    id: Astro.url.searchParams.get('id'),
+  });
+  target = parsed.success
+    ? await findReportTarget(db, lang, parsed.data.type, parsed.data.id)
+    : null;
+}
+if (!target) Astro.response.status = 404;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const errorKey: Record<string, MessageKey> = {
+  short: 'report.error.short',
+  long: 'report.error.long',
+  rate: 'report.error.rate',
+  invalid: 'report.error.short',
+};
+const error = result && !result.ok ? errorKey[result.error] : undefined;
+---
+
+{!target ? (
+  <NotFound lang={lang} />
+) : (
+  <AppShell lang={lang} title={t('report.metaTitle')} noindex>
+    <div class="report">
+      {result?.ok ? (
+        <>
+          <h1 class="page-title">{t('report.thanks.title')}</h1>
+          <p role="status">{t('report.thanks.body')}</p>
+          <a class="button button-secondary" href={`/${lang}${target.path}`}>
+            {t('report.backTo', { name: target.name.text })}
+          </a>
+        </>
+      ) : (
+        <>
+          <h1 class="page-title">{t('report.title')}</h1>
+          <p class="text-muted">
+            {t('report.about')}{' '}
+            <a href={`/${lang}${target.path}`}>
+              <Text value={target.name} lang={lang} />
+            </a>
+          </p>
+          <form method="post" action={`/${lang}/report`} class="form" novalidate>
+            <input type="hidden" name="type" value={target.type} />
+            <input type="hidden" name="id" value={String(target.id)} />
+            <div class="field">
+              <label for="report-message">{t('report.message')}</label>
+              <p id="report-hint" class="muted-note">
+                {t('report.hint')}
+              </p>
+              {error && (
+                <p id="report-error" class="error" role="alert">
+                  {t(error)}
+                </p>
+              )}
+              <textarea
+                id="report-message"
+                name="message"
+                rows="6"
+                required
+                minlength={MESSAGE_MIN}
+                maxlength={MESSAGE_MAX}
+                aria-describedby={error ? 'report-hint report-error' : 'report-hint'}
+                aria-invalid={error ? 'true' : undefined}
+              >{message}</textarea>
+            </div>
+            <div class="trap" aria-hidden="true">
+              <label for="report-website">Website</label>
+              <input
+                id="report-website"
+                name="website"
+                type="text"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+            <button type="submit" class="button">
+              {t('report.submit')}
+            </button>
+          </form>
+        </>
+      )}
+    </div>
+  </AppShell>
+)}
+
+<style>
+  .report {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    max-width: 40rem;
+  }
+  .form {
+    display: grid;
+    gap: var(--space-4);
+    width: 100%;
+  }
+  .field {
+    display: grid;
+    gap: var(--space-2);
+  }
+  label {
+    font-weight: var(--weight-semibold);
+  }
+  textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--ink-muted);
+    border-radius: var(--radius-input);
+    background: var(--surface-raised);
+    resize: vertical;
+  }
+  textarea[aria-invalid='true'] {
+    border: 2px solid var(--danger);
+  }
+  .error {
+    color: var(--danger);
+    font-weight: var(--weight-semibold);
+  }
+  .trap {
+    position: absolute;
+    inset-inline-start: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .form .button {
+    justify-self: start;
+  }
+</style>
