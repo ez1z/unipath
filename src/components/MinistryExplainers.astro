@@ -1,0 +1,80 @@
+---
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import { MINISTRY_STATUSES } from '../lib/db/values';
+import { ministryLabel } from '../lib/view';
+
+/** The three Ministry status explanations, rendered once per page as popovers. */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = getTranslations(lang);
+---
+
+{MINISTRY_STATUSES.map((status) => (
+  <div
+    id={`ministry-explain-${status}`}
+    class="explainer"
+    popover="auto"
+    role="dialog"
+    aria-labelledby={`ministry-explain-${status}-title`}
+  >
+    <p id={`ministry-explain-${status}-title`} class="text-title">
+      {ministryLabel(t, status)}
+    </p>
+    <p>{t(`ministry.explain.${status}` as MessageKey)}</p>
+    <div class="actions">
+      <a href={`/${lang}/how-we-check`}>{t('ministry.howWeCheck')}</a>
+      <button
+        type="button"
+        class="close"
+        popovertarget={`ministry-explain-${status}`}
+        popovertargetaction="hide"
+      >
+        {t('filter.close')}
+      </button>
+    </div>
+  </div>
+))}
+
+<style>
+  .explainer {
+    width: min(26rem, calc(100vw - 2 * var(--space-4)));
+    padding: var(--space-5);
+    border: 0;
+    border-radius: var(--radius-sheet);
+    background: var(--surface-raised);
+    color: var(--ink);
+    box-shadow: var(--shadow-raised);
+  }
+  .explainer::backdrop {
+    background: var(--scrim);
+  }
+  .explainer p + p {
+    margin-top: var(--space-2);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+  .actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+  .close {
+    flex-shrink: 0;
+    min-height: var(--touch-target);
+    padding: 0 var(--space-5);
+    border: 0;
+    border-radius: var(--radius-button);
+    background: var(--brand);
+    color: var(--on-brand);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+  }
+</style>

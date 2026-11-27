@@ -1,0 +1,67 @@
+---
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import type { ScholarshipSummary } from '../lib/db/queries';
+import { deadlineText } from '../lib/view';
+import Text from './Text.astro';
+
+/** Scholarships on a program or university page: coverage, deadline, and how they apply. */
+interface Props {
+  lang: Lang;
+  scholarships: ScholarshipSummary[];
+  empty: string;
+}
+const { lang, scholarships, empty } = Astro.props;
+const t = getTranslations(lang);
+---
+
+{scholarships.length === 0 ? (
+  <p class="text-muted">{empty}</p>
+) : (
+  <ul class="list">
+    {scholarships.map((s) => (
+      <li class:list={['item', { closed: !s.open }]}>
+        <p class="name">
+          <a href={`/${lang}/scholarships/${s.slug}`}>
+            <Text value={s.name} lang={lang} />
+          </a>
+        </p>
+        <p class="text-small">
+          <span class="badge">{t(`coverage.${s.coverage}` as MessageKey)}</span>{' '}
+          {deadlineText(t, lang, s)}
+        </p>
+        {s.via === 'university' && (
+          <p class="text-small text-muted">{t('scholarship.viaUniversity')}</p>
+        )}
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .item {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+  }
+  .closed {
+    background: var(--surface);
+  }
+  .name {
+    font-weight: var(--weight-semibold);
+  }
+  .name a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+</style>

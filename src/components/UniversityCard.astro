@@ -1,0 +1,48 @@
+---
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import type { UniversityCard } from '../lib/db/queries';
+import { formatNumber } from '../lib/format';
+import Fact from './Fact.astro';
+import MinistryBadge from './MinistryBadge.astro';
+import Text from './Text.astro';
+
+/** Three key facts: Ministry status, place, best ranking. */
+interface Props {
+  lang: Lang;
+  university: UniversityCard;
+}
+const { lang, university: u } = Astro.props;
+const t = getTranslations(lang);
+
+const rankings = [
+  ['qs', u.rankings.qs],
+  ['the', u.rankings.the],
+  ['arwu', u.rankings.arwu],
+  ['moscow', u.rankings.moscow],
+] as const;
+const best = rankings.find(([, position]) => position !== null);
+---
+
+<article class="card university-card">
+  <h3 class="card-title">
+    <a href={`/${lang}/universities/${u.slug}`}>
+      <Text value={u.name} lang={lang} />
+    </a>
+  </h3>
+  <dl class="facts">
+    <Fact term={t('summary.ministry')}>
+      <MinistryBadge lang={lang} status={u.ministryStatus} />
+    </Fact>
+    <Fact term={t('university.place')}>
+      {u.city}, <Text value={u.countryName} lang={lang} label={false} />
+    </Fact>
+    <Fact term={t('university.rankings')}>
+      {best
+        ? t('card.ranking', {
+            name: t(`ranking.${best[0]}` as MessageKey),
+            position: formatNumber(lang, best[1] ?? 0),
+          })
+        : t('university.noRankings')}
+    </Fact>
+  </dl>
+</article>

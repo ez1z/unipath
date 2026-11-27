@@ -1,0 +1,55 @@
+---
+/**
+ * Detail page body: one column on phones (summary right after the title),
+ * content column + sticky 340–380 px summary column on desktop.
+ */
+---
+
+<div class="detail">
+  <div class="head">
+    <slot name="head" />
+  </div>
+  <aside class="side">
+    <slot name="side" />
+  </aside>
+  <div class="content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  /* minmax(0, 1fr): an implicit auto column grows to its widest child (the tab strip),
+     so it could never scroll and the page would overflow on phones. */
+  .detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+  .content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+    min-width: 0;
+  }
+  @media (min-width: 1024px) {
+    .detail {
+      grid-template-columns: minmax(0, 1fr) minmax(340px, 380px);
+      grid-template-areas:
+        'head side'
+        'content side';
+      align-items: start;
+      column-gap: var(--space-6);
+    }
+    .head {
+      grid-area: head;
+    }
+    .content {
+      grid-area: content;
+    }
+    .side {
+      grid-area: side;
+      position: sticky;
+      top: var(--space-4);
+    }
+  }
+</style>

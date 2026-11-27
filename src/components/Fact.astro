@@ -1,0 +1,17 @@
+---
+/** One term / value pair inside a `.facts` list (SummaryBox, cards). */
+interface Props {
+  term: string;
+  /** Smaller second line under the value, e.g. the TMT amount. */
+  note?: string | null | undefined;
+}
+const { term, note } = Astro.props;
+---
+
+<div>
+  <dt>{term}</dt>
+  <dd>
+    <slot />
+    {note && <span class="note">{note}</span>}
+  </dd>
+</div>

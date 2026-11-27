@@ -1,0 +1,110 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+import type { LocalText } from '../lib/db/queries';
+import type { ProgramLevel } from '../lib/db/values';
+import { levelLabel } from '../lib/view';
+import Text from './Text.astro';
+
+/**
+ * Numbered vertical steps of a path (pre-year, then bachelor's) ending in
+ * "N years total". Total years are shown as a plain fact.
+ */
+interface Step {
+  level: ProgramLevel;
+  name: LocalText;
+  /** Provider name, when it differs from the page's own record. */
+  provider?: LocalText | undefined;
+  href?: string | undefined;
+  years: number;
+}
+interface Props {
+  lang: Lang;
+  steps: Step[];
+  totalYears: number | null;
+}
+const { lang, steps, totalYears } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<ol class="steps">
+  {steps.map((step, i) => (
+    <li>
+      <span class="number" aria-hidden="true">
+        {i + 1}
+      </span>
+      <div class="body">
+        <p class="level text-label text-muted">
+          {levelLabel(t, step.level)} · {t('path.stepYears', { n: step.years })}
+        </p>
+        <p class="name">
+          {step.href ? (
+            <a href={step.href}>
+              <Text value={step.name} lang={lang} />
+            </a>
+          ) : (
+            <Text value={step.name} lang={lang} />
+          )}
+        </p>
+        {step.provider && (
+          <p class="text-small text-muted">
+            <Text value={step.provider} lang={lang} label={false} />
+          </p>
+        )}
+      </div>
+    </li>
+  ))}
+</ol>
+{totalYears !== null && <p class="total">{t('path.total', { n: totalYears })}</p>}
+
+<style>
+  .steps {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    position: relative;
+    display: flex;
+    gap: var(--space-3);
+  }
+  /* The line joining one step to the next. */
+  li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 2.25rem;
+    bottom: calc(-1 * var(--space-4));
+    inset-inline-start: calc(1rem - 1px);
+    width: 2px;
+    background: var(--border);
+  }
+  .number {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-badge);
+    background: var(--brand);
+    color: var(--on-brand);
+    font-weight: var(--weight-semibold);
+  }
+  .body {
+    min-width: 0;
+    padding-top: var(--space-1);
+  }
+  .name {
+    font-weight: var(--weight-semibold);
+  }
+  .total {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--brand-soft);
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    font-weight: var(--weight-semibold);
+  }
+</style>

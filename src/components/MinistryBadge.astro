@@ -1,0 +1,79 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+import type { MinistryStatus } from '../lib/db/values';
+import { ministryLabel } from '../lib/view';
+
+/**
+ * Ministry status as text plus an icon, never colour alone. Tapping it opens the
+ * explanation (MinistryExplainers, once per page) through the Popover API, which
+ * needs no JavaScript.
+ */
+interface Props {
+  lang: Lang;
+  status: MinistryStatus;
+}
+const { lang, status } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<button
+  type="button"
+  class:list={['ministry-badge', status]}
+  popovertarget={`ministry-explain-${status}`}
+>
+  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+    {status === 'approved' ? (
+      <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" />
+    ) : status === 'not_listed' ? (
+      <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" />
+    ) : (
+      <path
+        d="M6 6a2 2 0 1 1 2.8 1.8C8.3 8 8 8.5 8 9v.5M8 12v.5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+    )}
+  </svg>
+  <span>{ministryLabel(t, status)}</span>
+  <span class="visually-hidden">{` – ${t('ministry.explain')}`}</span>
+</button>
+
+<style>
+  .ministry-badge {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: var(--touch-target);
+    padding: 0 var(--space-3);
+    border: 0;
+    border-radius: var(--radius-badge);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+    text-align: start;
+  }
+  .ministry-badge svg {
+    flex-shrink: 0;
+  }
+  .approved {
+    background: var(--brand-soft);
+    color: var(--ink);
+  }
+  .approved svg {
+    color: var(--brand);
+  }
+  .not_listed {
+    background: var(--surface);
+    color: var(--danger);
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+  .unchecked {
+    background: var(--surface);
+    color: var(--ink-muted);
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+</style>

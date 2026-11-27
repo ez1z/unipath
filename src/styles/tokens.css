@@ -20,6 +20,10 @@
   --border: #dcd4c2;
   --danger: #b3261e;
 
+  /* Elevation: sheets, popovers and the compare bar (not in SPEC's table; no text sits on these). */
+  --scrim: rgb(0 0 0 / 0.4);
+  --shadow-raised: 0 12px 40px rgb(0 0 0 / 0.22);
+
   /* Logo: arch swaps to cream on dark; the doorway is never recoloured. */
   --logo-arch: #234f3b;
   --logo-door: #e4775a;

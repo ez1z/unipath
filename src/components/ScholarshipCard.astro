@@ -1,0 +1,50 @@
+---
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import type { ScholarshipCard } from '../lib/db/catalog';
+import { deadlineText, triStateKey } from '../lib/view';
+import Fact from './Fact.astro';
+import Text from './Text.astro';
+
+/** Three key facts: coverage, deadline, country. */
+interface Props {
+  lang: Lang;
+  scholarship: ScholarshipCard;
+}
+const { lang, scholarship: s } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<article class:list={['card', 'scholarship-card', { closed: !s.open }]}>
+  <div class="badges">
+    <span class="badge">{t(`coverage.${s.coverage}` as MessageKey)}</span>
+    {s.openToTurkmen === 'yes' && (
+      <span class="badge badge-plain">{t(triStateKey('scholarship.turkmen', 'yes'))}</span>
+    )}
+  </div>
+  <h3 class="card-title">
+    <a href={`/${lang}/scholarships/${s.slug}`}>
+      <Text value={s.name} lang={lang} />
+    </a>
+  </h3>
+  <p class="text-small text-muted">{t('scholarship.by', { provider: s.provider })}</p>
+  <dl class="facts">
+    <Fact term={t('summary.deadline')}>{deadlineText(t, lang, s)}</Fact>
+    <Fact term={t('summary.amount')}>
+      {s.amountText ? <Text value={s.amountText} lang={lang} /> : t('common.notConfirmed')}
+    </Fact>
+    <Fact term={t('filter.country')}>
+      <Text value={s.countryName} lang={lang} label={false} />
+    </Fact>
+  </dl>
+</article>
+
+<style>
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .closed {
+    background: var(--surface);
+  }
+</style>

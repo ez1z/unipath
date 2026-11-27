@@ -11,7 +11,10 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = getTranslations(lang);
-const { pathname, search } = Astro.url;
+const { pathname } = Astro.url;
+const canonicalQuery = Astro.locals.canonicalQuery;
+const search =
+  canonicalQuery === undefined ? Astro.url.search : canonicalQuery ? `?${canonicalQuery}` : '';
 ---
 
 <nav class="lang-switch" aria-label={t('lang.label')}>

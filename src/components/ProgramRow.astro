@@ -1,0 +1,109 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+import type { PathTarget } from '../lib/db/catalog';
+import type { LocalText } from '../lib/db/queries';
+import type { ProgramLevel } from '../lib/db/values';
+import type { UsdTmtRate } from '../lib/format';
+import { languageName } from '../lib/format';
+import { levelLabel, moneyText, yearsText } from '../lib/view';
+import Text from './Text.astro';
+
+/** A program as a list row (University, College and Scholarship pages). */
+interface Props {
+  lang: Lang;
+  program: {
+    slug: string;
+    level: ProgramLevel;
+    name: LocalText;
+    durationYears: number;
+    tuitionPerYearUsd: number | null;
+    languageOfStudy: string;
+    shortestTotalYears?: number | null;
+    leadsTo?: PathTarget[];
+  };
+  /** Shown under the name, e.g. the provider on a scholarship page. */
+  context?: LocalText | undefined;
+  extra?: string | undefined;
+  rate: UsdTmtRate | null;
+}
+const { lang, program: p, context, extra, rate } = Astro.props;
+const t = getTranslations(lang);
+const money = p.tuitionPerYearUsd === null ? null : moneyText(t, lang, p.tuitionPerYearUsd, rate);
+---
+
+<li class="row">
+  <div class="main">
+    <p class="name">
+      <a href={`/${lang}/programs/${p.slug}`}>
+        <Text value={p.name} lang={lang} />
+      </a>
+    </p>
+    {context && (
+      <p class="text-small text-muted">
+        <Text value={context} lang={lang} label={false} />
+      </p>
+    )}
+    <p class="text-small text-muted">
+      {levelLabel(t, p.level)} · {yearsText(t, p.durationYears)} ·{' '}
+      {languageName(lang, p.languageOfStudy)}
+    </p>
+    {extra && <p class="text-small">{extra}</p>}
+    {p.leadsTo && p.leadsTo.length > 0 && (
+      <ul class="leads">
+        {p.leadsTo.map((target) => (
+          <li class="text-small">
+            <span aria-hidden="true">→ </span>
+            <a href={`/${lang}/programs/${target.slug}`}>
+              <Text value={target.name} lang={lang} label={false} />
+            </a>
+            {', '}
+            <Text value={target.provider.name} lang={lang} label={false} />
+            {' · '}
+            <strong>{t('path.total', { n: target.totalYears })}</strong>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+  <p class="cost">
+    {money ? t('common.perYear', { amount: money.usd }) : t('common.costNotConfirmed')}
+    {money?.tmt && <span class="text-small text-muted">{money.tmt}</span>}
+  </p>
+</li>
+
+<style>
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--border);
+  }
+  .main {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+  .name {
+    font-weight: var(--weight-semibold);
+  }
+  .name a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+  .leads {
+    margin-top: var(--space-2);
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-1);
+  }
+  .cost {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-weight: var(--weight-semibold);
+    text-align: end;
+  }
+</style>

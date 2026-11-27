@@ -1,0 +1,48 @@
+---
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import AppShell from '../layouts/AppShell.astro';
+
+/**
+ * A static text page (About, How we check, Privacy): a title and sections of
+ * translated paragraphs. Prerendered once per language.
+ */
+interface Section {
+  title?: MessageKey;
+  body: MessageKey[];
+}
+interface Props {
+  lang: Lang;
+  metaTitle: MessageKey;
+  title: MessageKey;
+  sections: Section[];
+}
+const { lang, metaTitle, title, sections } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<AppShell lang={lang} title={t(metaTitle)}>
+  <article class="content">
+    <h1 class="page-title">{t(title)}</h1>
+    {sections.map((section) => (
+      <section>
+        {section.title && <h2 class="text-h2">{t(section.title)}</h2>}
+        {section.body.map((key) => (
+          <p>{t(key)}</p>
+        ))}
+      </section>
+    ))}
+    <slot />
+  </article>
+</AppShell>
+
+<style>
+  .content {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 44rem;
+  }
+  section {
+    display: grid;
+    gap: var(--space-3);
+  }
+</style>

@@ -1,7 +1,9 @@
 ---
+import CompareBar from '../components/CompareBar.astro';
 import Icon from '../components/Icon.astro';
 import LanguageSwitch from '../components/LanguageSwitch.astro';
 import Logo from '../components/Logo.astro';
+import MinistryExplainers from '../components/MinistryExplainers.astro';
 import { getTranslations, type Lang } from '../i18n';
 import { activeSection, navItems } from '../lib/nav';
 import BaseLayout from './BaseLayout.astro';
@@ -15,16 +17,19 @@ interface Props {
   lang: Lang;
   title: string;
   description?: string | undefined;
+  noindex?: boolean;
+  /** Pages with Compare toggles get the compare bar; the Compare page passes its keys. */
+  compare?: boolean | string[];
 }
 
-const { lang, title, description } = Astro.props;
+const { lang, title, description, noindex = false, compare = false } = Astro.props;
 const t = getTranslations(lang);
 const items = navItems(lang);
 const current = activeSection(Astro.url.pathname);
 const ariaCurrent = (section: string) => (section === current ? 'page' : undefined);
 ---
 
-<BaseLayout lang={lang} title={title} description={description}>
+<BaseLayout lang={lang} title={title} description={description} noindex={noindex}>
   <a class="skip-link" href="#main">
     {t('a11y.skipToContent')}
   </a>
@@ -59,6 +64,29 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
   <main id="main" class="container" tabindex="-1">
     <slot />
   </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <nav aria-label={t('footer.label')}>
+        <ul>
+          <li>
+            <a href={`/${lang}/about`}>{t('footer.about')}</a>
+          </li>
+          <li>
+            <a href={`/${lang}/how-we-check`}>{t('footer.howWeCheck')}</a>
+          </li>
+          <li>
+            <a href={`/${lang}/privacy`}>{t('footer.privacy')}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <MinistryExplainers lang={lang} />
+  {compare !== false && (
+    <CompareBar lang={lang} current={Array.isArray(compare) ? compare : undefined} />
+  )}
 
   <nav class="bottom-bar" aria-label={t('nav.label')}>
     <ul>
@@ -129,11 +157,36 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
   }
 
   main {
+    padding-block: var(--space-5) var(--space-6);
+  }
+
+  /* Footer; its bottom padding keeps it clear of the fixed bottom bar. */
+  .site-footer {
+    border-top: 1px solid var(--border);
     padding-top: var(--space-5);
-    /* Keep the last content clear of the fixed bottom bar. */
     padding-bottom: calc(
       var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px) + var(--space-6)
     );
+  }
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .site-footer ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .site-footer a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
   }
   main:focus {
     outline: none;
@@ -256,6 +309,9 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
     }
     main {
       padding-block: var(--space-6);
+    }
+    .site-footer {
+      padding-bottom: var(--space-6);
     }
     .bottom-bar {
       display: none;

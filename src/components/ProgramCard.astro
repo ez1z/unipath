@@ -1,0 +1,84 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+import type { ProgramCard } from '../lib/db/queries';
+import type { UsdTmtRate } from '../lib/format';
+import { languageName } from '../lib/format';
+import { levelLabel, moneyText, yearsText } from '../lib/view';
+import CompareToggle from './CompareToggle.astro';
+import Fact from './Fact.astro';
+import MinistryBadge from './MinistryBadge.astro';
+import Text from './Text.astro';
+
+/** Three key facts: tuition, length (with total years when a pre-year applies), language. */
+interface Props {
+  lang: Lang;
+  program: ProgramCard;
+  rate: UsdTmtRate | null;
+  headingLevel?: 'h2' | 'h3';
+}
+const { lang, program: p, rate, headingLevel = 'h3' } = Astro.props;
+const t = getTranslations(lang);
+const Heading = headingLevel;
+const money = p.tuitionPerYearUsd === null ? null : moneyText(t, lang, p.tuitionPerYearUsd, rate);
+
+let pathNote: string | null = null;
+if (p.level === 'bachelor') {
+  if (p.preYearRequired === 'yes') {
+    pathNote =
+      p.shortestTotalYears === null
+        ? t('card.needsPreYear')
+        : t('card.totalYears', { n: p.shortestTotalYears });
+  } else if (p.preYearRequired === 'no') {
+    pathNote = t('card.directEntry');
+  }
+} else if (p.shortestTotalYears !== null) {
+  pathNote = t('card.leadsTo', { n: p.shortestTotalYears });
+}
+---
+
+<article class="card program-card">
+  <div class="badges">
+    <span class="badge badge-plain">{levelLabel(t, p.level)}</span>
+    {p.provider.ministryStatus && <MinistryBadge lang={lang} status={p.provider.ministryStatus} />}
+  </div>
+  <Heading class="card-title">
+    <a href={`/${lang}/programs/${p.slug}`}>
+      <Text value={p.name} lang={lang} />
+    </a>
+  </Heading>
+  <p class="provider text-small text-muted">
+    <Text value={p.provider.name} lang={lang} label={false} /> · {p.provider.city},{' '}
+    <Text value={p.provider.countryName} lang={lang} label={false} />
+  </p>
+  <dl class="facts">
+    <Fact term={t('summary.tuition')} note={money?.tmt}>
+      {money ? t('common.perYear', { amount: money.usd }) : t('common.costNotConfirmed')}
+    </Fact>
+    <Fact term={t('summary.duration')} note={pathNote}>
+      {yearsText(t, p.durationYears)}
+    </Fact>
+    <Fact term={t('summary.taughtIn')}>{languageName(lang, p.languageOfStudy)}</Fact>
+  </dl>
+  {p.level === 'bachelor' && (
+    <div class="actions">
+      <CompareToggle lang={lang} compareKey={String(p.id)} />
+    </div>
+  )}
+</article>
+
+<style>
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .program-card .facts {
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  }
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+  }
+</style>

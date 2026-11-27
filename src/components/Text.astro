@@ -1,0 +1,43 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+import type { LocalText } from '../lib/db/queries';
+
+/**
+ * Record text in the page language. When only English exists, the English text
+ * is marked lang="en" and followed by a small "Not translated yet" label.
+ */
+interface Props {
+  value: LocalText;
+  lang: Lang;
+  /** Leave the label out, e.g. inside a link that already carries one nearby. */
+  label?: boolean;
+}
+const { value, lang, label = true } = Astro.props;
+const t = getTranslations(lang);
+---
+
+{value.fallback ? (
+  <>
+    <span lang="en">{value.text}</span>
+    {label && <span class="not-translated">{t('common.notTranslated')}</span>}
+  </>
+) : (
+  value.text
+)}
+
+<style>
+  .not-translated {
+    display: inline-block;
+    margin-inline-start: var(--space-2);
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-badge);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+    font-size: var(--text-label);
+    line-height: var(--leading-label);
+    font-weight: var(--weight-semibold);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+
+/**
+ * The main search field: 64 px tall, 2 px brand border, search icon, and the
+ * button flush to the right edge at full height. A plain GET form to /search.
+ */
+interface Props {
+  lang: Lang;
+  value?: string | null;
+  /** Keeps the Universities tab when searching from it. */
+  tab?: 'programs' | 'universities';
+  id?: string;
+}
+const { lang, value, tab = 'programs', id = 'search-q' } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<form class="search-box" role="search" action={`/${lang}/search`} method="get">
+  <label class="visually-hidden" for={id}>
+    {t('searchBox.label')}
+  </label>
+  <svg
+    class="icon"
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    aria-hidden="true"
+    focusable="false"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+  >
+    <circle cx="11" cy="11" r="6.5"></circle>
+    <path d="M16 16l4.5 4.5"></path>
+  </svg>
+  <input
+    id={id}
+    name="q"
+    type="search"
+    value={value ?? ''}
+    placeholder={t('searchBox.placeholder')}
+    enterkeyhint="search"
+    autocomplete="off"
+    maxlength="100"
+  />
+  {tab === 'universities' && <input type="hidden" name="tab" value="universities" />}
+  <button type="submit">{t('searchBox.submit')}</button>
+</form>
+
+<style>
+  .search-box {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    height: 4rem;
+    flex-shrink: 0;
+    border: 2px solid var(--brand);
+    border-radius: var(--radius-button);
+    background: var(--surface-raised);
+    overflow: hidden;
+  }
+  .search-box:focus-within {
+    outline: var(--focus-ring-width) solid var(--brand);
+    outline-offset: 2px;
+  }
+  .icon {
+    align-self: center;
+    flex-shrink: 0;
+    margin-inline: var(--space-4) var(--space-2);
+    color: var(--ink-muted);
+  }
+  input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    font-size: var(--text-body);
+  }
+  input:focus {
+    outline: none;
+  }
+  input::placeholder {
+    color: var(--ink-muted);
+    opacity: 1;
+  }
+  button {
+    flex-shrink: 0;
+    padding-inline: var(--space-5);
+    border: 0;
+    background: var(--brand);
+    color: var(--on-brand);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+  }
+</style>

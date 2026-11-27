@@ -1,0 +1,62 @@
+---
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import type { ProgramRequirements } from '../lib/db/schema';
+import { formatNumber } from '../lib/format';
+
+/** English test, other tests and documents for one program. Unknown is said, not guessed. */
+interface Props {
+  lang: Lang;
+  requirements: ProgramRequirements;
+}
+const { lang, requirements: r } = Astro.props;
+const t = getTranslations(lang);
+const empty = r.ieltsMin === null && r.otherTests.length === 0 && r.documents.length === 0;
+---
+
+{empty ? (
+  <p class="text-muted">{t('requirements.none')}</p>
+) : (
+  <dl class="facts requirements">
+    <div>
+      <dt>{t('requirements.tests')}</dt>
+      <dd>
+        <ul>
+          <li>
+            {r.ieltsMin === null
+              ? t('requirements.noEnglishTest')
+              : t('requirements.ielts', { score: formatNumber(lang, r.ieltsMin) })}
+          </li>
+          {r.otherTests.map((test) => (
+            <li>
+              {test.min === null
+                ? test.name
+                : t('requirements.otherTest', { name: test.name, min: test.min })}
+            </li>
+          ))}
+        </ul>
+      </dd>
+    </div>
+    {r.documents.length > 0 && (
+      <div>
+        <dt>{t('requirements.documents')}</dt>
+        <dd>
+          <ul>
+            {r.documents.map((doc) => (
+              <li>{t(`doc.${doc}` as MessageKey)}</li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    )}
+  </dl>
+)}
+
+<style>
+  .requirements ul {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding-inline-start: var(--space-5);
+    font-weight: var(--weight-regular);
+  }
+</style>

@@ -8,11 +8,17 @@ interface Props {
   lang: Lang;
   title: string;
   description?: string | undefined;
+  /** Forms and share pages stay out of search engines. */
+  noindex?: boolean;
 }
 
-const { lang, title, description } = Astro.props;
+const { lang, title, description, noindex = false } = Astro.props;
 const t = getTranslations(lang);
-const { pathname, search, origin } = Astro.url;
+const { pathname, origin } = Astro.url;
+// Cached pages use the canonical query (lib/cache.ts), never the first visitor's raw one.
+const canonicalQuery = Astro.locals.canonicalQuery;
+const search =
+  canonicalQuery === undefined ? Astro.url.search : canonicalQuery ? `?${canonicalQuery}` : '';
 const urlFor = (path: string) => new URL(`${path}${search}`, origin).href;
 ---
 
@@ -23,6 +29,7 @@ const urlFor = (path: string) => new URL(`${path}${search}`, origin).href;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description ?? t('meta.description')} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={urlFor(pathname)} />
     {LANGS.map((code) => (
       <link rel="alternate" hreflang={code} href={urlFor(localizePath(pathname, code))} />

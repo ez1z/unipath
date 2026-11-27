@@ -1,0 +1,28 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+import AppShell from '../layouts/AppShell.astro';
+import EmptyState from './EmptyState.astro';
+
+/** Body of a 404 for a record that doesn't exist or isn't published. The page sets the status. */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<AppShell lang={lang} title={`${t('notFound.title')} – Clavis`} noindex>
+  <h1 class="page-title">{t('notFound.title')}</h1>
+  <div class="body">
+    <EmptyState
+      title={t('notFound.body')}
+      action={{ href: `/${lang}/search`, label: t('notFound.search') }}
+    />
+  </div>
+</AppShell>
+
+<style>
+  .body {
+    margin-top: var(--space-4);
+  }
+</style>

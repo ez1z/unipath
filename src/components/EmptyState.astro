@@ -1,0 +1,31 @@
+---
+interface Props {
+  title: string;
+  body?: string;
+  action?: { href: string; label: string } | undefined;
+}
+const { title, body, action } = Astro.props;
+---
+
+<div class="empty">
+  <p class="text-title">{title}</p>
+  {body && <p class="text-muted">{body}</p>}
+  {action && (
+    <a class="button button-secondary" href={action.href}>
+      {action.label}
+    </a>
+  )}
+</div>
+
+<style>
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    border: 1px dashed var(--border);
+  }
+</style>

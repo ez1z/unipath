@@ -1,0 +1,163 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+
+/**
+ * Sticky bar that appears once paths are picked for Compare. Picks live in
+ * localStorage (no account needed); the bar links to /compare?ids=… which works
+ * as a plain page. The Compare page passes `current` so removing a column there
+ * updates the picks too.
+ */
+interface Props {
+  lang: Lang;
+  /** On the Compare page: the keys it shows, which become the stored picks. */
+  current?: string[] | undefined;
+}
+const { lang, current } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<div
+  class="compare-bar"
+  data-compare-bar
+  data-lang={lang}
+  data-label={t('compare.bar', { n: '{n}' })}
+  data-full={t('compare.full')}
+  data-current={current ? current.join(',') : undefined}
+  hidden
+>
+  <div class="inner">
+    <a class="button" href={`/${lang}/compare`} data-compare-link>
+      {t('compare.bar', { n: 0 })}
+    </a>
+    <button type="button" class="button button-quiet" data-compare-clear>
+      {t('compare.clear')}
+    </button>
+    <p class="status" role="status" aria-live="polite" data-compare-status></p>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'clavis.compare';
+  const MAX = 3;
+  const KEY = /^\d{1,10}(-\d{1,10})?$/;
+
+  function read(): string[] {
+    try {
+      const value: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+      return Array.isArray(value)
+        ? value.filter((k): k is string => typeof k === 'string' && KEY.test(k)).slice(0, MAX)
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function write(keys: string[]) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
+    } catch {
+      // Private mode or storage full: picks just won't persist.
+    }
+  }
+
+  const bar = document.querySelector<HTMLElement>('[data-compare-bar]');
+  if (bar) {
+    const link = bar.querySelector<HTMLAnchorElement>('[data-compare-link]');
+    const clear = bar.querySelector<HTMLButtonElement>('[data-compare-clear]');
+    const status = bar.querySelector<HTMLElement>('[data-compare-status]');
+    const label = bar.dataset['label'] ?? '{n}';
+    const lang = bar.dataset['lang'] ?? 'tk';
+    const onComparePage = bar.dataset['current'] !== undefined;
+
+    let keys = onComparePage
+      ? (bar.dataset['current'] ?? '').split(',').filter((k) => KEY.test(k))
+      : read();
+    if (onComparePage) write(keys);
+
+    const render = () => {
+      for (const toggle of document.querySelectorAll<HTMLButtonElement>('[data-compare-key]')) {
+        toggle.hidden = false;
+        toggle.setAttribute(
+          'aria-pressed',
+          String(keys.includes(toggle.dataset['compareKey'] ?? '')),
+        );
+      }
+      // The bar isn't needed on the Compare page itself.
+      bar.hidden = keys.length === 0 || onComparePage;
+      if (link) {
+        link.textContent = label.replace('{n}', new Intl.NumberFormat(lang).format(keys.length));
+        link.href = `/${lang}/compare?ids=${encodeURIComponent(keys.join(','))}`;
+      }
+    };
+
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const toggle = target.closest<HTMLButtonElement>('[data-compare-key]');
+      if (!toggle) return;
+      const key = toggle.dataset['compareKey'] ?? '';
+      if (keys.includes(key)) {
+        keys = keys.filter((k) => k !== key);
+        if (status) status.textContent = '';
+      } else if (keys.length >= MAX) {
+        if (status) status.textContent = bar.dataset['full'] ?? '';
+        bar.hidden = false;
+        return;
+      } else {
+        keys = [...keys, key];
+      }
+      write(keys);
+      render();
+    });
+
+    clear?.addEventListener('click', () => {
+      keys = [];
+      write(keys);
+      if (status) status.textContent = '';
+      render();
+    });
+
+    render();
+  }
+</script>
+
+<style>
+  .compare-bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px) + var(--space-2));
+    z-index: 40;
+    padding-inline: var(--space-4);
+    pointer-events: none;
+  }
+  .compare-bar[hidden] {
+    display: none;
+  }
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: 40rem;
+    margin-inline: auto;
+    padding: var(--space-2);
+    border-radius: var(--radius-card-large);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-raised);
+    pointer-events: auto;
+  }
+  .status {
+    flex-basis: 100%;
+    color: var(--ink-muted);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .status:empty {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .compare-bar {
+      bottom: var(--space-5);
+    }
+  }
+</style>

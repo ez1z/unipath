@@ -1,0 +1,78 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+
+/** Desktop breadcrumb; on phones a single back link to the parent. */
+interface Props {
+  lang: Lang;
+  items: { href: string; label: string }[];
+  current: string;
+}
+const { lang, items, current } = Astro.props;
+const t = getTranslations(lang);
+const parent = items.at(-1);
+---
+
+<nav class="breadcrumb" aria-label={t('common.breadcrumb')}>
+  {parent && (
+    <a class="back" href={parent.href}>
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+        <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+      {parent.label}
+    </a>
+  )}
+  <ol>
+    {items.map((item) => (
+      <li>
+        <a href={item.href}>{item.label}</a>
+      </li>
+    ))}
+    <li aria-current="page">{current}</li>
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: var(--touch-target);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+  }
+  ol {
+    display: none;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--ink-muted);
+  }
+  li + li::before {
+    content: '/';
+    margin-inline: var(--space-2);
+    color: var(--ink-muted);
+  }
+  ol a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+  li[aria-current] {
+    display: inline-flex;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .back {
+      display: none;
+    }
+    ol {
+      display: flex;
+    }
+  }
+</style>
