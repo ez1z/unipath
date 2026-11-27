@@ -6,6 +6,7 @@
  * script refuses to run with --remote or NODE_ENV=production.
  */
 import { getPlatformProxy } from 'wrangler';
+import { bumpDataVersion } from '../src/lib/cache.ts';
 import { todayIn } from '../src/lib/dates.ts';
 import { createDb } from '../src/lib/db/client.ts';
 import { loadDemoData } from './load-demo-data.ts';
@@ -27,6 +28,8 @@ try {
   const counts = await loadDemoData(createDb(proxy.env.DB), buildDemoData(today));
   console.log(`Demo data loaded into the local D1 (dates relative to ${today}):`);
   for (const [table, count] of Object.entries(counts)) console.log(`  ${table}: ${count}`);
+  // Cached pages in the local Workers cache refresh on their next view.
+  console.log(`  data_version: ${await bumpDataVersion(proxy.env.KV)}`);
 } catch (error) {
   console.error(error);
   console.error('\nSeed failed. Did you run `pnpm db:migrate` first?');
