@@ -1,0 +1,54 @@
+{
+  "name": "clavis",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.9.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.22.3",
+      "onFail": "download"
+    }
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "astro check && tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "db:migrate": "wrangler d1 migrations apply DB --local",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.65.1",
+    "@types/node": "^24.19.4",
+    "@types/react": "19.3.3",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.15.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-astro": "3.2.2",
+    "eslint-plugin-jsx-a11y-x": "0.2.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.14.0",
+    "prettier": "3.10.1",
+    "prettier-plugin-astro": "1.1.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.74.0",
+    "vitest": "5.1.2",
+    "wrangler": "4.168.0"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "14.4.9",
+    "@astrojs/react": "7.1.9",
+    "@fontsource/onest": "5.3.1",
+    "astro": "7.4.13",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  }
+}

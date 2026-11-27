@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.astro/
+
+# local Cloudflare state (local D1, R2, KV) and secrets
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.env
+.env.*
+
+# tests
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# logs and OS files
+*.log
+.DS_Store
+Thumbs.db
+
+# editor / tool state
+.remember/

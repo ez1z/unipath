@@ -1,0 +1,29 @@
+// Cloudflare Worker config for Clavis.
+// Local dev only for now: `astro dev` / `wrangler` use local D1, R2 and KV (state in .wrangler/).
+// The IDs below are placeholders; real ones are created in M8 (see DEPLOY.md, written then).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "clavis",
+  "compatibility_date": "2026-11-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "clavis",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "FILES",
+      "bucket_name": "clavis-files",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "00000000000000000000000000000000",
+    },
+  ],
+}

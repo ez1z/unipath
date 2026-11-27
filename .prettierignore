@@ -1,0 +1,15 @@
+dist/
+.astro/
+.wrangler/
+node_modules/
+test-results/
+playwright-report/
+pnpm-lock.yaml
+worker-configuration.d.ts
+public/
+migrations/
+# Owner-written documents: left exactly as written.
+SPEC.md
+CLAUDE.md
+CLAUDE_1.md
+.remember/
