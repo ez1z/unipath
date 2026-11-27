@@ -1,0 +1,59 @@
+---
+/**
+ * The Save button for a record page: SaveButton with its labels and the
+ * sign-in sheet's links worked out on the server. The same for every visitor,
+ * so it can sit on cached pages.
+ */
+import { getTranslations, type Lang } from '../i18n';
+import SaveButton from '../islands/SaveButton';
+import { serializePendingAction } from '../lib/account';
+import { googleEnabled, telegramBotUsername } from '../lib/auth/server';
+import { googlePath, telegramPath } from '../lib/auth/urls';
+import type { SavedItemType } from '../lib/db/values';
+
+interface Props {
+  lang: Lang;
+  type: SavedItemType;
+  id: number;
+}
+const { lang, type, id } = Astro.props;
+const t = getTranslations(lang);
+const back = Astro.url.pathname;
+const action = serializePendingAction({ kind: 'save', item: { type, id } });
+---
+
+<SaveButton
+  client:visible
+  lang={lang}
+  type={type}
+  id={id}
+  back={back}
+  labels={{ save: t('save.save'), saved: t('save.saved'), error: t('save.error') }}
+  sheet={{
+    lang,
+    next: back,
+    action,
+    telegramHref: telegramBotUsername() ? telegramPath(lang, { next: back, action }) : null,
+    googleAction: googleEnabled() ? googlePath(lang) : null,
+    strings: {
+      title: t('signIn.title'),
+      why: t('signIn.why.save'),
+      telegram: t('signIn.telegram'),
+      email: t('signIn.email'),
+      google: t('signIn.google'),
+      or: t('signIn.or'),
+      emailLabel: t('signIn.emailLabel'),
+      codeLabel: t('signIn.codeLabel'),
+      codeSent: t('signIn.codeSent', { email: '{email}' }),
+      verify: t('signIn.verify'),
+      resend: t('signIn.resend'),
+      otherEmail: t('signIn.otherEmail'),
+      close: t('signIn.close'),
+      privacy: t('signIn.privacy'),
+      errorEmail: t('signIn.error.email'),
+      errorCode: t('signIn.error.code'),
+      errorRate: t('signIn.error.rate'),
+      errorGeneric: t('signIn.error.generic'),
+    },
+  }}
+/>

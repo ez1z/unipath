@@ -1,0 +1,39 @@
+---
+/**
+ * My Clav: title and the Tracker / Saved / Profile tabs. Account pages are
+ * rendered per request, never cached, and kept out of search engines.
+ */
+import SegmentedTabs from '../components/SegmentedTabs.astro';
+import { getTranslations, type Lang } from '../i18n';
+import { myPath } from '../lib/auth/urls';
+import AppShell from './AppShell.astro';
+
+interface Props {
+  lang: Lang;
+  tab: '' | 'saved' | 'profile';
+}
+const { lang, tab } = Astro.props;
+const t = getTranslations(lang);
+const tabs = [
+  { href: myPath(lang), label: t('my.tab.tracker'), current: tab === '' },
+  { href: myPath(lang, 'saved'), label: t('my.tab.saved'), current: tab === 'saved' },
+  { href: myPath(lang, 'profile'), label: t('my.tab.profile'), current: tab === 'profile' },
+];
+---
+
+<AppShell lang={lang} title={t('my.metaTitle')} noindex signedIn>
+  <div class="my">
+    <h1 class="page-title">{t('my.title')}</h1>
+    <SegmentedTabs label={t('my.tabs')} items={tabs} />
+    <slot />
+  </div>
+</AppShell>
+
+<style>
+  .my {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+    max-width: 48rem;
+  }
+</style>

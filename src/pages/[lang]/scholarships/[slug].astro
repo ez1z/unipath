@@ -5,6 +5,7 @@ import Fact from '../../../components/Fact.astro';
 import NotFound from '../../../components/NotFound.astro';
 import ProgramRow from '../../../components/ProgramRow.astro';
 import SummaryBox from '../../../components/SummaryBox.astro';
+import Save from '../../../components/Save.astro';
 import Text from '../../../components/Text.astro';
 import { getTranslations, isLang, type MessageKey } from '../../../i18n';
 import EligibilityChecklist from '../../../islands/EligibilityChecklist';
@@ -84,6 +85,7 @@ const steps =
             {s.amountText ? <Text value={s.amountText} lang={lang} /> : t('common.notConfirmed')}
           </Fact>
           <Fact term={t('summary.deadline')}>{deadlineText(t, lang, s)}</Fact>
+          <Save slot="actions" lang={lang} type="scholarship" id={s.id} />
           {s.sourceUrl && (
             <a
               slot="actions"

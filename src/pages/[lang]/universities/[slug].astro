@@ -9,6 +9,7 @@ import Requirements from '../../../components/Requirements.astro';
 import ScholarshipList from '../../../components/ScholarshipList.astro';
 import SegmentedTabs from '../../../components/SegmentedTabs.astro';
 import SummaryBox from '../../../components/SummaryBox.astro';
+import Save from '../../../components/Save.astro';
 import Text from '../../../components/Text.astro';
 import { getTranslations, isLang, type MessageKey } from '../../../i18n';
 import AppShell from '../../../layouts/AppShell.astro';
@@ -114,6 +115,7 @@ const allPrograms = page ? [...page.bachelors, ...page.preYears] : [];
         <Fact term={t('summary.openScholarships')}>
           {s.openScholarships === 0 ? t('summary.none') : formatNumber(lang, s.openScholarships)}
         </Fact>
+        <Save slot="actions" lang={lang} type="university" id={u.id} />
         {u.website && (
           <a
             slot="actions"

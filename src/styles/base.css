@@ -281,3 +281,173 @@ a {
   font-size: var(--text-small);
   line-height: var(--leading-small);
 }
+
+/* ---------------------------------------------------------------------------
+   Forms: account pages, sign-in, profile.
+   --------------------------------------------------------------------------- */
+
+.form {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+.field > label,
+.field > legend,
+.form-label {
+  font-weight: var(--weight-semibold);
+}
+fieldset.field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.input {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--ink-muted);
+  border-radius: var(--radius-input);
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+.input[aria-invalid='true'] {
+  border: 2px solid var(--danger);
+}
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target);
+}
+.choice input {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--brand);
+}
+.form-error {
+  color: var(--danger);
+  font-weight: var(--weight-semibold);
+}
+.notice {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 2px var(--ink-muted);
+}
+.notice-success {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+
+/* ---------------------------------------------------------------------------
+   Save button and the sign-in sheet (islands used on several pages).
+   --------------------------------------------------------------------------- */
+
+.save-form {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.save-button[data-saved='true'] {
+  background: var(--brand-soft);
+}
+.save-error {
+  color: var(--danger);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+}
+
+.sign-in-sheet {
+  width: min(100% - 2 * var(--space-4), 28rem);
+  max-height: calc(100dvh - 2 * var(--space-4));
+  padding: var(--space-5);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+.sign-in-sheet[open] {
+  display: grid;
+  gap: var(--space-4);
+}
+.sign-in-sheet::backdrop {
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
+}
+@media (max-width: 599px) {
+  /* A sheet from the bottom on phones. */
+  .sign-in-sheet {
+    width: 100%;
+    max-width: none;
+    margin: auto 0 0;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.sheet-method {
+  width: 100%;
+}
+.sheet-or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--ink-muted);
+  font-size: var(--text-small);
+}
+.sheet-or::before,
+.sheet-or::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+.sheet-code {
+  font-size: var(--text-h2);
+  letter-spacing: 0.3em;
+  font-variant-numeric: tabular-nums;
+}
+.sheet-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Quick questions on Home (island). */
+.quick-questions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+.quiz-details > summary {
+  list-style: none;
+  width: fit-content;
+}
+.quiz-details > summary::-webkit-details-marker {
+  display: none;
+}
+.quiz-form {
+  max-width: 36rem;
+  margin-top: var(--space-4);
+}
+.quiz-countries {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0 var(--space-3);
+}
+.quiz-english {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--space-3);
+}

@@ -1,0 +1,21 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import { getTranslations, LANGS, type Lang } from '../../i18n';
+import AppShell from '../../layouts/AppShell.astro';
+
+// Shown after "Delete my account". The same for everyone, so prerendered.
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const t = getTranslations(lang);
+---
+
+<AppShell lang={lang} title={t('deleted.metaTitle')} noindex>
+  <h1 class="visually-hidden">{t('deleted.title')}</h1>
+  <EmptyState
+    title={t('deleted.title')}
+    body={t('deleted.body')}
+    action={{ href: `/${lang}`, label: t('deleted.action') }}
+  />
+</AppShell>

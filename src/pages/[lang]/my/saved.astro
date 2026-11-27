@@ -1,0 +1,97 @@
+---
+import EmptyState from '../../../components/EmptyState.astro';
+import Text from '../../../components/Text.astro';
+import { getTranslations, isLang, type MessageKey } from '../../../i18n';
+import MyLayout from '../../../layouts/MyLayout.astro';
+import { ensureProfile, listSaved } from '../../../lib/account';
+import { getSignedIn } from '../../../lib/auth/server';
+import { signInPath } from '../../../lib/auth/urls';
+import { formatDate } from '../../../lib/format';
+import { getDb } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+const signedIn = await getSignedIn(Astro.request.headers, Astro.response.headers);
+if (!signedIn) return Astro.redirect(signInPath(lang, { next: Astro.url.pathname }), 303);
+const db = getDb();
+await ensureProfile(db, signedIn.user.id, lang);
+const items = await listSaved(db, signedIn.user.id, lang);
+const here = Astro.url.pathname;
+const isoDate = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<MyLayout lang={lang} tab="saved">
+  {items.length === 0 ? (
+    <EmptyState
+      title={t('my.saved.empty.title')}
+      body={t('my.saved.empty.body')}
+      action={{ href: `/${lang}/search`, label: t('my.saved.empty.action') }}
+    />
+  ) : (
+    <ul class="saved">
+      {items.map((item) => (
+        <li class="card saved-item">
+          <div class="text">
+            <span class="badge badge-plain">{t(`my.saved.type.${item.type}` as MessageKey)}</span>
+            {item.target ? (
+              <a class="name" href={`/${lang}${item.target.path}`}>
+                <Text value={item.target.name} lang={lang} />
+              </a>
+            ) : (
+              <span class="name text-muted">{t('my.saved.gone')}</span>
+            )}
+            <span class="muted-note">
+              {t('my.saved.savedOn', { date: formatDate(lang, isoDate(item.savedAt)) })}
+            </span>
+          </div>
+          <form method="post" action="/api/save">
+            <input type="hidden" name="type" value={item.type} />
+            <input type="hidden" name="id" value={String(item.id)} />
+            <input type="hidden" name="saved" value="0" />
+            <input type="hidden" name="lang" value={lang} />
+            <input type="hidden" name="back" value={here} />
+            <button
+              type="submit"
+              class="button button-quiet"
+              aria-label={t('my.saved.removeLabel', {
+                name: item.target?.name.text ?? t('my.saved.gone'),
+              })}
+            >
+              {t('my.saved.remove')}
+            </button>
+          </form>
+        </li>
+      ))}
+    </ul>
+  )}
+</MyLayout>
+
+<style>
+  .saved {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .saved-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .text {
+    display: grid;
+    gap: var(--space-1);
+    justify-items: start;
+    min-width: 0;
+  }
+  .name {
+    font-weight: var(--weight-semibold);
+    overflow-wrap: anywhere;
+  }
+</style>

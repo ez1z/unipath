@@ -1,0 +1,237 @@
+---
+/**
+ * Sign-in without JavaScript: Telegram, email code, Google (in that order).
+ * The SignInSheet island offers the same on top of the page a student is on.
+ * Forms post back here (Astro's origin check guards them); after sign-in the
+ * student goes through /auth/continue, which finishes what they tried.
+ */
+import { getTranslations, isLang, type MessageKey } from '../../i18n';
+import AppShell from '../../layouts/AppShell.astro';
+import { parsePendingAction } from '../../lib/account';
+import { safeNextPath } from '../../lib/auth/next';
+import {
+  getSignedIn,
+  googleEnabled,
+  redirectWithCookies,
+  sendCode,
+  signInWithCode,
+  telegramBotUsername,
+  type CodeError,
+} from '../../lib/auth/server';
+import { CODE_LENGTH } from '../../lib/auth/auth';
+import { continuePath, googlePath, signInPath, telegramPath } from '../../lib/auth/urls';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const query = Astro.url.searchParams;
+let next = safeNextPath(query.get('next'));
+let action = parsePendingAction(query.get('action')) ? query.get('action') : null;
+
+let step: 'start' | 'code' = 'start';
+let email = '';
+let error: CodeError | string | null = query.get('error');
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const field = (name: string) => {
+    const value = form.get(name);
+    return typeof value === 'string' ? value : '';
+  };
+  next = safeNextPath(field('next'));
+  action = parsePendingAction(field('action')) ? field('action') : null;
+  email = field('email').trim();
+
+  if (field('intent') === 'verify') {
+    const result = await signInWithCode(Astro.request, lang, email, field('code'));
+    if (result.ok) return redirectWithCookies(continuePath(lang, { next, action }), result.cookies);
+    step = result.error === 'email' ? 'start' : 'code';
+    error = result.error;
+  } else {
+    const result = await sendCode(Astro.request, lang, email);
+    if (result.ok) {
+      step = 'code';
+      email = result.email;
+      error = null;
+    } else {
+      error = result.error;
+    }
+  }
+  if (error === 'rate') Astro.response.status = 429;
+  else if (error) Astro.response.status = 400;
+} else if (await getSignedIn(Astro.request.headers, Astro.response.headers)) {
+  // Already signed in: finish the action, if any, and go back.
+  return Astro.redirect(continuePath(lang, { next, action }), 303);
+}
+
+const to = { next, action };
+const errorKeys: Record<string, MessageKey> = {
+  email: 'signIn.error.email',
+  code: 'signIn.error.code',
+  rate: 'signIn.error.rate',
+  generic: 'signIn.error.generic',
+  taken: 'signIn.error.generic',
+  google: 'signIn.error.google',
+  'telegram-failed': 'signIn.error.telegram-failed',
+  'telegram-expired': 'signIn.error.telegram-expired',
+  'telegram-taken': 'signIn.error.telegram-taken',
+};
+const errorKey = error ? (errorKeys[error] ?? 'signIn.error.generic') : null;
+const why = action ? t('signIn.why.save') : t('signIn.why.default');
+const bot = telegramBotUsername();
+const google = googleEnabled();
+---
+
+<AppShell lang={lang} title={t('signIn.metaTitle')} noindex>
+  <div class="sign-in">
+    <h1 class="page-title">{t('signIn.title')}</h1>
+
+    {step === 'start' ? (
+      <>
+        <p class="text-muted">{why}</p>
+        {errorKey && (
+          <p class="notice form-error" role="alert">
+            {t(errorKey)}
+          </p>
+        )}
+
+        {bot && (
+          <a class="button method" href={telegramPath(lang, to)}>
+            {t('signIn.telegram')}
+          </a>
+        )}
+
+        <p class="or" aria-hidden="true">
+          {t('signIn.or')}
+        </p>
+
+        <form method="post" action={`/${lang}/sign-in`} class="form" novalidate>
+          <input type="hidden" name="intent" value="send" />
+          {next && <input type="hidden" name="next" value={next} />}
+          {action && <input type="hidden" name="action" value={action} />}
+          <div class="field">
+            <label for="sign-in-email">{t('signIn.emailLabel')}</label>
+            <input
+              id="sign-in-email"
+              class="input"
+              type="email"
+              name="email"
+              value={email}
+              autocomplete="email"
+              inputmode="email"
+              required
+              aria-invalid={error === 'email' ? 'true' : undefined}
+            />
+          </div>
+          <button type="submit" class="button button-secondary method">
+            {t('signIn.email')}
+          </button>
+        </form>
+
+        {google && (
+          <>
+            <p class="or" aria-hidden="true">
+              {t('signIn.or')}
+            </p>
+            <form method="post" action={googlePath(lang)}>
+              {next && <input type="hidden" name="next" value={next} />}
+              {action && <input type="hidden" name="action" value={action} />}
+              <button type="submit" class="button button-secondary method">
+                {t('signIn.google')}
+              </button>
+            </form>
+          </>
+        )}
+
+        <p class="muted-note">{t('signIn.privacy')}</p>
+      </>
+    ) : (
+      <>
+        <p role="status">{t('signIn.codeSent', { email })}</p>
+        {errorKey && (
+          <p class="notice form-error" role="alert">
+            {t(errorKey)}
+          </p>
+        )}
+        <form method="post" action={`/${lang}/sign-in`} class="form" novalidate>
+          <input type="hidden" name="intent" value="verify" />
+          <input type="hidden" name="email" value={email} />
+          {next && <input type="hidden" name="next" value={next} />}
+          {action && <input type="hidden" name="action" value={action} />}
+          <div class="field">
+            <label for="sign-in-code">{t('signIn.codeLabel')}</label>
+            <input
+              id="sign-in-code"
+              class="input code"
+              type="text"
+              name="code"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              pattern={`[0-9]{${CODE_LENGTH}}`}
+              maxlength={CODE_LENGTH}
+              required
+              aria-invalid={error === 'code' ? 'true' : undefined}
+            />
+          </div>
+          <button type="submit" class="button method">
+            {t('signIn.verify')}
+          </button>
+        </form>
+        <div class="row">
+          <form method="post" action={`/${lang}/sign-in`}>
+            <input type="hidden" name="intent" value="send" />
+            <input type="hidden" name="email" value={email} />
+            {next && <input type="hidden" name="next" value={next} />}
+            {action && <input type="hidden" name="action" value={action} />}
+            <button type="submit" class="button button-quiet">
+              {t('signIn.resend')}
+            </button>
+          </form>
+          <a class="button button-quiet" href={signInPath(lang, to)}>
+            {t('signIn.otherEmail')}
+          </a>
+        </div>
+      </>
+    )}
+  </div>
+</AppShell>
+
+<style>
+  .sign-in {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 26rem;
+    margin-inline: auto;
+    padding-block: var(--space-5);
+  }
+  .method {
+    width: 100%;
+  }
+  .or {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--ink-muted);
+    font-size: var(--text-small);
+  }
+  .or::before,
+  .or::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--border);
+  }
+  .code {
+    font-size: var(--text-h2);
+    letter-spacing: 0.3em;
+    font-variant-numeric: tabular-nums;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>

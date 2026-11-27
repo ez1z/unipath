@@ -23,5 +23,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
       waitUntil: (promise) => cf.waitUntil(promise),
     };
   }
-  return withPageCache(context.request, () => next(), cacheContext);
+  const response = await withPageCache(context.request, () => next(), cacheContext);
+  // Everything rendered per request that isn't a cached public page (account,
+  // sign-in, share, admin, API) is private unless it says otherwise.
+  if (!policy && !response.headers.has('Cache-Control')) {
+    try {
+      response.headers.set('Cache-Control', 'private, no-store');
+    } catch {
+      // Immutable headers (a fetched response passed through): leave as is.
+    }
+  }
+  return response;
 });

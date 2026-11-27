@@ -20,9 +20,21 @@ interface Props {
   noindex?: boolean;
   /** Pages with Compare toggles get the compare bar; the Compare page passes its keys. */
   compare?: boolean | string[];
+  /**
+   * Account pages know the student is signed in and say "My Clav". Cached public
+   * pages are the same for everyone, so they always say "Sign in" (it opens My Clav).
+   */
+  signedIn?: boolean;
 }
 
-const { lang, title, description, noindex = false, compare = false } = Astro.props;
+const {
+  lang,
+  title,
+  description,
+  noindex = false,
+  compare = false,
+  signedIn = false,
+} = Astro.props;
 const t = getTranslations(lang);
 const items = navItems(lang);
 const current = activeSection(Astro.url.pathname);
@@ -55,7 +67,7 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
       <div class="header-actions">
         <LanguageSwitch lang={lang} />
         <a class="sign-in" href={`/${lang}/my`}>
-          {t('auth.signIn')}
+          {signedIn ? t('nav.my') : t('auth.signIn')}
         </a>
       </div>
     </div>

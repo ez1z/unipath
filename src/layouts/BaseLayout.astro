@@ -3,6 +3,7 @@ import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import { LANGS, DEFAULT_LANG, getTranslations, localizePath, type Lang } from '../i18n';
+import { THEME_COOKIE, THEME_SCRIPT, themeFromCookie } from '../lib/theme';
 
 interface Props {
   lang: Lang;
@@ -20,12 +21,16 @@ const canonicalQuery = Astro.locals.canonicalQuery;
 const search =
   canonicalQuery === undefined ? Astro.url.search : canonicalQuery ? `?${canonicalQuery}` : '';
 const urlFor = (path: string) => new URL(`${path}${search}`, origin).href;
+// Only pages rendered per request for one visitor may read their cookie.
+const perVisitor = !Astro.isPrerendered && canonicalQuery === undefined;
+const theme = perVisitor ? themeFromCookie(Astro.cookies.get(THEME_COOKIE)?.value) : undefined;
 ---
 
 <!doctype html>
-<html lang={lang} dir="ltr">
+<html lang={lang} dir="ltr" data-theme={theme}>
   <head>
     <meta charset="utf-8" />
+    <script is:inline set:html={THEME_SCRIPT} />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description ?? t('meta.description')} />

@@ -67,6 +67,8 @@ const TEXT_PAIRS: [text: string, background: string][] = [
   ['--on-accent', '--accent'],
   ['--danger', '--surface'],
   ['--danger', '--surface-raised'],
+  // The "Delete my account" button.
+  ['--on-brand', '--danger'],
 ];
 
 describe('design tokens', () => {

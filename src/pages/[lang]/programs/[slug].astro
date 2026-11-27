@@ -9,6 +9,7 @@ import PathSteps from '../../../components/PathSteps.astro';
 import Requirements from '../../../components/Requirements.astro';
 import ScholarshipList from '../../../components/ScholarshipList.astro';
 import SummaryBox from '../../../components/SummaryBox.astro';
+import Save from '../../../components/Save.astro';
 import Text from '../../../components/Text.astro';
 import { getTranslations, isLang } from '../../../i18n';
 import AppShell from '../../../layouts/AppShell.astro';
@@ -115,6 +116,7 @@ const pathLabel = (path: PathOption) => {
               p.applicationDeadline === null ? null : daysBetween(now, p.applicationDeadline),
           })}
         </Fact>
+        <Save slot="actions" lang={lang} type="program" id={p.id} />
         {money?.tmt && (
           <p slot="actions" class="muted-note">
             {rateNote(t, lang, rate)}

@@ -1,0 +1,80 @@
+---
+/**
+ * "Continue with Telegram" on the website: the official Login Widget. This is
+ * the only page that loads Telegram's script (SPEC: Telegram Login Widget);
+ * no other page has a third-party script. The widget sends the browser to
+ * /api/auth/telegram/callback, which checks the signature with the bot token.
+ *
+ * Locally the widget can't finish (Telegram only works on the bot's domain);
+ * tests call the callback with data signed by the local stand-in token.
+ */
+import { getTranslations, isLang } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { parsePendingAction } from '../../../lib/account';
+import { safeNextPath } from '../../../lib/auth/next';
+import { siteUrl, telegramBotUsername } from '../../../lib/auth/server';
+import { continuePath, signInPath } from '../../../lib/auth/urls';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const next = safeNextPath(Astro.url.searchParams.get('next'));
+const rawAction = Astro.url.searchParams.get('action');
+const action = parsePendingAction(rawAction) ? rawAction : null;
+const to = { next, action };
+
+const bot = telegramBotUsername();
+const callback = new URL('/api/auth/telegram/callback', siteUrl());
+callback.searchParams.set('next', continuePath(lang, to));
+callback.searchParams.set('fail', signInPath(lang, to));
+---
+
+<AppShell lang={lang} title={t('signIn.metaTitle')} noindex>
+  <div class="telegram">
+    <h1 class="page-title">{t('signIn.telegram.title')}</h1>
+    {bot ? (
+      <>
+        <p class="text-muted">{t('signIn.telegram.body')}</p>
+        <div class="widget">
+          <script
+            is:inline
+            async
+            src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login={bot}
+            data-size="large"
+            data-userpic="false"
+            data-request-access="write"
+            data-lang={lang === 'tk' ? 'en' : lang}
+            data-auth-url={callback.href}
+          />
+          <noscript>
+            <p class="notice">{t('signIn.telegram.noScript')}</p>
+          </noscript>
+        </div>
+      </>
+    ) : (
+      <p class="notice">{t('signIn.telegram.notSetUp')}</p>
+    )}
+    <a class="button button-quiet" href={signInPath(lang, to)}>
+      {t('signIn.back')}
+    </a>
+  </div>
+</AppShell>
+
+<style>
+  .telegram {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    max-width: 26rem;
+    margin-inline: auto;
+    padding-block: var(--space-5);
+  }
+  .widget {
+    min-height: var(--touch-target);
+  }
+</style>

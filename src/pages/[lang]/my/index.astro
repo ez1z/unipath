@@ -1,0 +1,28 @@
+---
+import EmptyState from '../../../components/EmptyState.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import MyLayout from '../../../layouts/MyLayout.astro';
+import { ensureProfile } from '../../../lib/account';
+import { getSignedIn } from '../../../lib/auth/server';
+import { signInPath } from '../../../lib/auth/urls';
+import { getDb } from '../../../lib/server';
+
+// My Clav › Tracker. The board and list arrive in M4.
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+const signedIn = await getSignedIn(Astro.request.headers, Astro.response.headers);
+if (!signedIn) return Astro.redirect(signInPath(lang, { next: Astro.url.pathname }), 303);
+await ensureProfile(getDb(), signedIn.user.id, lang);
+---
+
+<MyLayout lang={lang} tab="">
+  <EmptyState
+    title={t('my.tracker.empty.title')}
+    body={t('my.tracker.empty.body')}
+    action={{ href: `/${lang}/search`, label: t('my.tracker.empty.action') }}
+  />
+</MyLayout>

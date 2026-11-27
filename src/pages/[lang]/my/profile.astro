@@ -1,0 +1,410 @@
+---
+/**
+ * My Clav › Profile: nickname, language, theme, reminder channel, sign-in
+ * methods (link Telegram / Google, add an email), sign out, delete account.
+ * Plain forms that post back here (Post/Redirect/Get), so all of it works
+ * without JavaScript.
+ */
+import { env } from 'cloudflare:workers';
+import { getTranslations, isLang, type MessageKey } from '../../../i18n';
+import { LANG_COOKIE, LANG_NAMES, LANGS } from '../../../i18n/config';
+import MyLayout from '../../../layouts/MyLayout.astro';
+import {
+  deleteAccount,
+  ensureProfile,
+  profileSchema,
+  THEME_COOKIE,
+  THEMES,
+  updateProfile,
+  type Theme,
+} from '../../../lib/account';
+import { CODE_LENGTH } from '../../../lib/auth/auth';
+import {
+  confirmEmailChange,
+  getSignedIn,
+  googleEnabled,
+  linkedMethods,
+  redirectWithCookies,
+  sendCode,
+  signOutCookies,
+  siteUrl,
+  telegramBotUsername,
+  type CodeError,
+} from '../../../lib/auth/server';
+import { isPlaceholderEmail } from '../../../lib/auth/telegram-plugin';
+import { googlePath, myPath, signInPath, telegramPath } from '../../../lib/auth/urls';
+import { REMINDER_CHANNELS } from '../../../lib/db/values';
+import { getDb } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+const signedIn = await getSignedIn(Astro.request.headers, Astro.response.headers);
+if (!signedIn) return Astro.redirect(signInPath(lang, { next: Astro.url.pathname }), 303);
+
+const db = getDb();
+const userId = signedIn.user.id;
+const here = myPath(lang, 'profile');
+const methods = await linkedMethods(signedIn);
+const hasEmail = methods.has('email');
+const secure = siteUrl().startsWith('https://');
+const yearSeconds = 365 * 24 * 60 * 60;
+
+let pendingEmail: string | null = null;
+let emailError: CodeError | null = null;
+let deleteError = false;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const field = (name: string) => {
+    const value = form.get(name);
+    return typeof value === 'string' ? value : undefined;
+  };
+  const intent = field('intent');
+
+  if (intent === 'settings') {
+    const limit = await env.WRITE_LIMITER.limit({ key: `write:${userId}` });
+    if (!limit.success) return Astro.redirect(here, 303);
+    const parsed = profileSchema.safeParse({
+      displayName: field('displayName') ?? null,
+      preferredLang: field('preferredLang'),
+      reminderChannel: field('reminderChannel'),
+    });
+    if (parsed.success) {
+      const patch = parsed.data;
+      // A channel the student can't receive on is not kept.
+      if (patch.reminderChannel === 'email' && !hasEmail) delete patch.reminderChannel;
+      if (patch.reminderChannel === 'telegram' && !methods.has('telegram')) {
+        delete patch.reminderChannel;
+      }
+      await ensureProfile(db, userId, lang);
+      await updateProfile(db, userId, patch);
+      const nextLang = patch.preferredLang ?? lang;
+      Astro.cookies.set(LANG_COOKIE, nextLang, {
+        path: '/',
+        maxAge: yearSeconds,
+        sameSite: 'lax',
+        secure,
+      });
+      const theme = field('theme');
+      if (theme === 'light' || theme === 'dark') {
+        // Read by the page's theme script, so not httpOnly. Holds no personal data.
+        Astro.cookies.set(THEME_COOKIE, theme, {
+          path: '/',
+          maxAge: yearSeconds,
+          sameSite: 'lax',
+          secure,
+        });
+      } else if (theme === 'system') {
+        Astro.cookies.delete(THEME_COOKIE, { path: '/' });
+      }
+      return Astro.redirect(`${myPath(nextLang, 'profile')}?updated=1`, 303);
+    }
+  } else if (intent === 'add-email') {
+    const result = await sendCode(Astro.request, lang, field('email'), true);
+    if (result.ok) pendingEmail = result.email;
+    else emailError = result.error;
+  } else if (intent === 'confirm-email') {
+    const result = await confirmEmailChange(Astro.request, lang, field('email'), field('code'));
+    if (result.ok) return redirectWithCookies(`${here}?email=added`, result.cookies);
+    pendingEmail = field('email') ?? null;
+    emailError = result.error;
+  } else if (intent === 'sign-out') {
+    return redirectWithCookies(`/${lang}`, await signOutCookies(Astro.request));
+  } else if (intent === 'delete') {
+    if (field('confirm') === 'yes') {
+      // Sign out first (clears the cookie), then remove everything.
+      const cookies = await signOutCookies(Astro.request);
+      await deleteAccount(db, userId);
+      return redirectWithCookies(`/${lang}/account-deleted`, cookies);
+    }
+    deleteError = true;
+  }
+  if (emailError === 'rate') Astro.response.status = 429;
+  else if (emailError || deleteError) Astro.response.status = 400;
+}
+
+const profile = await ensureProfile(db, userId, lang);
+const themeCookie = Astro.cookies.get(THEME_COOKIE)?.value;
+const theme: Theme = themeCookie === 'light' || themeCookie === 'dark' ? themeCookie : 'system';
+const updated = Astro.url.searchParams.get('updated') === '1';
+const emailAdded = Astro.url.searchParams.get('email') === 'added';
+
+const channelDisabled: Record<string, MessageKey | null> = {
+  email: hasEmail ? null : 'profile.reminder.needsEmail',
+  telegram: methods.has('telegram') ? null : 'profile.reminder.needsTelegram',
+  none: null,
+};
+const emailErrorKey: Record<CodeError, MessageKey> = {
+  email: 'signIn.error.email',
+  code: 'signIn.error.code',
+  rate: 'signIn.error.rate',
+  taken: 'profile.addEmail.taken',
+  generic: 'signIn.error.generic',
+};
+const bot = telegramBotUsername();
+const google = googleEnabled();
+const email = isPlaceholderEmail(signedIn.user.email) ? null : signedIn.user.email;
+---
+
+<MyLayout lang={lang} tab="profile">
+  {updated && (
+    <p class="notice notice-success" role="status">
+      {t('profile.updated')}
+    </p>
+  )}
+  {emailAdded && (
+    <p class="notice notice-success" role="status">
+      {t('profile.addEmail.done')}
+    </p>
+  )}
+
+  <section class="card section" aria-labelledby="settings-title">
+    <h2 id="settings-title" class="text-title">
+      {t('profile.title')}
+    </h2>
+    <form method="post" action={here} class="form">
+      <input type="hidden" name="intent" value="settings" />
+
+      <div class="field">
+        <label for="profile-nickname">{t('profile.nickname')}</label>
+        <p id="profile-nickname-hint" class="muted-note">
+          {t('profile.nicknameHint')}
+        </p>
+        <input
+          id="profile-nickname"
+          class="input"
+          type="text"
+          name="displayName"
+          maxlength="40"
+          autocomplete="nickname"
+          value={profile.displayName ?? ''}
+          aria-describedby="profile-nickname-hint"
+        />
+      </div>
+
+      <fieldset class="field">
+        <legend>{t('profile.language')}</legend>
+        {LANGS.map((code) => (
+          <label class="choice" lang={code}>
+            <input
+              type="radio"
+              name="preferredLang"
+              value={code}
+              checked={profile.preferredLang === code}
+            />
+            {LANG_NAMES[code]}
+          </label>
+        ))}
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>{t('profile.theme')}</legend>
+        {THEMES.map((value) => (
+          <label class="choice">
+            <input type="radio" name="theme" value={value} checked={theme === value} />
+            {t(`profile.theme.${value}` as MessageKey)}
+          </label>
+        ))}
+      </fieldset>
+
+      <fieldset class="field" aria-describedby="profile-reminders-hint">
+        <legend>{t('profile.reminders')}</legend>
+        <p id="profile-reminders-hint" class="muted-note">
+          {t('profile.remindersHint')}
+        </p>
+        {REMINDER_CHANNELS.map((channel) => {
+          const disabledKey = channelDisabled[channel];
+          return (
+            <label class="choice">
+              <input
+                type="radio"
+                name="reminderChannel"
+                value={channel}
+                checked={profile.reminderChannel === channel}
+                disabled={disabledKey !== null}
+              />
+              <span>
+                {t(`profile.reminder.${channel}` as MessageKey)}
+                {disabledKey && <span class="muted-note block">{t(disabledKey)}</span>}
+              </span>
+            </label>
+          );
+        })}
+      </fieldset>
+
+      <button type="submit" class="button submit">
+        {t('profile.save')}
+      </button>
+    </form>
+  </section>
+
+  <section class="card section" aria-labelledby="methods-title">
+    <h2 id="methods-title" class="text-title">
+      {t('profile.methods')}
+    </h2>
+    <p class="muted-note">{t('profile.methodsHint')}</p>
+    <ul class="methods">
+      {bot && (
+        <li>
+          <span class="method-name">{t('profile.method.telegram')}</span>
+          {methods.has('telegram') ? (
+            <span class="badge badge-plain">{t('profile.method.linked')}</span>
+          ) : (
+            <a class="button button-secondary" href={telegramPath(lang, { next: here })}>
+              {t('profile.method.link', { method: t('profile.method.telegram') })}
+            </a>
+          )}
+        </li>
+      )}
+      <li class="email-method">
+        <span class="method-name">
+          {t('profile.method.email')}
+          {email && <span class="muted-note block">{email}</span>}
+        </span>
+        {email ? (
+          <span class="badge badge-plain">{t('profile.method.linked')}</span>
+        ) : pendingEmail && emailError !== 'email' ? (
+          <form method="post" action={here} class="form inline-form" novalidate>
+            <p role="status">{t('profile.addEmail.sent', { email: pendingEmail })}</p>
+            <p class="muted-note">{t('profile.addEmail.noCode')}</p>
+            {emailError && (
+              <p class="form-error" role="alert">
+                {t(emailErrorKey[emailError])}
+              </p>
+            )}
+            <input type="hidden" name="intent" value="confirm-email" />
+            <input type="hidden" name="email" value={pendingEmail} />
+            <div class="field">
+              <label for="profile-code">{t('signIn.codeLabel')}</label>
+              <input
+                id="profile-code"
+                class="input"
+                type="text"
+                name="code"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength={CODE_LENGTH}
+                required
+              />
+            </div>
+            <button type="submit" class="button">
+              {t('profile.addEmail.confirm')}
+            </button>
+          </form>
+        ) : (
+          <form method="post" action={here} class="form inline-form" novalidate>
+            <input type="hidden" name="intent" value="add-email" />
+            {emailError && (
+              <p class="form-error" role="alert">
+                {t(emailErrorKey[emailError])}
+              </p>
+            )}
+            <div class="field">
+              <label for="profile-email">{t('signIn.emailLabel')}</label>
+              <input
+                id="profile-email"
+                class="input"
+                type="email"
+                name="email"
+                autocomplete="email"
+                required
+              />
+            </div>
+            <button type="submit" class="button button-secondary">
+              {t('profile.addEmail')}
+            </button>
+          </form>
+        )}
+      </li>
+      {google && (
+        <li>
+          <span class="method-name">{t('profile.method.google')}</span>
+          {methods.has('google') ? (
+            <span class="badge badge-plain">{t('profile.method.linked')}</span>
+          ) : (
+            <form method="post" action={googlePath(lang)}>
+              <button type="submit" class="button button-secondary">
+                {t('profile.method.link', { method: t('profile.method.google') })}
+              </button>
+            </form>
+          )}
+        </li>
+      )}
+    </ul>
+    <form method="post" action={here}>
+      <input type="hidden" name="intent" value="sign-out" />
+      <button type="submit" class="button button-secondary">
+        {t('profile.signOut')}
+      </button>
+    </form>
+  </section>
+
+  <section class="card section danger" aria-labelledby="delete-title">
+    <h2 id="delete-title" class="text-title">
+      {t('profile.delete.title')}
+    </h2>
+    <p>{t('profile.delete.body')}</p>
+    <form method="post" action={here} class="form">
+      <input type="hidden" name="intent" value="delete" />
+      {deleteError && (
+        <p class="form-error" role="alert">
+          {t('profile.delete.needConfirm')}
+        </p>
+      )}
+      <label class="choice">
+        <input type="checkbox" name="confirm" value="yes" required />
+        {t('profile.delete.confirm')}
+      </label>
+      <button type="submit" class="button delete-button">
+        {t('profile.delete.button')}
+      </button>
+    </form>
+  </section>
+</MyLayout>
+
+<style>
+  .section {
+    gap: var(--space-4);
+  }
+  .submit,
+  .delete-button {
+    justify-self: start;
+  }
+  .block {
+    display: block;
+  }
+  .methods {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .methods li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .method-name {
+    font-weight: var(--weight-semibold);
+    overflow-wrap: anywhere;
+  }
+  .inline-form {
+    max-width: 22rem;
+  }
+  .danger {
+    box-shadow: inset 0 0 0 2px var(--danger);
+  }
+  .delete-button {
+    background: var(--danger);
+    color: var(--on-brand);
+  }
+</style>
