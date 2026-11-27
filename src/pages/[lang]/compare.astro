@@ -1,0 +1,284 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import MinistryBadge from '../../components/MinistryBadge.astro';
+import Text from '../../components/Text.astro';
+import { getTranslations, isLang } from '../../i18n';
+import AppShell from '../../layouts/AppShell.astro';
+import { getComparePage, getUsdTmtRate, type CompareColumn } from '../../lib/db/catalog';
+import { daysBetween } from '../../lib/dates';
+import { formatDate, formatMonth, formatNumber, languageName, nextIntake } from '../../lib/format';
+import { compareKey, parseCompareIds, serializeCompareIds } from '../../lib/search/filters';
+import { deadlineText, levelLabel, moneyText, rateNote, yearsText } from '../../lib/view';
+import { getDb, today } from '../../lib/server';
+
+// Compare is per visitor and never cached (lib/cache.ts).
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+const now = today();
+
+const items = parseCompareIds(Astro.url.searchParams);
+const [page, rate] = await Promise.all([
+  getComparePage(db, items, { lang, today: now }),
+  getUsdTmtRate(db),
+]);
+const { columns, missing } = page;
+const keys = columns.map((c) => c.key);
+
+const removeHref = (key: string) => {
+  const rest = items.filter((item) => compareKey(item) !== key);
+  const query = serializeCompareIds(rest).toString();
+  return query ? `/${lang}/compare?${query}` : `/${lang}/compare`;
+};
+
+const money = (usd: number | null) => {
+  if (usd === null) return { main: t('common.costNotConfirmed'), note: null };
+  const m = moneyText(t, lang, usd, rate);
+  return { main: t('common.perYear', { amount: m.usd }), note: m.tmt };
+};
+
+interface Row {
+  label: string;
+  cell: (c: CompareColumn) => { main: string; note?: string | null };
+}
+const rows: Row[] = [
+  {
+    label: t('compare.row.place'),
+    cell: (c) => ({ main: `${c.bachelor.provider.city}, ${c.bachelor.provider.countryName.text}` }),
+  },
+  {
+    label: t('compare.row.totalYears'),
+    cell: (c) =>
+      c.totalYears === null
+        ? { main: t('card.needsPreYear') }
+        : { main: t('path.total', { n: c.totalYears }) },
+  },
+  {
+    label: t('compare.row.preYearTuition'),
+    cell: (c) =>
+      c.preYear ? money(c.preYear.tuitionPerYearUsd) : { main: t('compare.noPreYear') },
+  },
+  { label: t('compare.row.tuition'), cell: (c) => money(c.bachelor.tuitionPerYearUsd) },
+  {
+    label: t('compare.row.taughtIn'),
+    cell: (c) => ({ main: languageName(lang, c.bachelor.languageOfStudy) }),
+  },
+  {
+    label: t('compare.row.english'),
+    cell: (c) => ({
+      main:
+        c.bachelor.requirements.ieltsMin === null
+          ? t('requirements.noEnglishTest')
+          : t('requirements.ielts', {
+              score: formatNumber(lang, c.bachelor.requirements.ieltsMin),
+            }),
+    }),
+  },
+  {
+    label: t('compare.row.deadline'),
+    cell: (c) => ({
+      main: deadlineText(t, lang, {
+        deadline: c.bachelor.applicationDeadline,
+        daysLeft:
+          c.bachelor.applicationDeadline === null
+            ? null
+            : daysBetween(now, c.bachelor.applicationDeadline),
+      }),
+    }),
+  },
+  {
+    label: t('compare.row.intake'),
+    cell: (c) => {
+      const month = nextIntake(c.bachelor.intakes, now);
+      return { main: month === null ? t('common.notConfirmed') : formatMonth(lang, month) };
+    },
+  },
+  {
+    label: t('compare.row.scholarships'),
+    cell: (c) => ({
+      main: c.openScholarships === 0 ? t('summary.none') : formatNumber(lang, c.openScholarships),
+    }),
+  },
+  {
+    label: t('compare.row.checked'),
+    cell: (c) => ({ main: formatDate(lang, c.bachelor.lastChecked) }),
+  },
+];
+---
+
+<AppShell lang={lang} title={t('compare.metaTitle')} compare={keys} noindex>
+  <h1 class="page-title">{t('compare.title')}</h1>
+  <p class="text-muted intro">{t('compare.intro')}</p>
+  {missing > 0 && (
+    <p class="notice" role="status">
+      {t('compare.missing')}
+    </p>
+  )}
+
+  {columns.length === 0 ? (
+    <EmptyState
+      title={t('compare.empty.title')}
+      body={t('compare.empty.body')}
+      action={{ href: `/${lang}/search?level=bachelor`, label: t('compare.empty.action') }}
+    />
+  ) : (
+    <div class="scroller" role="region" aria-labelledby="compare-caption">
+      <table>
+        <caption id="compare-caption" class="visually-hidden">
+          {t('compare.title')}
+        </caption>
+        <thead>
+          <tr>
+            <td />
+            {columns.map((c) => (
+              <th scope="col">
+                <a class="name" href={`/${lang}/programs/${c.bachelor.slug}`}>
+                  <Text value={c.bachelor.name} lang={lang} />
+                </a>
+                <span class="provider">
+                  <Text value={c.bachelor.provider.name} lang={lang} label={false} />
+                </span>
+                <a class="remove" href={removeHref(c.key)}>
+                  {t('compare.removeItem', { name: c.bachelor.name.text })}
+                </a>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{t('compare.row.ministry')}</th>
+            {columns.map((c) => (
+              <td>
+                {c.bachelor.provider.ministryStatus ? (
+                  <MinistryBadge lang={lang} status={c.bachelor.provider.ministryStatus} />
+                ) : (
+                  t('common.notConfirmed')
+                )}
+              </td>
+            ))}
+          </tr>
+          <tr>
+            <th scope="row">{t('compare.row.path')}</th>
+            {columns.map((c) => (
+              <td>
+                <ol class="path">
+                  {c.preYear && (
+                    <li>
+                      <a href={`/${lang}/programs/${c.preYear.slug}`}>
+                        <Text value={c.preYear.name} lang={lang} label={false} />
+                      </a>
+                      <span class="note">
+                        {levelLabel(t, c.preYear.level)} · {yearsText(t, c.preYear.durationYears)}
+                      </span>
+                    </li>
+                  )}
+                  <li>
+                    <Text value={c.bachelor.name} lang={lang} label={false} />
+                    <span class="note">
+                      {levelLabel(t, 'bachelor')} · {yearsText(t, c.bachelor.durationYears)}
+                    </span>
+                  </li>
+                </ol>
+                {c.autoPreYear && <span class="note">{t('compare.autoPreYear')}</span>}
+              </td>
+            ))}
+          </tr>
+          {rows.map((row) => (
+            <tr>
+              <th scope="row">{row.label}</th>
+              {columns.map((c) => {
+                const value = row.cell(c);
+                return (
+                  <td>
+                    {value.main}
+                    {value.note && <span class="note">{value.note}</span>}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+  {columns.length > 0 && rate && <p class="muted-note rate">{rateNote(t, lang, rate)}</p>}
+</AppShell>
+
+<style>
+  .intro {
+    margin-block: var(--space-2) var(--space-5);
+  }
+  .notice {
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    box-shadow: inset 0 0 0 2px var(--ink-muted);
+  }
+  .scroller {
+    /* Contains the visually hidden caption (position: absolute), which would
+       otherwise sit at the table's far edge and widen the page on phones. */
+    position: relative;
+    overflow-x: auto;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
+    background: var(--surface-raised);
+  }
+  table {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border);
+    text-align: start;
+    vertical-align: top;
+  }
+  thead th {
+    min-width: 12rem;
+  }
+  tbody th {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    width: 10rem;
+    background: var(--surface-raised);
+    color: var(--ink-muted);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-small);
+  }
+  .name {
+    display: block;
+    font-weight: var(--weight-semibold);
+  }
+  .provider,
+  .note {
+    display: block;
+    color: var(--ink-muted);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--weight-regular);
+  }
+  .remove {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+    font-size: var(--text-small);
+    font-weight: var(--weight-medium);
+  }
+  .path {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding-inline-start: var(--space-5);
+  }
+  .rate {
+    margin-top: var(--space-3);
+  }
+</style>

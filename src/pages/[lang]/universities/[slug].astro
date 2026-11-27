@@ -1,0 +1,324 @@
+---
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import DetailLayout from '../../../components/DetailLayout.astro';
+import Fact from '../../../components/Fact.astro';
+import MinistryBadge from '../../../components/MinistryBadge.astro';
+import NotFound from '../../../components/NotFound.astro';
+import ProgramRow from '../../../components/ProgramRow.astro';
+import Requirements from '../../../components/Requirements.astro';
+import ScholarshipList from '../../../components/ScholarshipList.astro';
+import SegmentedTabs from '../../../components/SegmentedTabs.astro';
+import SummaryBox from '../../../components/SummaryBox.astro';
+import Text from '../../../components/Text.astro';
+import { getTranslations, isLang, type MessageKey } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { UNIVERSITY_TABS, universityTab } from '../../../lib/cache';
+import { getUniversityPage, getUsdTmtRate } from '../../../lib/db/catalog';
+import { daysBetween } from '../../../lib/dates';
+import { formatNumber } from '../../../lib/format';
+import { deadlineText, moneyText, rateNote } from '../../../lib/view';
+import { getDb, today } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang, slug } = Astro.params;
+if (!isLang(lang) || !slug) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+const now = today();
+const tab = universityTab(Astro.url.searchParams);
+
+const [page, rate] = await Promise.all([
+  getUniversityPage(db, slug, { lang, today: now }),
+  getUsdTmtRate(db),
+]);
+if (!page) Astro.response.status = 404;
+
+const u = page?.university;
+const s = page?.summary;
+const base = `/${lang}/universities/${slug}`;
+const tabHref = (name: (typeof UNIVERSITY_TABS)[number]) =>
+  name === 'programs' ? base : `${base}?tab=${name}`;
+
+let cost: string | null = null;
+let costNote: string | null = null;
+if (s && s.tuitionMinUsd !== null && s.tuitionMaxUsd !== null) {
+  const min = moneyText(t, lang, s.tuitionMinUsd, rate);
+  const max = moneyText(t, lang, s.tuitionMaxUsd, rate);
+  cost = s.tuitionMinUsd === s.tuitionMaxUsd ? min.usd : `${min.usd} – ${max.usd}`;
+  if (min.tmt) costNote = s.tuitionMinUsd === s.tuitionMaxUsd ? min.tmt : `${min.tmt} – ${max.tmt}`;
+}
+const rankings = u
+  ? (
+      [
+        ['qs', u.rankings.qs],
+        ['the', u.rankings.the],
+        ['arwu', u.rankings.arwu],
+        ['moscow', u.rankings.moscow],
+      ] as const
+    ).filter(([, position]) => position !== null)
+  : [];
+const allPrograms = page ? [...page.bachelors, ...page.preYears] : [];
+---
+
+{!page || !u || !s ? (
+  <NotFound lang={lang} />
+) : (
+  <AppShell lang={lang} title={t('university.metaTitle', { name: u.name.text })}>
+    <Breadcrumb
+      lang={lang}
+      items={[{ href: `/${lang}/search?tab=universities`, label: t('search.tab.universities') }]}
+      current={u.name.text}
+    />
+    <DetailLayout>
+      <header slot="head" class="head">
+        <h1 class="page-title">
+          <Text value={u.name} lang={lang} />
+        </h1>
+        <p class="text-muted">
+          {u.city}, <Text value={u.countryName} lang={lang} label={false} />
+        </p>
+      </header>
+
+      <SummaryBox
+        slot="side"
+        lang={lang}
+        lastChecked={u.lastChecked}
+        sourceUrl={u.sourceUrl}
+        reportHref={`/${lang}/report?type=university&id=${u.id}`}
+      >
+        <div slot="badges">
+          <MinistryBadge lang={lang} status={u.ministryStatus} />
+          {u.ministryBasis && (
+            <p class="basis text-small text-muted">
+              {t('ministry.basis', { basis: u.ministryBasis })}
+            </p>
+          )}
+        </div>
+        <Fact term={t('summary.cost')} note={costNote}>
+          {cost ?? t('common.costNotConfirmed')}
+        </Fact>
+        <Fact term={t('summary.nextDeadline')}>
+          {s.nextDeadline === null
+            ? t('deadline.notConfirmed')
+            : deadlineText(t, lang, {
+                deadline: s.nextDeadline,
+                daysLeft: daysBetween(now, s.nextDeadline),
+              })}
+        </Fact>
+        <Fact term={t('summary.english')}>
+          {s.ieltsMin === null
+            ? t('requirements.noEnglishTest')
+            : t('requirements.ieltsFrom', { score: formatNumber(lang, s.ieltsMin) })}
+        </Fact>
+        <Fact term={t('summary.openScholarships')}>
+          {s.openScholarships === 0 ? t('summary.none') : formatNumber(lang, s.openScholarships)}
+        </Fact>
+        {u.website && (
+          <a
+            slot="actions"
+            class="button button-secondary"
+            href={u.website}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {t('common.officialWebsite')}
+          </a>
+        )}
+      </SummaryBox>
+
+      <div class="tabs-and-panel">
+        <SegmentedTabs
+          label={t('tabs.label')}
+          scroll
+          items={UNIVERSITY_TABS.map((name) => ({
+            href: tabHref(name),
+            label: t(`university.tab.${name}` as MessageKey),
+            current: name === tab,
+          }))}
+        />
+
+        <section class="panel" aria-labelledby="panel-title">
+          <h2 id="panel-title" class="visually-hidden">
+            {t(`university.tab.${tab}` as MessageKey)}
+          </h2>
+
+          {tab === 'programs' &&
+            (allPrograms.length === 0 ? (
+              <p class="text-muted">{t('university.noPrograms')}</p>
+            ) : (
+              <>
+                {page.bachelors.length > 0 && (
+                  <div class="group">
+                    <h3 class="text-title">{t('university.group.bachelor')}</h3>
+                    <ul class="rows">
+                      {page.bachelors.map((program) => (
+                        <ProgramRow
+                          lang={lang}
+                          program={program}
+                          rate={rate}
+                          extra={
+                            program.preYearRequired === 'yes' && program.shortestTotalYears !== null
+                              ? t('card.totalYears', { n: program.shortestTotalYears })
+                              : program.preYearRequired === 'yes'
+                                ? t('card.needsPreYear')
+                                : undefined
+                          }
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {page.preYears.length > 0 && (
+                  <div class="group">
+                    <h3 class="text-title">{t('university.group.preYear')}</h3>
+                    <ul class="rows">
+                      {page.preYears.map((program) => (
+                        <ProgramRow
+                          lang={lang}
+                          program={program}
+                          rate={rate}
+                          context={
+                            program.provider.type === 'college' ? program.provider.name : undefined
+                          }
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </>
+            ))}
+
+          {tab === 'overview' && (
+            <dl class="facts overview">
+              <Fact term={t('university.kind')}>
+                {u.type ? t(`university.type.${u.type}` as MessageKey) : t('common.notConfirmed')}
+              </Fact>
+              <Fact term={t('university.place')}>
+                {u.city}, <Text value={u.countryName} lang={lang} label={false} />
+              </Fact>
+              <Fact term={t('summary.ministry')}>
+                <MinistryBadge lang={lang} status={u.ministryStatus} />
+                {u.ministryBasis && (
+                  <span class="note">{t('ministry.basis', { basis: u.ministryBasis })}</span>
+                )}
+              </Fact>
+              <Fact term={t('university.rankings')}>
+                {rankings.length === 0 ? (
+                  t('university.noRankings')
+                ) : (
+                  <ul class="plain">
+                    {rankings.map(([name, position]) => (
+                      <li>
+                        {t('card.ranking', {
+                          name: t(`ranking.${name}` as MessageKey),
+                          position: formatNumber(lang, position ?? 0),
+                        })}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Fact>
+              {u.website && (
+                <Fact term={t('common.officialWebsite')}>
+                  <a href={u.website} rel="noopener noreferrer" target="_blank">
+                    {new URL(u.website).hostname}
+                  </a>
+                </Fact>
+              )}
+            </dl>
+          )}
+
+          {tab === 'costs' &&
+            (allPrograms.length === 0 ? (
+              <p class="text-muted">{t('university.noPrograms')}</p>
+            ) : (
+              <>
+                <p class="muted-note">{t('university.costsNote')}</p>
+                <ul class="rows">
+                  {allPrograms.map((program) => (
+                    <ProgramRow
+                      lang={lang}
+                      program={{ ...program, leadsTo: [] }}
+                      rate={rate}
+                      context={
+                        program.provider.type === 'college' ? program.provider.name : undefined
+                      }
+                    />
+                  ))}
+                </ul>
+                {rate && <p class="muted-note">{rateNote(t, lang, rate)}</p>}
+              </>
+            ))}
+
+          {tab === 'requirements' &&
+            (allPrograms.length === 0 ? (
+              <p class="text-muted">{t('university.noPrograms')}</p>
+            ) : (
+              <div class="requirements">
+                {allPrograms.map((program) => (
+                  <article class="card">
+                    <h3 class="card-title">
+                      <a href={`/${lang}/programs/${program.slug}`}>
+                        <Text value={program.name} lang={lang} />
+                      </a>
+                    </h3>
+                    <Requirements lang={lang} requirements={program.requirements} />
+                  </article>
+                ))}
+              </div>
+            ))}
+
+          {tab === 'scholarships' && (
+            <ScholarshipList
+              lang={lang}
+              scholarships={page.scholarships}
+              empty={t('university.noScholarships')}
+            />
+          )}
+        </section>
+      </div>
+    </DetailLayout>
+  </AppShell>
+)}
+
+<style>
+  .head {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .basis {
+    margin-top: var(--space-2);
+  }
+  .tabs-and-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    min-width: 0;
+  }
+  .panel {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .group {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .overview {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .plain {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .requirements {
+    display: grid;
+    gap: var(--space-3);
+  }
+</style>

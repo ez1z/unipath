@@ -1,0 +1,346 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import FilterSheet from '../../components/FilterSheet.astro';
+import ProgramCard from '../../components/ProgramCard.astro';
+import SearchBox from '../../components/SearchBox.astro';
+import SegmentedTabs from '../../components/SegmentedTabs.astro';
+import UniversityCard from '../../components/UniversityCard.astro';
+import { getTranslations, isLang, type MessageKey } from '../../i18n';
+import AppShell from '../../layouts/AppShell.astro';
+import { canonicalSearchQuery, searchTab } from '../../lib/cache';
+import { getCountries, getStudyLanguages, getUsdTmtRate } from '../../lib/db/catalog';
+import { searchPrograms, searchUniversities } from '../../lib/db/queries';
+import { filterChips, programFilterGroups, universityFilterGroups } from '../../lib/search/facets';
+import {
+  countProgramFilters,
+  countUniversityFilters,
+  MAX_PAGE,
+  PARAM,
+  parseProgramFilters,
+  parseUniversityFilters,
+  PROGRAM_SORTS,
+} from '../../lib/search/filters';
+import { getDb, today } from '../../lib/server';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+const now = today();
+
+const params = Astro.url.searchParams;
+const tab = searchTab(params);
+const canonical = new URLSearchParams(canonicalSearchQuery(params));
+const path = `/${lang}/search`;
+
+const [countries, rate] = await Promise.all([getCountries(db, lang), getUsdTmtRate(db)]);
+
+let groups;
+let filterCount;
+let q: string | null;
+let page: number;
+let programResults = null;
+let universityResults = null;
+let sort: (typeof PROGRAM_SORTS)[number] = 'relevance';
+if (tab === 'programs') {
+  const f = parseProgramFilters(params);
+  const [results, languages] = await Promise.all([
+    searchPrograms(db, f, { lang, today: now }),
+    getStudyLanguages(db),
+  ]);
+  programResults = results;
+  groups = programFilterGroups(t, lang, f, countries, languages);
+  filterCount = countProgramFilters(f);
+  q = f.q;
+  page = f.page;
+  sort = f.sort;
+} else {
+  const f = parseUniversityFilters(params);
+  universityResults = await searchUniversities(db, f, { lang, today: now });
+  groups = universityFilterGroups(t, f, countries);
+  filterCount = countUniversityFilters(f);
+  q = f.q;
+  page = f.page;
+}
+const results = programResults ?? universityResults;
+const total = results?.total ?? 0;
+const shown = results?.items.length ?? 0;
+
+const chips = filterChips(t, lang, path, canonical, groups);
+const keep = (keys: string[]) => {
+  const out = new URLSearchParams();
+  for (const [k, v] of canonical) if (keys.includes(k)) out.append(k, v);
+  return out;
+};
+
+// Switching tabs keeps the search text and the filters both tabs share.
+const tabHref = (target: 'programs' | 'universities') => {
+  const next = keep([PARAM.q, PARAM.country, PARAM.scholarships]);
+  if (target === 'universities') next.set('tab', 'universities');
+  const query = next.toString();
+  return query ? `${path}?${query}` : path;
+};
+
+const clearParams = keep([PARAM.q, 'tab']);
+const clearHref = clearParams.toString() ? `${path}?${clearParams}` : path;
+
+const moreParams = new URLSearchParams(canonical);
+moreParams.set(PARAM.page, String(page + 1));
+const showMore = results?.hasMore && page < MAX_PAGE;
+
+// Hidden values the filter form carries along.
+const hidden: [string, string][] = [];
+if (tab === 'universities') hidden.push(['tab', 'universities']);
+if (q) hidden.push([PARAM.q, q]);
+if (sort !== 'relevance') hidden.push([PARAM.sort, sort]);
+
+const countMessage: MessageKey =
+  tab === 'programs' ? 'search.count.programs' : 'search.count.universities';
+const sortHidden = [...canonical].filter(([k]) => k !== PARAM.sort && k !== PARAM.page);
+---
+
+<AppShell lang={lang} title={t('search.metaTitle')} compare={tab === 'programs'}>
+  <h1 class="page-title">{t('search.title')}</h1>
+
+  <div class="search-row">
+    <SearchBox lang={lang} value={q} tab={tab} />
+    <button
+      type="button"
+      class="button button-secondary filters-button"
+      popovertarget="filters-sheet"
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+        <path
+          d="M4 7h10M18 7h2M4 17h4M12 17h8"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        ></path>
+        <circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="2"></circle>
+        <circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="2"></circle>
+      </svg>
+      {filterCount > 0 ? t('search.filtersCount', { n: filterCount }) : t('search.filters')}
+    </button>
+  </div>
+
+  <SegmentedTabs
+    label={t('search.tabs')}
+    items={[
+      { href: tabHref('programs'), label: t('search.tab.programs'), current: tab === 'programs' },
+      {
+        href: tabHref('universities'),
+        label: t('search.tab.universities'),
+        current: tab === 'universities',
+      },
+    ]}
+  />
+
+  <div class="layout">
+    <FilterSheet
+      lang={lang}
+      panel={{
+        id: 'filters',
+        action: path,
+        countUrl: `/api/search/count?kind=${tab}&lang=${lang}`,
+        hidden,
+        groups,
+        applyLabel: t('search.apply'),
+        clearLabel: t('search.clearAll'),
+        clearHref,
+      }}
+    />
+
+    <section class="results" aria-labelledby="results-count">
+      {chips.length > 0 && (
+        <ul class="chips" aria-label={t('search.activeFilters')}>
+          {chips.map((chip) => (
+            <li>
+              <a
+                class="chip"
+                href={chip.href}
+                aria-label={t('search.removeFilter', { label: chip.label })}
+              >
+                {chip.label}
+                <svg
+                  viewBox="0 0 16 16"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" />
+                </svg>
+              </a>
+            </li>
+          ))}
+          <li>
+            <a class="chip clear" href={clearHref}>
+              {t('search.clearAll')}
+            </a>
+          </li>
+        </ul>
+      )}
+
+      <div class="results-head">
+        <h2 id="results-count" class="text-title" aria-live="polite">
+          {t(countMessage, { n: total })}
+        </h2>
+        {tab === 'programs' && total > 1 && (
+          <form class="sort" method="get" action={path} data-autosubmit>
+            {sortHidden.map(([k, v]) => (
+              <input type="hidden" name={k} value={v} />
+            ))}
+            <label for="sort">{t('search.sort')}</label>
+            <select id="sort" name="sort">
+              {PROGRAM_SORTS.map((s) => (
+                <option value={s} selected={s === sort}>
+                  {t(`search.sort.${s}` as MessageKey)}
+                </option>
+              ))}
+            </select>
+            <button type="submit" class="button button-secondary" data-autosubmit-button>
+              {t('search.sort')}
+            </button>
+          </form>
+        )}
+      </div>
+
+      {total === 0 ? (
+        <EmptyState
+          title={t('search.empty.title')}
+          body={t('search.empty.body')}
+          action={filterCount > 0 ? { href: clearHref, label: t('search.clearAll') } : undefined}
+        />
+      ) : (
+        <ol class="grid">
+          {programResults?.items.map((program, i) => (
+            <li id={`result-${i + 1}`}>
+              <ProgramCard lang={lang} program={program} rate={rate} />
+            </li>
+          ))}
+          {universityResults?.items.map((university, i) => (
+            <li id={`result-${i + 1}`}>
+              <UniversityCard lang={lang} university={university} />
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {showMore && (
+        <a
+          class="button button-secondary show-more"
+          href={`${path}?${moreParams}#result-${shown + 1}`}
+        >
+          {t('common.showMore')}
+        </a>
+      )}
+      {results?.hasMore && page >= MAX_PAGE && (
+        <p class="muted-note">{t('search.limit', { n: shown })}</p>
+      )}
+    </section>
+  </div>
+</AppShell>
+
+<script>
+  // Sort applies on change; the Sort button is for visitors without JavaScript.
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-autosubmit]')) {
+    const button = form.querySelector<HTMLElement>('[data-autosubmit-button]');
+    if (button) button.hidden = true;
+    form.addEventListener('change', () => form.requestSubmit());
+  }
+</script>
+
+<style>
+  .page-title {
+    margin-bottom: var(--space-4);
+  }
+  .search-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .search-row > :global(.search-box) {
+    flex: 1 1 18rem;
+  }
+  .filters-button {
+    min-height: 4rem;
+  }
+  .layout {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-4);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+  }
+  .chip.clear {
+    box-shadow: none;
+    color: var(--brand);
+    background: transparent;
+  }
+  .results-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .sort {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .sort select {
+    flex-shrink: 0;
+    min-height: var(--touch-target);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--ink-muted);
+    border-radius: var(--radius-input);
+    background: var(--surface-raised);
+  }
+  .sort [hidden] {
+    display: none;
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .grid > li {
+    display: grid;
+    scroll-margin-top: var(--space-5);
+  }
+  .show-more {
+    margin-top: var(--space-5);
+    width: 100%;
+  }
+  @media (min-width: 1024px) {
+    .filters-button {
+      display: none;
+    }
+    .layout {
+      grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-6);
+    }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .show-more {
+      width: auto;
+    }
+  }
+</style>

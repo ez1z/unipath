@@ -1,0 +1,179 @@
+---
+import EmptyState from '../../../components/EmptyState.astro';
+import FilterSheet from '../../../components/FilterSheet.astro';
+import ScholarshipCard from '../../../components/ScholarshipCard.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { getCountries, searchScholarships } from '../../../lib/db/catalog';
+import { filterChips, scholarshipFilterGroups } from '../../../lib/search/facets';
+import {
+  countScholarshipFilters,
+  MAX_PAGE,
+  PARAM,
+  parseScholarshipFilters,
+  serializeScholarshipFilters,
+} from '../../../lib/search/filters';
+import { getDb, today } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+
+const f = parseScholarshipFilters(Astro.url.searchParams);
+const [results, countries] = await Promise.all([
+  searchScholarships(db, f, { lang, today: today() }),
+  getCountries(db, lang),
+]);
+const path = `/${lang}/scholarships`;
+const canonical = serializeScholarshipFilters(f);
+const groups = scholarshipFilterGroups(t, f, countries);
+const chips = filterChips(t, lang, path, canonical, groups);
+const filterCount = countScholarshipFilters(f);
+const more = new URLSearchParams(canonical);
+more.set(PARAM.page, String(f.page + 1));
+---
+
+<AppShell lang={lang} title={t('scholarships.metaTitle')}>
+  <div class="title-row">
+    <div>
+      <h1 class="page-title">{t('scholarships.title')}</h1>
+      <p class="text-muted">{t('scholarships.intro')}</p>
+    </div>
+    <button
+      type="button"
+      class="button button-secondary filters-button"
+      popovertarget="filters-sheet"
+    >
+      {filterCount > 0 ? t('search.filtersCount', { n: filterCount }) : t('search.filters')}
+    </button>
+  </div>
+
+  <div class="layout">
+    <FilterSheet
+      lang={lang}
+      panel={{
+        id: 'filters',
+        action: path,
+        countUrl: `/api/search/count?kind=scholarships&lang=${lang}`,
+        hidden: [],
+        groups,
+        applyLabel: t('search.apply'),
+        clearLabel: t('search.clearAll'),
+        clearHref: path,
+      }}
+    />
+
+    <section aria-labelledby="results-count">
+      {chips.length > 0 && (
+        <ul class="chips" aria-label={t('search.activeFilters')}>
+          {chips.map((chip) => (
+            <li>
+              <a
+                class="chip"
+                href={chip.href}
+                aria-label={t('search.removeFilter', { label: chip.label })}
+              >
+                {chip.label}
+                <svg
+                  viewBox="0 0 16 16"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      <h2 id="results-count" class="text-title count">
+        {t('search.count.scholarships', { n: results.total })}
+      </h2>
+      {results.total === 0 ? (
+        <EmptyState
+          title={t('search.empty.title')}
+          body={t('search.empty.body')}
+          action={filterCount > 0 ? { href: path, label: t('search.clearAll') } : undefined}
+        />
+      ) : (
+        <ol class="grid">
+          {results.items.map((scholarship, i) => (
+            <li id={`result-${i + 1}`}>
+              <ScholarshipCard lang={lang} scholarship={scholarship} />
+            </li>
+          ))}
+        </ol>
+      )}
+      {results.hasMore && f.page < MAX_PAGE && (
+        <a
+          class="button button-secondary show-more"
+          href={`${path}?${more}#result-${results.items.length + 1}`}
+        >
+          {t('common.showMore')}
+        </a>
+      )}
+    </section>
+  </div>
+</AppShell>
+
+<style>
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .layout {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+  }
+  .count {
+    margin-bottom: var(--space-4);
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .grid > li {
+    display: grid;
+    scroll-margin-top: var(--space-5);
+  }
+  .show-more {
+    margin-top: var(--space-5);
+    width: 100%;
+  }
+  @media (min-width: 1024px) {
+    .filters-button {
+      display: none;
+    }
+    .layout {
+      grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-6);
+    }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .show-more {
+      width: auto;
+    }
+  }
+</style>

@@ -1,0 +1,16 @@
+---
+import ContentPage from '../../components/ContentPage.astro';
+import { LANGS, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+---
+
+<ContentPage
+  lang={lang}
+  metaTitle="about.metaTitle"
+  title="about.title"
+  sections={[{ body: ['about.p1', 'about.p2', 'about.p3', 'about.p4'] }]}
+/>

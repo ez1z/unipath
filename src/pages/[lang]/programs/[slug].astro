@@ -1,0 +1,336 @@
+---
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import CompareToggle from '../../../components/CompareToggle.astro';
+import DetailLayout from '../../../components/DetailLayout.astro';
+import Fact from '../../../components/Fact.astro';
+import MinistryBadge from '../../../components/MinistryBadge.astro';
+import NotFound from '../../../components/NotFound.astro';
+import PathSteps from '../../../components/PathSteps.astro';
+import Requirements from '../../../components/Requirements.astro';
+import ScholarshipList from '../../../components/ScholarshipList.astro';
+import SummaryBox from '../../../components/SummaryBox.astro';
+import Text from '../../../components/Text.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { getUsdTmtRate } from '../../../lib/db/catalog';
+import { getProgramWithPathways, type PathOption } from '../../../lib/db/queries';
+import { formatMonth, languageName, nextIntake } from '../../../lib/format';
+import { deadlineText, levelLabel, moneyText, rateNote, yearsText } from '../../../lib/view';
+import { daysBetween } from '../../../lib/dates';
+import { getDb, today } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang, slug } = Astro.params;
+if (!isLang(lang) || !slug) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+const now = today();
+
+const [page, rate] = await Promise.all([
+  getProgramWithPathways(db, slug, { lang, today: now }),
+  getUsdTmtRate(db),
+]);
+if (!page) Astro.response.status = 404;
+
+const p = page?.program;
+const provider = p?.provider;
+const providerHref =
+  provider &&
+  `/${lang}/${provider.type === 'university' ? 'universities' : 'colleges'}/${provider.slug}`;
+const money =
+  p && p.tuitionPerYearUsd !== null ? moneyText(t, lang, p.tuitionPerYearUsd, rate) : null;
+const intake = p ? nextIntake(p.intakes, now) : null;
+const shortest = page?.paths[0]?.totalYears ?? null;
+const isBachelor = p?.level === 'bachelor';
+
+const pathKey = (path: PathOption) =>
+  path.kind === 'direct' ? String(path.bachelor.id) : `${path.preYear.id}-${path.bachelor.id}`;
+const pathLabel = (path: PathOption) => {
+  if (path.kind === 'direct') return t('path.direct');
+  if (isBachelor) return t('path.withPreYear', { level: levelLabel(t, path.preYear.level) });
+  return path.bachelor.name.text;
+};
+---
+
+{!page || !p || !provider ? (
+  <NotFound lang={lang} />
+) : (
+  <AppShell
+    lang={lang}
+    title={t('program.metaTitle', { name: p.name.text, provider: provider.name.text })}
+    compare
+  >
+    <Breadcrumb
+      lang={lang}
+      items={[
+        { href: `/${lang}/search`, label: t('search.title') },
+        { href: providerHref ?? `/${lang}/search`, label: provider.name.text },
+      ]}
+      current={p.name.text}
+    />
+    <DetailLayout>
+      <header slot="head" class="head">
+        <div class="badges">
+          <span class="badge badge-plain">{levelLabel(t, p.level)}</span>
+          {provider.ministryStatus && (
+            <MinistryBadge lang={lang} status={provider.ministryStatus} />
+          )}
+        </div>
+        <h1 class="page-title">
+          <Text value={p.name} lang={lang} />
+        </h1>
+        <p class="text-muted">
+          <a href={providerHref}>
+            <Text value={provider.name} lang={lang} />
+          </a>
+          {' · '}
+          {provider.city}, <Text value={provider.countryName} lang={lang} label={false} />
+        </p>
+        {provider.type === 'college' && <p class="muted-note">{t('ministry.college')}</p>}
+      </header>
+
+      <SummaryBox
+        slot="side"
+        lang={lang}
+        lastChecked={p.lastChecked}
+        sourceUrl={p.sourceUrl}
+        reportHref={`/${lang}/report?type=program&id=${p.id}`}
+      >
+        <Fact term={t('summary.duration')}>{yearsText(t, p.durationYears)}</Fact>
+        <Fact term={t('summary.tuition')} note={money?.tmt}>
+          {money ? t('common.perYear', { amount: money.usd }) : t('common.costNotConfirmed')}
+        </Fact>
+        <Fact term={t('summary.taughtIn')}>{languageName(lang, p.languageOfStudy)}</Fact>
+        <Fact term={t('summary.nextIntake')}>
+          {intake === null ? t('common.notConfirmed') : formatMonth(lang, intake)}
+        </Fact>
+        <Fact term={t('summary.totalPath')}>
+          {shortest === null ? t('path.none') : t('path.total', { n: shortest })}
+        </Fact>
+        <Fact term={t('summary.deadline')}>
+          {deadlineText(t, lang, {
+            deadline: p.applicationDeadline,
+            daysLeft:
+              p.applicationDeadline === null ? null : daysBetween(now, p.applicationDeadline),
+          })}
+        </Fact>
+        {money?.tmt && (
+          <p slot="actions" class="muted-note">
+            {rateNote(t, lang, rate)}
+          </p>
+        )}
+      </SummaryBox>
+
+      <section aria-labelledby="path-title" class="card path-card">
+        <h2 id="path-title" class="section-title">
+          {t('path.title')}
+        </h2>
+        {page.paths.length === 0 ? (
+          <p class="text-muted">
+            {isBachelor && p.preYearRequired === 'yes' ? t('card.needsPreYear') : t('path.none')}
+          </p>
+        ) : (
+          <div class="paths">
+            {page.paths.length > 1 && (
+              <fieldset class="switch">
+                <legend class="visually-hidden">{t('path.options')}</legend>
+                {page.paths.map((path, i) => (
+                  <label class={`option option-${i}`}>
+                    <input type="radio" name="path" value={String(i)} checked={i === 0} />
+                    <span>
+                      {pathLabel(path)}
+                      <span class="option-years">{t('path.total', { n: path.totalYears })}</span>
+                    </span>
+                  </label>
+                ))}
+              </fieldset>
+            )}
+            {page.paths.map((path, i) => (
+              <div class={`panel panel-${i}`}>
+                {page.paths.length > 1 && <h3 class="text-title">{pathLabel(path)}</h3>}
+                <PathSteps
+                  lang={lang}
+                  totalYears={path.totalYears}
+                  steps={
+                    path.kind === 'direct'
+                      ? [
+                          {
+                            level: path.bachelor.level,
+                            name: path.bachelor.name,
+                            years: path.bachelor.durationYears,
+                          },
+                        ]
+                      : [
+                          {
+                            level: path.preYear.level,
+                            name: path.preYear.name,
+                            href:
+                              path.preYear.id === p.id
+                                ? undefined
+                                : `/${lang}/programs/${path.preYear.slug}`,
+                            provider:
+                              path.preYear.provider.id === provider.id &&
+                              path.preYear.provider.type === provider.type
+                                ? undefined
+                                : path.preYear.provider.name,
+                            years: path.preYear.durationYears,
+                          },
+                          {
+                            level: path.bachelor.level,
+                            name: path.bachelor.name,
+                            href:
+                              path.bachelor.id === p.id
+                                ? undefined
+                                : `/${lang}/programs/${path.bachelor.slug}`,
+                            provider:
+                              path.bachelor.provider.id === provider.id &&
+                              path.bachelor.provider.type === provider.type
+                                ? undefined
+                                : path.bachelor.provider.name,
+                            years: path.bachelor.durationYears,
+                          },
+                        ]
+                  }
+                />
+                <p class="muted-note">
+                  {path.kind === 'direct'
+                    ? path.directEntry === 'unknown'
+                      ? t('path.directUnknown')
+                      : ''
+                    : path.entryGuaranteed
+                      ? t('path.guaranteed')
+                      : t('path.notGuaranteed')}
+                </p>
+                <div class="path-actions">
+                  <CompareToggle lang={lang} compareKey={pathKey(path)} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section aria-labelledby="requirements-title">
+        <h2 id="requirements-title" class="section-title">
+          {t('requirements.title')}
+        </h2>
+        <div class="section-body">
+          <Requirements lang={lang} requirements={p.requirements} />
+        </div>
+      </section>
+
+      <section aria-labelledby="scholarships-title">
+        <h2 id="scholarships-title" class="section-title">
+          {t('program.scholarships')}
+        </h2>
+        <div class="section-body">
+          <ScholarshipList
+            lang={lang}
+            scholarships={page.scholarships}
+            empty={t('program.noScholarships')}
+          />
+        </div>
+      </section>
+    </DetailLayout>
+  </AppShell>
+)}
+
+<style>
+  .head {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .path-card {
+    gap: var(--space-4);
+    padding: var(--space-5);
+  }
+  .section-body {
+    margin-top: var(--space-3);
+  }
+  .switch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    border: 0;
+  }
+  .option {
+    display: inline-flex;
+    flex: 1 1 12rem;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch-target);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-chip);
+    box-shadow: inset 0 0 0 1px var(--ink-muted);
+    cursor: pointer;
+    font-weight: var(--weight-semibold);
+  }
+  .option input {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    accent-color: var(--brand);
+  }
+  .option:has(input:checked) {
+    background: var(--brand-soft);
+    box-shadow: inset 0 0 0 2px var(--brand);
+  }
+  .option-years {
+    display: block;
+    font-weight: var(--weight-regular);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--ink-muted);
+  }
+  .panel {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .panel + .panel {
+    margin-top: var(--space-5);
+  }
+  /* With :has() support, only the chosen path shows; without it, all paths are listed. */
+  .paths:has(.switch input:checked) .panel {
+    display: none;
+  }
+  .paths:has(.option-0 input:checked) .panel-0,
+  .paths:has(.option-1 input:checked) .panel-1,
+  .paths:has(.option-2 input:checked) .panel-2,
+  .paths:has(.option-3 input:checked) .panel-3,
+  .paths:has(.option-4 input:checked) .panel-4,
+  .paths:has(.option-5 input:checked) .panel-5,
+  .paths:has(.option-6 input:checked) .panel-6,
+  .paths:has(.option-7 input:checked) .panel-7 {
+    display: grid;
+    margin-top: 0;
+  }
+  .paths .panel:nth-of-type(n + 9) {
+    display: grid;
+  }
+  /* The switch already names the chosen path. */
+  .paths:has(.switch input:checked) .panel > h3 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .muted-note:empty {
+    display: none;
+  }
+  .path-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>

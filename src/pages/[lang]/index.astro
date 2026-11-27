@@ -1,8 +1,13 @@
 ---
-import AppShell from '../../layouts/AppShell.astro';
+import ScholarshipCard from '../../components/ScholarshipCard.astro';
+import SearchBox from '../../components/SearchBox.astro';
+import Text from '../../components/Text.astro';
 import { getTranslations, isLang } from '../../i18n';
+import AppShell from '../../layouts/AppShell.astro';
+import { getCountries, searchScholarships } from '../../lib/db/catalog';
+import { getDb, today } from '../../lib/server';
 
-// Home reads the database from M2 on, so it renders on the server.
+// Home reads the database, so it renders on the server (cached 5 minutes).
 export const prerender = false;
 
 const { lang } = Astro.params;
@@ -10,17 +15,88 @@ if (!isLang(lang)) {
   return new Response(null, { status: 404 });
 }
 const t = getTranslations(lang);
+const db = getDb();
+
+const [countries, deadlines] = await Promise.all([
+  getCountries(db, lang),
+  searchScholarships(
+    db,
+    { countries: [], coverages: [], includeClosed: false, page: 1 },
+    { lang, today: today(), pageSize: 4 },
+  ),
+]);
+const popular = countries.filter((c) => c.popularRank !== null).slice(0, 4);
 ---
 
 <AppShell lang={lang} title={t('home.title')}>
   <section class="hero">
     <h1 class="headline">{t('home.headline')}</h1>
+    <SearchBox lang={lang} id="home-q" />
+    <ul class="chips" aria-label={t('home.chips')}>
+      <li>
+        <a class="chip" href={`/${lang}/search?approved=1`}>
+          {t('home.chip.approved')}
+        </a>
+      </li>
+      <li>
+        <a class="chip" href={`/${lang}/scholarships?coverage=full`}>
+          {t('home.chip.funded')}
+        </a>
+      </li>
+      <li>
+        <a class="chip" href="#countries">
+          {t('home.chip.countries')}
+        </a>
+      </li>
+    </ul>
   </section>
+
+  <section id="countries" class="block" aria-labelledby="countries-title">
+    <h2 id="countries-title" class="section-title">
+      {t('home.countries')}
+    </h2>
+    <ul class="tiles">
+      {popular.map((country) => (
+        <li>
+          <a class="tile" href={`/${lang}/search?country=${country.code}`}>
+            <span class="code" aria-hidden="true">
+              {country.code}
+            </span>
+            <span class="tile-name">
+              <Text value={country.name} lang={lang} />
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {deadlines.items.length > 0 && (
+    <section class="block deadlines" aria-labelledby="deadlines-title">
+      <div class="block-head">
+        <h2 id="deadlines-title" class="section-title">
+          {t('home.deadlines')}
+        </h2>
+        <a href={`/${lang}/scholarships`}>{t('home.allScholarships')}</a>
+      </div>
+      <ul class="grid">
+        {deadlines.items.map((scholarship) => (
+          <li>
+            <ScholarshipCard lang={lang} scholarship={scholarship} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <p class="trust">{t('home.trust')}</p>
 </AppShell>
 
 <style>
   .hero {
-    padding-block: var(--space-5);
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-4) var(--space-5);
   }
   .headline {
     max-width: 22ch;
@@ -30,11 +106,107 @@ const t = getTranslations(lang);
     letter-spacing: -0.01em;
     text-wrap: balance;
   }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .block {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  .block-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+  .block-head a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: 100%;
+    min-height: 6rem;
+    padding: var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .tile:hover {
+    box-shadow: inset 0 0 0 2px var(--brand);
+  }
+  .code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-badge);
+    background: var(--brand-soft);
+    color: var(--brand);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-small);
+  }
+  .tile-name {
+    font-weight: var(--weight-semibold);
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .grid > li {
+    display: grid;
+  }
+  /* SPEC: deadlines sit beside the hero on desktop; phones keep a short Home. */
+  .deadlines {
+    display: none;
+  }
+  .trust {
+    margin-top: var(--space-6);
+    color: var(--ink-muted);
+    font-weight: var(--weight-medium);
+  }
   @media (min-width: 1024px) {
+    .hero {
+      max-width: 44rem;
+      padding-block: var(--space-6);
+    }
     .headline {
       font-size: var(--text-display);
       line-height: var(--leading-display);
       letter-spacing: -0.02em;
+    }
+    .tiles {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .deadlines {
+      display: grid;
+    }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>

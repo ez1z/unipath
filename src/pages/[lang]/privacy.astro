@@ -1,0 +1,23 @@
+---
+import ContentPage from '../../components/ContentPage.astro';
+import { LANGS, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+---
+
+<ContentPage
+  lang={lang}
+  metaTitle="privacy.metaTitle"
+  title="privacy.title"
+  sections={[
+    { body: ['privacy.intro'] },
+    { title: 'privacy.account.title', body: ['privacy.account.body'] },
+    { title: 'privacy.messages.title', body: ['privacy.messages.body'] },
+    { title: 'privacy.device.title', body: ['privacy.device.body'] },
+    { title: 'privacy.reports.title', body: ['privacy.reports.body'] },
+    { title: 'privacy.control.title', body: ['privacy.control.body'] },
+  ]}
+/>

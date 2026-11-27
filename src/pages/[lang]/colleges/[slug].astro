@@ -1,0 +1,115 @@
+---
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import DetailLayout from '../../../components/DetailLayout.astro';
+import Fact from '../../../components/Fact.astro';
+import NotFound from '../../../components/NotFound.astro';
+import ProgramRow from '../../../components/ProgramRow.astro';
+import SummaryBox from '../../../components/SummaryBox.astro';
+import Text from '../../../components/Text.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { getCollegePage, getUsdTmtRate } from '../../../lib/db/catalog';
+import { formatNumber } from '../../../lib/format';
+import { getDb, today } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang, slug } = Astro.params;
+if (!isLang(lang) || !slug) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+
+const [page, rate] = await Promise.all([
+  getCollegePage(db, slug, { lang, today: today() }),
+  getUsdTmtRate(db),
+]);
+if (!page) Astro.response.status = 404;
+const c = page?.college;
+const partners = page
+  ? new Set(
+      page.programs.flatMap((p) => p.leadsTo.map((l) => `${l.provider.type}:${l.provider.id}`)),
+    ).size
+  : 0;
+---
+
+{!page || !c ? (
+  <NotFound lang={lang} />
+) : (
+  <AppShell lang={lang} title={t('college.metaTitle', { name: c.name.text })}>
+    <Breadcrumb
+      lang={lang}
+      items={[
+        { href: `/${lang}/search?level=foundation&level=language`, label: t('search.title') },
+      ]}
+      current={c.name.text}
+    />
+    <DetailLayout>
+      <header slot="head" class="head">
+        <span class="badge badge-plain">{t('college.kind')}</span>
+        <h1 class="page-title">
+          <Text value={c.name} lang={lang} />
+        </h1>
+        <p class="text-muted">
+          {c.city}, <Text value={c.countryName} lang={lang} label={false} />
+        </p>
+        <p>{t('college.intro')}</p>
+        <p class="muted-note">{t('ministry.college')}</p>
+      </header>
+
+      <SummaryBox
+        slot="side"
+        lang={lang}
+        lastChecked={c.lastChecked}
+        sourceUrl={c.sourceUrl}
+        reportHref={`/${lang}/report?type=college&id=${c.id}`}
+      >
+        <Fact term={t('search.tab.programs')}>{formatNumber(lang, page.programs.length)}</Fact>
+        <Fact term={t('search.tab.universities')}>{formatNumber(lang, partners)}</Fact>
+        {c.website && (
+          <a
+            slot="actions"
+            class="button button-secondary"
+            href={c.website}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {t('common.officialWebsite')}
+          </a>
+        )}
+      </SummaryBox>
+
+      <section aria-labelledby="programs-title">
+        <h2 id="programs-title" class="section-title">
+          {t('college.programs')}
+        </h2>
+        {page.programs.length === 0 ? (
+          <p class="text-muted">{t('university.noPrograms')}</p>
+        ) : (
+          <ul class="rows">
+            {page.programs.map((program) => (
+              <ProgramRow
+                lang={lang}
+                program={program}
+                rate={rate}
+                extra={program.leadsTo.length === 0 ? t('college.noPaths') : undefined}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
+    </DetailLayout>
+  </AppShell>
+)}
+
+<style>
+  .head {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-2);
+  }
+  .rows {
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -1,0 +1,245 @@
+---
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import DetailLayout from '../../../components/DetailLayout.astro';
+import Fact from '../../../components/Fact.astro';
+import NotFound from '../../../components/NotFound.astro';
+import ProgramRow from '../../../components/ProgramRow.astro';
+import SummaryBox from '../../../components/SummaryBox.astro';
+import Text from '../../../components/Text.astro';
+import { getTranslations, isLang, type MessageKey } from '../../../i18n';
+import EligibilityChecklist from '../../../islands/EligibilityChecklist';
+import AppShell from '../../../layouts/AppShell.astro';
+import { getUsdTmtRate } from '../../../lib/db/catalog';
+import { getScholarshipWithPrograms } from '../../../lib/db/queries';
+import { deadlineText, levelLabel, listText, triStateKey } from '../../../lib/view';
+import { getDb, today } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang, slug } = Astro.params;
+if (!isLang(lang) || !slug) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+
+const [page, rate] = await Promise.all([
+  getScholarshipWithPrograms(db, slug, { lang, today: today() }),
+  getUsdTmtRate(db),
+]);
+if (!page) Astro.response.status = 404;
+const s = page?.scholarship;
+const steps =
+  s?.howToApply?.text
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean) ?? [];
+---
+
+{!page || !s ? (
+  <NotFound lang={lang} />
+) : (
+  <AppShell lang={lang} title={t('scholarship.metaTitle', { name: s.name.text })}>
+    <Breadcrumb
+      lang={lang}
+      items={[{ href: `/${lang}/scholarships`, label: t('scholarships.title') }]}
+      current={s.name.text}
+    />
+    <DetailLayout>
+      <header slot="head" class="head">
+        <div class="badges">
+          <span class="badge">{t(`coverage.${s.coverage}` as MessageKey)}</span>
+          <span class="badge badge-plain">{levelLabel(t, 'bachelor')}</span>
+          <span class="badge badge-plain">
+            {t(triStateKey('scholarship.turkmen', s.openToTurkmen))}
+          </span>
+        </div>
+        <h1 class="page-title">
+          <Text value={s.name} lang={lang} />
+        </h1>
+        <p class="text-muted">
+          {t('scholarship.by', { provider: s.provider })} ·{' '}
+          <Text value={s.countryName} lang={lang} label={false} />
+        </p>
+        {!s.open && <p class="closed-note">{t('scholarship.closed')}</p>}
+      </header>
+
+      <div slot="side" class="side">
+        <SummaryBox
+          lang={lang}
+          lastChecked={s.lastChecked}
+          sourceUrl={s.sourceUrl}
+          reportHref={`/${lang}/report?type=scholarship&id=${s.id}`}
+        >
+          <Fact term={t('summary.covers')}>
+            {s.covers.length === 0
+              ? t('common.notConfirmed')
+              : listText(
+                  lang,
+                  s.covers.map((c) => t(`covers.${c}` as MessageKey)),
+                )}
+          </Fact>
+          <Fact term={t('summary.preYear')}>
+            {t(triStateKey('scholarship.preYear', s.coversPreYear))}
+          </Fact>
+          <Fact term={t('summary.amount')}>
+            {s.amountText ? <Text value={s.amountText} lang={lang} /> : t('common.notConfirmed')}
+          </Fact>
+          <Fact term={t('summary.deadline')}>{deadlineText(t, lang, s)}</Fact>
+          {s.sourceUrl && (
+            <a
+              slot="actions"
+              class="button button-secondary"
+              href={s.sourceUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {t('summary.official')}
+            </a>
+          )}
+        </SummaryBox>
+
+        {s.eligibility.length > 0 && (
+          <section class="card eligibility" aria-labelledby="eligibility-title">
+            <h2 id="eligibility-title" class="text-title">
+              {t('scholarship.eligibility')}
+            </h2>
+            <EligibilityChecklist
+              client:visible
+              lang={lang}
+              items={s.eligibility}
+              hint={t('scholarship.eligibilityHint')}
+              fitLabel={t('scholarship.fit')}
+              missingLabel={t('scholarship.missing', { items: '{items}' })}
+              fallbackLabel={s.eligibilityFallback ? t('common.notTranslated') : null}
+            />
+          </section>
+        )}
+      </div>
+
+      <section aria-labelledby="programs-title">
+        <h2 id="programs-title" class="section-title">
+          {t('scholarship.programs')}
+        </h2>
+        {page.universities.length > 0 && (
+          <p class="universities">
+            {t('scholarship.universities')}{' '}
+            {page.universities.map((u, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={`/${lang}/universities/${u.slug}`}>
+                  <Text value={u.name} lang={lang} label={false} />
+                </a>
+              </>
+            ))}
+          </p>
+        )}
+        {page.programs.length === 0 ? (
+          <p class="text-muted">{t('scholarship.noPrograms')}</p>
+        ) : (
+          <ul class="rows">
+            {page.programs.map((program) => (
+              <ProgramRow
+                lang={lang}
+                program={program}
+                rate={rate}
+                context={program.provider.name}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {steps.length > 0 && s.howToApply && (
+        <section aria-labelledby="apply-title">
+          <h2 id="apply-title" class="section-title">
+            {t('scholarship.howToApply')}
+          </h2>
+          {s.howToApply.fallback && <p class="muted-note">{t('common.notTranslated')}</p>}
+          <ol class="apply" lang={s.howToApply.fallback ? 'en' : undefined}>
+            {steps.map((step) => (
+              <li>{step}</li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </DetailLayout>
+  </AppShell>
+)}
+
+<style>
+  .head {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .closed-note {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    box-shadow: inset 0 0 0 2px var(--danger);
+    color: var(--danger);
+    font-weight: var(--weight-semibold);
+  }
+  .side {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .eligibility {
+    padding: var(--space-5);
+  }
+  .universities {
+    margin-top: var(--space-3);
+  }
+  .rows {
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .apply {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-inline-start: var(--space-5);
+  }
+  .eligibility :global(ul) {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-3) 0;
+    padding: 0;
+    list-style: none;
+  }
+  .eligibility :global(label) {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    min-height: var(--touch-target);
+    padding-block: var(--space-2);
+    cursor: pointer;
+  }
+  .eligibility :global(input) {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: var(--space-1) 0 0;
+    accent-color: var(--brand);
+  }
+  .eligibility :global(.hint) {
+    color: var(--ink-muted);
+    font-size: var(--text-small);
+  }
+  .eligibility :global(.status:empty) {
+    display: none;
+  }
+  .eligibility :global(.status) {
+    padding: var(--space-3);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    font-weight: var(--weight-semibold);
+  }
+  .eligibility :global(.status.fit) {
+    background: var(--brand-soft);
+  }
+</style>

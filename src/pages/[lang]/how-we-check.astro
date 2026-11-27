@@ -1,0 +1,35 @@
+---
+import ContentPage from '../../components/ContentPage.astro';
+import { LANGS, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+---
+
+<ContentPage
+  lang={lang}
+  metaTitle="howWeCheck.metaTitle"
+  title="howWeCheck.title"
+  sections={[
+    { body: ['howWeCheck.intro'] },
+    {
+      title: 'howWeCheck.ministry.title',
+      body: [
+        'howWeCheck.ministry.body',
+        'ministry.explain.approved',
+        'ministry.explain.not_listed',
+        'ministry.explain.unchecked',
+      ],
+    },
+    {
+      title: 'howWeCheck.facts.title',
+      body: ['howWeCheck.facts.body', 'howWeCheck.money.body'],
+    },
+    {
+      title: 'howWeCheck.mistakes.title',
+      body: ['howWeCheck.mistakes.body', 'howWeCheck.official'],
+    },
+  ]}
+/>
