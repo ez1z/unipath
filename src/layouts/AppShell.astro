@@ -1,0 +1,264 @@
+---
+import Icon from '../components/Icon.astro';
+import LanguageSwitch from '../components/LanguageSwitch.astro';
+import Logo from '../components/Logo.astro';
+import { getTranslations, type Lang } from '../i18n';
+import { activeSection, navItems } from '../lib/nav';
+import BaseLayout from './BaseLayout.astro';
+
+/**
+ * App shell: desktop header (logo, five tabs, language switch, Sign in) and,
+ * below 1024 px, a slim header (logo, language switch) plus the bottom bar with
+ * the same five tabs.
+ */
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string | undefined;
+}
+
+const { lang, title, description } = Astro.props;
+const t = getTranslations(lang);
+const items = navItems(lang);
+const current = activeSection(Astro.url.pathname);
+const ariaCurrent = (section: string) => (section === current ? 'page' : undefined);
+---
+
+<BaseLayout lang={lang} title={title} description={description}>
+  <a class="skip-link" href="#main">
+    {t('a11y.skipToContent')}
+  </a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo-link" href={`/${lang}`} aria-label={t('nav.logo')}>
+        <Logo />
+      </a>
+
+      <nav class="header-nav" aria-label={t('nav.label')}>
+        <ul>
+          {items.map((item) => (
+            <li>
+              <a href={item.href} aria-current={ariaCurrent(item.section)}>
+                {t(item.labelKey)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <LanguageSwitch lang={lang} />
+        <a class="sign-in" href={`/${lang}/my`}>
+          {t('auth.signIn')}
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container" tabindex="-1">
+    <slot />
+  </main>
+
+  <nav class="bottom-bar" aria-label={t('nav.label')}>
+    <ul>
+      {items.map((item) => (
+        <li>
+          <a href={item.href} aria-current={ariaCurrent(item.section)}>
+            <span class="tab-icon">
+              <Icon name={item.section} />
+            </span>
+            <span class="tab-label">{t(item.labelKey)}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</BaseLayout>
+
+<style>
+  .skip-link {
+    position: absolute;
+    inset-inline-start: var(--space-4);
+    top: var(--space-2);
+    z-index: 100;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-button);
+    background: var(--brand);
+    color: var(--on-brand);
+    font-weight: var(--weight-semibold);
+    transform: translateY(-200%);
+  }
+  .skip-link:focus {
+    transform: none;
+  }
+
+  /* Header */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 3.5rem;
+    padding-block: var(--space-1);
+  }
+  .logo-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    min-height: var(--touch-target);
+    border-radius: var(--radius-chip);
+    color: inherit;
+    text-decoration: none;
+  }
+  .header-nav {
+    display: none;
+  }
+  .header-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-3);
+    margin-inline-start: auto;
+  }
+  .sign-in {
+    display: none;
+  }
+
+  main {
+    padding-top: var(--space-5);
+    /* Keep the last content clear of the fixed bottom bar. */
+    padding-bottom: calc(
+      var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px) + var(--space-6)
+    );
+  }
+  main:focus {
+    outline: none;
+  }
+
+  /* Phone bottom bar */
+  .bottom-bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 50;
+    background: var(--surface-raised);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottom-bar ul {
+    display: flex;
+    gap: var(--space-1);
+    margin: 0 auto;
+    padding: 0 var(--space-1);
+    max-width: 40rem;
+    list-style: none;
+    /* Only with very large system text: scroll the bar, never widen the page. */
+    overflow-x: auto;
+  }
+  /* Each tab is as wide as its label and the spare space is shared out, so long
+     Turkmen and Russian words fit whole instead of five equal, too-narrow tabs.
+     The default min-width (the longest word) stops a tab shrinking mid-word;
+     two-word labels wrap at the space instead. */
+  .bottom-bar li {
+    flex: 1 1 auto;
+  }
+  .bottom-bar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-height: var(--bottom-bar-height);
+    padding-block: var(--space-2);
+    border-radius: var(--radius-chip);
+    color: var(--ink-muted);
+    text-decoration: none;
+    text-align: center;
+  }
+  .tab-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 2rem;
+    border-radius: var(--radius-badge);
+  }
+  .tab-label {
+    max-width: 100%;
+    font-size: var(--text-label);
+    line-height: var(--leading-label);
+    font-weight: var(--weight-semibold);
+    /* Wrap only between words. */
+    overflow-wrap: normal;
+  }
+  .bottom-bar a[aria-current='page'] {
+    color: var(--ink);
+  }
+  .bottom-bar a[aria-current='page'] .tab-icon {
+    background: var(--brand-soft);
+    color: var(--brand);
+  }
+
+  /* Desktop */
+  @media (min-width: 1024px) {
+    .header-inner {
+      min-height: 4.5rem;
+      gap: var(--space-5);
+    }
+    .header-nav {
+      display: block;
+      min-width: 0;
+    }
+    .header-nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .header-nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--touch-target);
+      padding-inline: var(--space-3);
+      border-radius: var(--radius-chip);
+      color: var(--ink-muted);
+      font-weight: var(--weight-medium);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .header-nav a:hover {
+      color: var(--ink);
+    }
+    .header-nav a[aria-current='page'] {
+      color: var(--ink);
+      background: var(--brand-soft);
+    }
+    .sign-in {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-target);
+      padding-inline: var(--space-5);
+      border-radius: var(--radius-button);
+      background: var(--brand);
+      color: var(--on-brand);
+      font-weight: var(--weight-semibold);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    main {
+      padding-block: var(--space-6);
+    }
+    .bottom-bar {
+      display: none;
+    }
+  }
+</style>

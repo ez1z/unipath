@@ -1,0 +1,10 @@
+/*
+ * Onest (the Google Fonts family), self-hosted so pages make no third-party requests.
+ * Each face carries a unicode-range, so the browser downloads only the subsets a page
+ * actually renders (Latin + Latin Extended for Turkmen, Cyrillic for Russian), and only
+ * the weights it uses. Every face uses font-display: swap.
+ */
+@import '@fontsource/onest/400.css';
+@import '@fontsource/onest/500.css';
+@import '@fontsource/onest/600.css';
+@import '@fontsource/onest/700.css';

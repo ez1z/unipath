@@ -1,0 +1,81 @@
+---
+import { LANGS, LANG_NAMES, getTranslations, localizePath, type Lang } from '../i18n';
+
+/**
+ * Plain links to the same page in each language, so it works without JavaScript.
+ * With JavaScript, choosing a language also saves it in a cookie, and `/` then
+ * opens that language.
+ */
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = getTranslations(lang);
+const { pathname, search } = Astro.url;
+---
+
+<nav class="lang-switch" aria-label={t('lang.label')}>
+  <ul>
+    {LANGS.map((code) => (
+      <li>
+        <a
+          href={`${localizePath(pathname, code)}${search}`}
+          hreflang={code}
+          lang={code}
+          data-set-lang={code}
+          aria-current={code === lang ? 'true' : undefined}
+        >
+          {code.toUpperCase()}
+          <span class="visually-hidden">{` – ${LANG_NAMES[code]}`}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  import { LANG_COOKIE, isLang } from '../i18n/config';
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const link = target.closest<HTMLAnchorElement>('a[data-set-lang]');
+    const lang = link?.dataset['setLang'];
+    if (!isLang(lang)) return;
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${LANG_COOKIE}=${lang}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+  });
+</script>
+
+<style>
+  ul {
+    display: flex;
+    gap: var(--space-1);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  a {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+    padding-inline: var(--space-2);
+    border-radius: var(--radius-chip);
+    color: var(--ink-muted);
+    font-size: var(--text-label);
+    line-height: var(--leading-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--ink);
+  }
+  a[aria-current='true'] {
+    background: var(--brand-soft);
+    color: var(--ink);
+  }
+</style>

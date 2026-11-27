@@ -1,0 +1,41 @@
+---
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import { LANGS, DEFAULT_LANG, getTranslations, localizePath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string | undefined;
+}
+
+const { lang, title, description } = Astro.props;
+const t = getTranslations(lang);
+const { pathname, search, origin } = Astro.url;
+const urlFor = (path: string) => new URL(`${path}${search}`, origin).href;
+---
+
+<!doctype html>
+<html lang={lang} dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description ?? t('meta.description')} />
+    <link rel="canonical" href={urlFor(pathname)} />
+    {LANGS.map((code) => (
+      <link rel="alternate" hreflang={code} href={urlFor(localizePath(pathname, code))} />
+    ))}
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={urlFor(localizePath(pathname, DEFAULT_LANG))}
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

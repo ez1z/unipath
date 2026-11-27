@@ -1,0 +1,47 @@
+---
+/**
+ * Clavis logo: pointed iwan arch with a coral doorway on a threshold line,
+ * plus the lowercase "clavis" wordmark. Colours come from tokens: the arch turns
+ * cream in dark theme, the doorway never changes.
+ */
+interface Props {
+  /** Hide the wordmark and show only the mark. */
+  markOnly?: boolean;
+}
+const { markOnly = false } = Astro.props;
+---
+
+<span class="logo">
+  <svg class="mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true" focusable="false">
+    <path class="arch" d="M10 52V32Q10 15 32 6Q54 15 54 32V52z"></path>
+    <path class="door" d="M19 52V33Q19 21 32 14Q45 21 45 33V52z"></path>
+    <rect class="arch" x="6" y="52" width="52" height="4" rx="2"></rect>
+  </svg>
+  {!markOnly && <span class="wordmark">clavis</span>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--ink);
+  }
+  .mark {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+  }
+  .arch {
+    fill: var(--logo-arch);
+  }
+  .door {
+    fill: var(--logo-door);
+  }
+  .wordmark {
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.02em;
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { getTranslations, isLang } from '../../i18n';
+
+// Home reads the database from M2 on, so it renders on the server.
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) {
+  return new Response(null, { status: 404 });
+}
+const t = getTranslations(lang);
+---
+
+<AppShell lang={lang} title={t('home.title')}>
+  <section class="hero">
+    <h1 class="headline">{t('home.headline')}</h1>
+  </section>
+</AppShell>
+
+<style>
+  .hero {
+    padding-block: var(--space-5);
+  }
+  .headline {
+    max-width: 22ch;
+    font-size: var(--text-h1);
+    line-height: var(--leading-h1);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  @media (min-width: 1024px) {
+    .headline {
+      font-size: var(--text-display);
+      line-height: var(--leading-display);
+      letter-spacing: -0.02em;
+    }
+  }
+</style>

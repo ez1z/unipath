@@ -1,0 +1,108 @@
+/*
+ * Clavis design tokens. The only place raw colour values may appear.
+ * Light is the default. Dark applies with [data-theme="dark"], or with the
+ * system setting when no theme is chosen ([data-theme="light"] opts out).
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Colour: light */
+  --surface: #faf3e3;
+  --surface-raised: #ffffff;
+  --ink: #16261d;
+  --ink-muted: #4a5a50;
+  --brand: #234f3b;
+  --on-brand: #faf3e3;
+  --brand-soft: #e3eddd;
+  --accent: #e4775a;
+  --on-accent: #16261d;
+  --border: #dcd4c2;
+  --danger: #b3261e;
+
+  /* Logo: arch swaps to cream on dark; the doorway is never recoloured. */
+  --logo-arch: #234f3b;
+  --logo-door: #e4775a;
+
+  /* Type */
+  --font-sans:
+    'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --text-display: 3rem; /* 48 */
+  --leading-display: 3.25rem; /* 52 */
+  --text-h1: 2rem; /* 32 */
+  --leading-h1: 2.375rem; /* 38 */
+  --text-h2: 1.5rem; /* 24 */
+  --leading-h2: 1.875rem; /* 30 */
+  --text-title: 1.125rem; /* 18 */
+  --leading-title: 1.5rem; /* 24 */
+  --text-body: 1rem; /* 16 */
+  --leading-body: 1.5rem; /* 24 */
+  --text-small: 0.875rem; /* 14 */
+  --leading-small: 1.25rem; /* 20 */
+  --text-label: 0.8125rem; /* 13 */
+  --leading-label: 1rem; /* 16 */
+
+  /* Space: 4 px base */
+  --space-1: 0.25rem; /* 4 */
+  --space-2: 0.5rem; /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-5: 1.5rem; /* 24 */
+  --space-6: 2rem; /* 32 */
+
+  /* Shape */
+  --radius-input: 8px;
+  --radius-chip: 8px;
+  --radius-button: 14px;
+  --radius-card: 14px;
+  --radius-sheet: 20px;
+  --radius-card-large: 20px;
+  --radius-badge: 999px;
+
+  /* Sizing and layout */
+  --touch-target: 2.75rem; /* 44 */
+  --focus-ring-width: 3px;
+  --content-max: 1200px;
+  --page-pad: var(--space-4);
+  --page-pad-desktop: var(--space-6);
+  --bottom-bar-height: 4rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --surface: #111b16;
+    --surface-raised: #1a2721;
+    --ink: #f3ecdd;
+    --ink-muted: #b4bfb7;
+    --brand: #7fbf98;
+    --on-brand: #0f1a14;
+    --brand-soft: #20382b;
+    --accent: #f0906f;
+    --on-accent: #16261d;
+    --border: #2e3d35;
+    --danger: #f2b8b5;
+    --logo-arch: #faf3e3;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --surface: #111b16;
+  --surface-raised: #1a2721;
+  --ink: #f3ecdd;
+  --ink-muted: #b4bfb7;
+  --brand: #7fbf98;
+  --on-brand: #0f1a14;
+  --brand-soft: #20382b;
+  --accent: #f0906f;
+  --on-accent: #16261d;
+  --border: #2e3d35;
+  --danger: #f2b8b5;
+  --logo-arch: #faf3e3;
+}
