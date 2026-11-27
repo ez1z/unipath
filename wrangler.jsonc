@@ -20,14 +20,35 @@
       "bucket_name": "clavis-files",
     },
   ],
-  // Per-IP limit on "Report a mistake" (5 a minute). Works locally in wrangler / astro preview.
+  // Rate limits (work locally in wrangler / astro preview).
+  // REPORT_LIMITER: "Report a mistake", per IP. AUTH_LIMITER: sign-in code requests and
+  // sign-in attempts, per IP. WRITE_LIMITER: account writes (save, profile), per user.
   "ratelimits": [
     {
       "name": "REPORT_LIMITER",
       "namespace_id": "1001",
       "simple": { "limit": 5, "period": 60 },
     },
+    {
+      "name": "AUTH_LIMITER",
+      "namespace_id": "1002",
+      "simple": { "limit": 10, "period": 60 },
+    },
+    {
+      "name": "WRITE_LIMITER",
+      "namespace_id": "1003",
+      "simple": { "limit": 60, "period": 60 },
+    },
   ],
+  // Local defaults. Secrets (BETTER_AUTH_SECRET, TELEGRAM_BOT_TOKEN, GOOGLE_CLIENT_ID,
+  // GOOGLE_CLIENT_SECRET) live in .dev.vars locally and in Wrangler secrets in production.
+  // DEV_MAILBOX lets local tests read sign-in codes; it only works on localhost.
+  "vars": {
+    "SITE_URL": "http://localhost:4321",
+    "TELEGRAM_BOT_USERNAME": "clavis_dev_bot",
+    "EMAIL_FROM": "no-reply@clavis.example",
+    "DEV_MAILBOX": "1",
+  },
   "kv_namespaces": [
     {
       "binding": "KV",

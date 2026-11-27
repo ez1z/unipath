@@ -27,6 +27,8 @@ jobs:
           node-version: 24.22.3
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Fake local values only (stand-in Telegram token, dev secret); no real service is used.
+      - run: cp .dev.vars.example .dev.vars
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
@@ -52,6 +54,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      # Fake local values only (stand-in Telegram token, dev secret); no real service is used.
+      - run: cp .dev.vars.example .dev.vars
       # The pages read the local D1 (.wrangler/state on the runner): load the demo seed.
       - run: pnpm db:migrate && pnpm db:seed
       - run: pnpm e2e

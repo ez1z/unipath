@@ -1,0 +1,8 @@
+# Local-only secrets for `pnpm dev` / `pnpm preview`. Copy to .dev.vars (gitignored).
+# These are fake values for local stand-ins: nothing here reaches a real service.
+BETTER_AUTH_SECRET=dev-only-secret-change-me-0123456789abcdef
+# A made-up bot token: tests sign Telegram login data with it. Not a real bot.
+TELEGRAM_BOT_TOKEN=123456:dev-only-fake-telegram-token
+# Leave empty to hide "Continue with Google" locally. Real values come from Eziz.
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
