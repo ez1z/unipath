@@ -3,6 +3,7 @@
   "include": [".astro/types.d.ts", "worker-configuration.d.ts", "**/*"],
   "exclude": ["dist", ".wrangler", "node_modules", "test-results", "playwright-report"],
   "compilerOptions": {
+    "erasableSyntaxOnly": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "types": ["node"]
