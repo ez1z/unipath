@@ -2,8 +2,15 @@
 import ScholarshipCard from '../../components/ScholarshipCard.astro';
 import SearchBox from '../../components/SearchBox.astro';
 import Text from '../../components/Text.astro';
-import { getTranslations, isLang } from '../../i18n';
+import { getTranslations, isLang, type MessageKey } from '../../i18n';
+import QuickQuestions from '../../islands/QuickQuestions';
 import AppShell from '../../layouts/AppShell.astro';
+import { FIELDS } from '../../lib/db/values';
+import { formatUsd } from '../../lib/format';
+import { BUDGETS } from '../../lib/matches';
+// The matches arrive as HTML from /[lang]/matches; importing the list here puts
+// its card styles on Home.
+import '../../components/MatchesList.astro';
 import { getCountries, searchScholarships } from '../../lib/db/catalog';
 import { getDb, today } from '../../lib/server';
 import { parseScholarshipFilters } from '../../lib/search/filters';
@@ -27,6 +34,10 @@ const [countries, deadlines] = await Promise.all([
   }),
 ]);
 const popular = countries.filter((c) => c.popularRank !== null).slice(0, 4);
+const quizCountries = countries
+  .filter((c) => c.popularRank !== null)
+  .slice(0, 8)
+  .map((c) => ({ value: c.code, label: c.name.text }));
 ---
 
 <AppShell lang={lang} title={t('home.title')}>
@@ -50,6 +61,41 @@ const popular = countries.filter((c) => c.popularRank !== null).slice(0, 4);
         </a>
       </li>
     </ul>
+  </section>
+
+  <section class="block" aria-labelledby="matches-title">
+    <h2 id="matches-title" class="section-title">
+      {t('quiz.title')}
+    </h2>
+    <QuickQuestions
+      client:visible
+      lang={lang}
+      searchPath={`/${lang}/search`}
+      matchesPath={`/${lang}/matches`}
+      countries={quizCountries}
+      fields={FIELDS.map((f) => ({ value: f, label: t(`field.${f}` as MessageKey) }))}
+      budgets={BUDGETS.map((b) => ({
+        value: String(b),
+        label: t('quiz.budget.upTo', { amount: formatUsd(lang, b) }),
+      }))}
+      tests={['IELTS', 'TOEFL', 'Duolingo'].map((name) => ({ value: name, label: name }))}
+      strings={{
+        intro: t('quiz.intro'),
+        start: t('quiz.start'),
+        edit: t('quiz.edit'),
+        countries: t('quiz.countries'),
+        field: t('quiz.field'),
+        anyField: t('quiz.anyField'),
+        budget: t('quiz.budget'),
+        anyBudget: t('quiz.budget.any'),
+        english: t('quiz.english'),
+        englishNone: t('quiz.english.none'),
+        score: t('quiz.score'),
+        show: t('quiz.show'),
+        loading: t('quiz.loading'),
+        error: t('quiz.error'),
+      }}
+    />
   </section>
 
   <section id="countries" class="block" aria-labelledby="countries-title">

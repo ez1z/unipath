@@ -1,0 +1,33 @@
+---
+/**
+ * HTML fragment for "Matches for you" (no layout): the Home island fetches it
+ * with the quick-question answers in the query. Cached like search results,
+ * keyed by the canonical query (lib/cache.ts).
+ */
+import MatchesList from '../../components/MatchesList.astro';
+import { isLang } from '../../i18n';
+import { getUsdTmtRate } from '../../lib/db/catalog';
+import { findMatches, parseMatchQuery, searchQueryFor } from '../../lib/matches';
+import { getDb, today } from '../../lib/server';
+
+export const prerender = false;
+export const partial = true;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const db = getDb();
+const query = parseMatchQuery(Astro.url.searchParams);
+const [matches, rate] = await Promise.all([
+  findMatches(db, query, { lang, today: today() }),
+  getUsdTmtRate(db),
+]);
+Astro.response.headers.set('X-Robots-Tag', 'noindex');
+---
+
+<MatchesList
+  lang={lang}
+  programs={matches.items}
+  total={matches.total}
+  rate={rate}
+  searchQuery={searchQueryFor(query).toString()}
+/>

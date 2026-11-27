@@ -616,6 +616,11 @@ export interface SearchOptions {
   pageSize?: number;
 }
 
+export interface ProgramSearchOptions extends SearchOptions {
+  /** One more condition on `programs` (Matches for you: the English score). */
+  where?: SQL | undefined;
+}
+
 /** Matches the full-text index; rowid is the record's id. */
 function textMatch(
   table: 'program_search' | 'university_search',
@@ -631,7 +636,13 @@ function textRank(table: 'program_search' | 'university_search', id: AnySQLiteCo
 }
 
 /** The program search as a query builder (not yet run), so tests can read its plan. */
-export function programSearchQuery(db: Db, f: ProgramFilters, today: string, pageSize = PAGE_SIZE) {
+export function programSearchQuery(
+  db: Db,
+  f: ProgramFilters,
+  today: string,
+  pageSize = PAGE_SIZE,
+  extra?: SQL,
+) {
   const fts = toFtsQuery(f.q);
   const country = sql`coalesce(${universities.countryCode}, ${pathwayColleges.countryCode})`;
   const shortestPre = db
@@ -663,6 +674,7 @@ export function programSearchQuery(db: Db, f: ProgramFilters, today: string, pag
     pathCondition(db, f),
     f.approvedOnly ? approvedCondition(db) : undefined,
     f.hasScholarships ? scholarshipCondition(db, today) : undefined,
+    extra,
   );
 
   const ranking = rankingSql(universities);
@@ -700,9 +712,9 @@ export function programSearchQuery(db: Db, f: ProgramFilters, today: string, pag
 export async function searchPrograms(
   db: Db,
   f: ProgramFilters,
-  { lang, today, pageSize = PAGE_SIZE }: SearchOptions,
+  { lang, today, pageSize = PAGE_SIZE, where }: ProgramSearchOptions,
 ): Promise<SearchPage<ProgramCard>> {
-  const rows = await programSearchQuery(db, f, today, pageSize);
+  const rows = await programSearchQuery(db, f, today, pageSize, where);
   const texts = await loadTexts(db, lang, textRequest(rows), ['name']);
   return {
     items: rows.map((row) => ({

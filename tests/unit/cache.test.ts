@@ -35,9 +35,19 @@ describe('cachePolicy', () => {
       '/en/compare?ids=101',
       '/en/report?type=program&id=101',
       '/en/my',
+      '/en/my/saved',
+      '/en/my/profile',
+      '/en/sign-in',
+      '/en/sign-in/telegram',
+      '/en/auth/continue?next=/en',
+      '/en/account-deleted',
       '/en/share/abc',
       '/admin',
       '/api/report',
+      '/api/save?type=program&id=101',
+      '/api/me',
+      '/api/auth/get-session',
+      '/api/dev/mailbox?to=a@b.c',
       '/xx/search',
       '/',
     ]) {
@@ -52,6 +62,14 @@ describe('cachePolicy', () => {
     expect(a?.query).not.toContain('utm');
     expect(policy('/en/programs/x?ref=1')?.query).toBe('');
     expect(policy('/tk?anything=1')?.query).toBe('');
+  });
+
+  test('Matches for you is cached per canonical set of answers', () => {
+    const a = policy('/en/matches?country=TR&field=law&ielts=6&utm_source=x');
+    const b = policy('/en/matches?ielts=6&field=law&country=TR');
+    expect(a?.ttl).toBe(TTL.search);
+    expect(a?.query).toBe(b?.query);
+    expect(a?.query).not.toContain('utm');
   });
 
   test('only university pages keep their tab', () => {

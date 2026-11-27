@@ -6,6 +6,7 @@
  * admin, Compare and form pages are never cached.
  */
 import { isLang, splitLangPath } from '../i18n/config.ts';
+import { parseMatchQuery, serializeMatchQuery } from './matches.ts';
 import {
   parseProgramFilters,
   parseScholarshipFilters,
@@ -80,6 +81,9 @@ export function cachePolicy(url: URL): CachePolicy | null {
 
   if (rest === '') return { ttl: TTL.home, query: '' };
   if (rest === '/search') return { ttl: TTL.search, query: canonicalSearchQuery(params) };
+  if (rest === '/matches') {
+    return { ttl: TTL.search, query: serializeMatchQuery(parseMatchQuery(params)).toString() };
+  }
   if (rest === '/scholarships') {
     return {
       ttl: TTL.search,

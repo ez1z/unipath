@@ -1,0 +1,70 @@
+---
+/**
+ * The program cards of "Matches for you". Rendered by the /[lang]/matches
+ * partial; Home imports it too, so the cards' styles are already on Home
+ * when the island drops the partial in.
+ */
+import { getTranslations, type Lang } from '../i18n';
+import type { ProgramCard as Card } from '../lib/db/queries';
+import type { UsdTmtRate } from '../lib/format';
+import ProgramCard from './ProgramCard.astro';
+
+interface Props {
+  lang: Lang;
+  programs: Card[];
+  total: number;
+  rate: UsdTmtRate | null;
+  /** Query string for /search with the same answers. */
+  searchQuery: string;
+}
+const { lang, programs, total, rate, searchQuery } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<div class="matches-list" data-total={total}>
+  {programs.length === 0 ? (
+    <p class="text-muted">{t('quiz.none')}</p>
+  ) : (
+    <>
+      <ul class="matches-grid">
+        {programs.map((program) => (
+          <li>
+            <ProgramCard lang={lang} program={program} rate={rate} />
+          </li>
+        ))}
+      </ul>
+      {total > programs.length && (
+        <a class="button button-secondary see-all" href={`/${lang}/search?${searchQuery}`}>
+          {t('quiz.seeAll')}
+        </a>
+      )}
+    </>
+  )}
+</div>
+
+<style>
+  .matches-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+  .matches-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .matches-grid > li {
+    display: grid;
+  }
+  @media (min-width: 1024px) {
+    .matches-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .see-all {
+    justify-self: start;
+  }
+</style>

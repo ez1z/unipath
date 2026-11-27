@@ -18,6 +18,10 @@ import {
   parseScholarshipFilters,
   parseUniversityFilters,
 } from '../../../src/lib/search/filters.ts';
+import { savedCheckQuery, savedListQuery } from '../../../src/lib/account.ts';
+import { matchFilters, parseMatchQuery } from '../../../src/lib/matches.ts';
+import { sql } from 'drizzle-orm';
+import { programs } from '../../../src/lib/db/schema.ts';
 import { createTestDb, TODAY, type TestDb } from './test-db.ts';
 
 let t: TestDb;
@@ -108,6 +112,26 @@ describe('query plans use indexes', () => {
 
   test('study languages for the Language filter', async () => {
     expect(await fullScans(studyLanguagesQuery(t.db))).toEqual([]);
+  });
+
+  test('Matches for you (with the IELTS condition)', async () => {
+    const f = matchFilters(parseMatchQuery(new URLSearchParams('country=TR&field=law&ielts=6')));
+    const required = sql`json_extract(${programs.requirements}, '$.ieltsMin')`;
+    const query = programSearchQuery(
+      t.db,
+      f,
+      TODAY,
+      6,
+      sql`(${required} is null or ${required} <= 6)`,
+    );
+    expect(await fullScans(query)).toEqual([]);
+  });
+
+  test("a student's saved items", async () => {
+    expect(await fullScans(savedListQuery(t.db, 'user-1'))).toEqual([]);
+    expect(await fullScans(savedCheckQuery(t.db, 'user-1', { type: 'program', id: 101 }))).toEqual(
+      [],
+    );
   });
 
   test('translations lookup', async () => {
