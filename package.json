@@ -23,15 +23,14 @@
     "db:migrate": "wrangler d1 migrations apply DB --local",
     "cf-typegen": "wrangler types",
     "db:generate": "drizzle-kit generate",
-    "db:seed": "node scripts/seed.ts"
+    "db:seed": "node scripts/seed.ts",
+    "lighthouse": "node scripts/lighthouse.ts"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.65.1",
     "@types/node": "^24.19.4",
-    "@types/react": "19.3.3",
-    "@types/react-dom": "19.3.0",
     "drizzle-kit": "0.31.11",
     "eslint": "10.15.0",
     "eslint-config-prettier": "10.1.8",
@@ -39,6 +38,7 @@
     "eslint-plugin-jsx-a11y-x": "0.2.0",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.14.0",
+    "lighthouse": "13.6.0",
     "prettier": "3.10.1",
     "prettier-plugin-astro": "1.1.2",
     "typescript": "6.0.3",
@@ -48,12 +48,11 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.4.9",
-    "@astrojs/react": "7.1.9",
+    "@astrojs/preact": "6.1.6",
     "@fontsource/onest": "5.3.1",
     "astro": "7.4.13",
     "drizzle-orm": "0.45.4",
-    "react": "19.3.1",
-    "react-dom": "19.3.1",
+    "preact": "11.2.0",
     "zod": "4.6.7"
   }
 }
