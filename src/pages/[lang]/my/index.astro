@@ -1,13 +1,25 @@
 ---
+/**
+ * My Clav › Tracker: stage filter chips with counts, the next deadline, the
+ * board (columns on desktop, grouped list on phone) and Share with parents.
+ */
 import EmptyState from '../../../components/EmptyState.astro';
 import { getTranslations, isLang } from '../../../i18n';
+import TrackerBoard from '../../../islands/TrackerBoard';
 import MyLayout from '../../../layouts/MyLayout.astro';
 import { ensureProfile } from '../../../lib/account';
 import { getSignedIn } from '../../../lib/auth/server';
 import { signInPath } from '../../../lib/auth/urls';
-import { getDb } from '../../../lib/server';
+import { getDb, today } from '../../../lib/server';
+import { BOARD_COLUMNS, columnOf, listTracker, nextDeadline } from '../../../lib/tracker';
+import {
+  cardDeadline,
+  columnLabel,
+  itemDeadlineText,
+  progressText,
+  stageLabels,
+} from '../../../lib/tracker-view';
 
-// My Clav › Tracker. The board and list arrive in M4.
 export const prerender = false;
 
 const { lang } = Astro.params;
@@ -16,13 +28,139 @@ const t = getTranslations(lang);
 Astro.response.headers.set('Cache-Control', 'private, no-store');
 const signedIn = await getSignedIn(Astro.request.headers, Astro.response.headers);
 if (!signedIn) return Astro.redirect(signInPath(lang, { next: Astro.url.pathname }), 303);
-await ensureProfile(getDb(), signedIn.user.id, lang);
+const db = getDb();
+await ensureProfile(db, signedIn.user.id, lang);
+
+const now = today();
+const all = await listTracker(db, signedIn.user.id, lang);
+const filter = BOARD_COLUMNS.find((c) => c.key === Astro.url.searchParams.get('stage'))?.key;
+const shown = filter ? all.filter((i) => columnOf(i.stage) === filter) : all;
+const next = nextDeadline(all, now);
+const here = filter ? `${Astro.url.pathname}?stage=${filter}` : Astro.url.pathname;
+const error = Astro.url.searchParams.get('error');
+const countOf = (key: string) => all.filter((i) => columnOf(i.stage) === key).length;
 ---
 
-<MyLayout lang={lang} tab="">
-  <EmptyState
-    title={t('my.tracker.empty.title')}
-    body={t('my.tracker.empty.body')}
-    action={{ href: `/${lang}/search`, label: t('my.tracker.empty.action') }}
-  />
+<MyLayout lang={lang} tab="" wide>
+  {all.length === 0 ? (
+    <EmptyState
+      title={t('my.tracker.empty.title')}
+      body={t('my.tracker.empty.body')}
+      action={{ href: `/${lang}/search`, label: t('my.tracker.empty.action') }}
+    />
+  ) : (
+    <>
+      <div class="tracker-head">
+        <a class="button button-secondary" href={`/${lang}/my/share`}>
+          {t('share.cta')}
+        </a>
+        <a class="button button-quiet" href={`/${lang}/search`}>
+          {t('tracker.add')}
+        </a>
+      </div>
+      {error && (
+        <p class="notice" role="alert">
+          {error === 'rate' ? t('tracker.error.rate') : t('tracker.error.generic')}
+        </p>
+      )}
+      {next && (
+        <a class="card next-deadline" href={`/${lang}/my/tracker/${next.id}`}>
+          <span class="text-label text-muted">{t('tracker.next')}</span>
+          <span class="next-name">{next.name.text}</span>
+          <span>{itemDeadlineText(t, lang, next, now)}</span>
+          <progress
+            class="progress-bar"
+            max={Math.max(next.total, 1)}
+            value={next.done}
+            aria-label={t('tracker.progressLabel')}
+          ></progress>
+          <span class="text-small text-muted">{progressText(t, next)}</span>
+        </a>
+      )}
+      <nav aria-label={t('tracker.filter')}>
+        <ul class="chips">
+          <li>
+            <a class="chip" href={Astro.url.pathname} aria-current={filter ? undefined : 'true'}>
+              {t('tracker.all')} <span>{all.length}</span>
+            </a>
+          </li>
+          {BOARD_COLUMNS.map((c) => (
+            <li>
+              <a
+                class="chip"
+                href={`${Astro.url.pathname}?stage=${c.key}`}
+                aria-current={filter === c.key ? 'true' : undefined}
+              >
+                {columnLabel(t, c.key)} <span>{countOf(c.key)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <TrackerBoard
+        client:visible
+        lang={lang}
+        back={here}
+        items={shown.map((item) => ({
+          id: item.id,
+          name: item.name.text,
+          nameNote: item.name.fallback ? t('common.notTranslated') : null,
+          provider: item.provider?.text ?? null,
+          stage: item.stage,
+          href: `/${lang}/my/tracker/${item.id}`,
+          deadline: cardDeadline(t, lang, item, now),
+          progress: progressText(t, item),
+          done: item.done,
+          total: item.total,
+        }))}
+        columns={BOARD_COLUMNS.filter((c) => !filter || c.key === filter).map((c) => ({
+          key: c.key,
+          label: columnLabel(t, c.key),
+          stages: [...c.stages],
+          empty: t('board.empty'),
+        }))}
+        stageLabels={stageLabels(t)}
+        labels={{
+          change: t('tracker.change'),
+          saved: t('tracker.saved'),
+          error: t('tracker.error.generic'),
+          moveTo: t('tracker.moveTo', { name: '{name}' }),
+          dropHere: t('board.dropHere'),
+          progress: t('tracker.progressLabel'),
+        }}
+      />
+    </>
+  )}
 </MyLayout>
+
+<style>
+  .tracker-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .next-deadline {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 32rem;
+    padding: var(--space-4) var(--space-5);
+    color: var(--ink);
+    text-decoration: none;
+    box-shadow: inset 0 0 0 2px var(--brand);
+  }
+  .next-name {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    font-weight: var(--weight-semibold);
+    color: var(--brand);
+    text-decoration: underline;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -1,0 +1,43 @@
+---
+/**
+ * "Track this" for a program, pathway or scholarship. A plain form, the same
+ * for every visitor (so it can sit on cached pages): signed in, it opens the
+ * new (or already tracked) item; signed out, it goes to sign-in and tracking
+ * finishes right after.
+ */
+import { getTranslations, type Lang } from '../i18n';
+import type { TrackType } from '../lib/tracker';
+
+interface Props {
+  lang: Lang;
+  type: TrackType;
+  id: number;
+  /** "Track this path" on a program's paths. */
+  path?: boolean;
+  /** Names what is tracked, for screen readers when several buttons share a page. */
+  label?: string;
+}
+const { lang, type, id, path = false, label } = Astro.props;
+const t = getTranslations(lang);
+const text = path ? t('track.path') : t('track.this');
+---
+
+<form method="post" action="/api/tracker/track" class="track-form">
+  <input type="hidden" name="type" value={type} />
+  <input type="hidden" name="id" value={String(id)} />
+  <input type="hidden" name="lang" value={lang} />
+  <input type="hidden" name="back" value={Astro.url.pathname} />
+  <button type="submit" class="button" aria-label={label ? `${text}: ${label}` : undefined}>
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+      <path
+        d="M5 4h14v16H5zM9 9l2 2 4-4M9 15h6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </svg>
+    {text}
+  </button>
+</form>

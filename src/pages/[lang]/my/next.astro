@@ -1,0 +1,40 @@
+---
+/**
+ * HTML fragment for Home's "Next deadline" card (no layout). Home is cached and
+ * the same for everyone, so its NextDeadline island fetches this private part.
+ * 204 when signed out or nothing is due.
+ */
+import { getTranslations, isLang } from '../../../i18n';
+import { getSignedIn } from '../../../lib/auth/server';
+import { getDb, today } from '../../../lib/server';
+import { listTracker, nextDeadline } from '../../../lib/tracker';
+import { itemDeadlineText, progressText } from '../../../lib/tracker-view';
+
+export const prerender = false;
+export const partial = true;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' };
+const signedIn = await getSignedIn(Astro.request.headers);
+if (!signedIn) return new Response(null, { status: 204, headers });
+const now = today();
+const next = nextDeadline(await listTracker(getDb(), signedIn.user.id, lang), now);
+if (!next) return new Response(null, { status: 204, headers });
+for (const [key, value] of Object.entries(headers)) Astro.response.headers.set(key, value);
+---
+
+<a class="card next-card" href={`/${lang}/my/tracker/${next.id}`}>
+  <span class="text-label text-muted">{t('tracker.next')}</span>
+  <span class="next-card-name">{next.name.text}</span>
+  {next.provider && <span class="text-small text-muted">{next.provider.text}</span>}
+  <span>{itemDeadlineText(t, lang, next, now)}</span>
+  <progress
+    class="progress-bar"
+    max={Math.max(next.total, 1)}
+    value={next.done}
+    aria-label={t('tracker.progressLabel')}
+  ></progress>
+  <span class="text-small text-muted">{progressText(t, next)}</span>
+</a>

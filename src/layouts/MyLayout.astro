@@ -11,8 +11,11 @@ import AppShell from './AppShell.astro';
 interface Props {
   lang: Lang;
   tab: '' | 'saved' | 'profile';
+  /** The tracker board needs the full width on desktop. */
+  wide?: boolean;
+  title?: string | undefined;
 }
-const { lang, tab } = Astro.props;
+const { lang, tab, wide = false, title } = Astro.props;
 const t = getTranslations(lang);
 const tabs = [
   { href: myPath(lang), label: t('my.tab.tracker'), current: tab === '' },
@@ -21,8 +24,8 @@ const tabs = [
 ];
 ---
 
-<AppShell lang={lang} title={t('my.metaTitle')} noindex signedIn>
-  <div class="my">
+<AppShell lang={lang} title={title ?? t('my.metaTitle')} noindex signedIn>
+  <div class:list={['my', { wide }]}>
     <h1 class="page-title">{t('my.title')}</h1>
     <SegmentedTabs label={t('my.tabs')} items={tabs} />
     <slot />
@@ -35,5 +38,8 @@ const tabs = [
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-5);
     max-width: 48rem;
+  }
+  .my.wide {
+    max-width: none;
   }
 </style>

@@ -3,6 +3,7 @@ import ScholarshipCard from '../../components/ScholarshipCard.astro';
 import SearchBox from '../../components/SearchBox.astro';
 import Text from '../../components/Text.astro';
 import { getTranslations, isLang, type MessageKey } from '../../i18n';
+import NextDeadline from '../../islands/NextDeadline';
 import QuickQuestions from '../../islands/QuickQuestions';
 import AppShell from '../../layouts/AppShell.astro';
 import { FIELDS } from '../../lib/db/values';
@@ -41,27 +42,32 @@ const quizCountries = countries
 ---
 
 <AppShell lang={lang} title={t('home.title')}>
-  <section class="hero">
-    <h1 class="headline">{t('home.headline')}</h1>
-    <SearchBox lang={lang} id="home-q" />
-    <ul class="chips" aria-label={t('home.chips')}>
-      <li>
-        <a class="chip" href={`/${lang}/search?approved=1`}>
-          {t('home.chip.approved')}
-        </a>
-      </li>
-      <li>
-        <a class="chip" href={`/${lang}/scholarships?coverage=full`}>
-          {t('home.chip.funded')}
-        </a>
-      </li>
-      <li>
-        <a class="chip" href="#countries">
-          {t('home.chip.countries')}
-        </a>
-      </li>
-    </ul>
-  </section>
+  <div class="hero-band">
+    <section class="hero">
+      <h1 class="headline">{t('home.headline')}</h1>
+      <SearchBox lang={lang} id="home-q" />
+      <ul class="chips" aria-label={t('home.chips')}>
+        <li>
+          <a class="chip" href={`/${lang}/search?approved=1`}>
+            {t('home.chip.approved')}
+          </a>
+        </li>
+        <li>
+          <a class="chip" href={`/${lang}/scholarships?coverage=full`}>
+            {t('home.chip.funded')}
+          </a>
+        </li>
+        <li>
+          <a class="chip" href="#countries">
+            {t('home.chip.countries')}
+          </a>
+        </li>
+      </ul>
+    </section>
+    <div class="hero-side">
+      <NextDeadline client:load path={`/${lang}/my/next`} />
+    </div>
+  </div>
 
   <section class="block" aria-labelledby="matches-title">
     <h2 id="matches-title" class="section-title">
@@ -236,10 +242,23 @@ const quizCountries = countries
     color: var(--ink-muted);
     font-weight: var(--weight-medium);
   }
+  .hero-side:has(.next-card) {
+    margin-bottom: var(--space-4);
+  }
   @media (min-width: 1024px) {
     .hero {
       max-width: 44rem;
       padding-block: var(--space-6);
+    }
+    /* Signed in with a deadline: the card sits right of the headline and search. */
+    .hero-band:has(.next-card) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+      align-items: center;
+      gap: var(--space-6);
+    }
+    .hero-side:has(.next-card) {
+      margin-bottom: 0;
     }
     .headline {
       font-size: var(--text-display);

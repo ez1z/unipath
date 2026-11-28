@@ -451,3 +451,152 @@ fieldset.field {
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: var(--space-3);
 }
+
+/* ---------------------------------------------------------------------------
+   Tracker board (island on My Clav › Tracker).
+   --------------------------------------------------------------------------- */
+
+.tracker-board {
+  display: grid;
+  gap: var(--space-5);
+}
+.board-column {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.board-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+}
+.board-count {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-badge);
+  background: var(--brand-soft);
+  font-size: var(--text-small);
+}
+.board-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.board-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+.board-card[draggable='true'] {
+  cursor: grab;
+}
+.board-name {
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+}
+.board-empty {
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--ink-muted);
+}
+.board-progress {
+  display: grid;
+  gap: var(--space-1);
+}
+.board-progress progress,
+.progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  border: 0;
+  border-radius: var(--radius-badge);
+  background: var(--brand-soft);
+  accent-color: var(--brand);
+  overflow: hidden;
+  appearance: none;
+}
+.board-progress progress::-webkit-progress-bar,
+.progress-bar::-webkit-progress-bar {
+  background: var(--brand-soft);
+}
+.board-progress progress::-webkit-progress-value,
+.progress-bar::-webkit-progress-value {
+  background: var(--brand);
+}
+.board-progress progress::-moz-progress-bar,
+.progress-bar::-moz-progress-bar {
+  background: var(--brand);
+}
+.stage-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.stage-select {
+  flex: 1 1 10rem;
+  width: auto;
+}
+.drop-zones {
+  display: grid;
+  gap: var(--space-2);
+}
+.drop-zone {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 2px var(--brand);
+  background: var(--brand-soft);
+  font-weight: var(--weight-semibold);
+}
+.tracker-board[data-dragging] .board-column {
+  border-radius: var(--radius-card);
+  outline: 2px dashed var(--border);
+  outline-offset: var(--space-1);
+}
+@media (min-width: 1024px) {
+  .tracker-board {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+/* Share link (ShareWithParents island). */
+.share-link {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Home's "Next deadline" card (fragment from /[lang]/my/next). */
+.next-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.next-card-name {
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+  font-weight: var(--weight-semibold);
+  color: var(--brand);
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}

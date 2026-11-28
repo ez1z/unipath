@@ -1,0 +1,192 @@
+---
+/**
+ * Read-only parent view of a student's tracker (or one application), opened
+ * from a share link without signing in. Shows stages, deadlines, paths and
+ * checklists; never notes, email or anything else. Never cached, never indexed.
+ */
+import PathSteps from '../../../components/PathSteps.astro';
+import Text from '../../../components/Text.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { formatDate } from '../../../lib/format';
+import { getDb, today } from '../../../lib/server';
+import { getSharedView, shareTokenSchema, taskLabel } from '../../../lib/tracker';
+import { itemDeadlineText, progressText, stageLabel } from '../../../lib/tracker-view';
+
+export const prerender = false;
+
+const { lang, token } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+// The token is the only key: keep it out of the Referer sent to linked pages.
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+
+const parsed = shareTokenSchema.safeParse(token);
+const view = parsed.success ? await getSharedView(getDb(), parsed.data, lang) : null;
+if (!view) Astro.response.status = 404;
+const now = today();
+const title = view?.nickname ? t('shared.titleNamed', { name: view.nickname }) : t('shared.title');
+---
+
+<AppShell lang={lang} title={view ? title : t('shared.gone')} noindex>
+  {!view ? (
+    <section class="card gone">
+      <h1 class="page-title">{t('shared.gone')}</h1>
+      <p>{t('shared.goneBody')}</p>
+      <a class="button" href={`/${lang}/about`}>
+        {t('shared.about')}
+      </a>
+    </section>
+  ) : (
+    <div class="shared">
+      <header class="head">
+        <h1 class="page-title">{title}</h1>
+        <p>{t('shared.intro')}</p>
+        <p class="muted-note">
+          {t('shared.until', { date: formatDate(lang, view.expiresAt.toISOString().slice(0, 10)) })}
+        </p>
+      </header>
+      {view.items.length === 0 ? (
+        <p class="card empty">{t('shared.empty')}</p>
+      ) : (
+        <ul class="items">
+          {view.items.map(({ item, tasks }) => (
+            <li class="card item">
+              <div class="item-head">
+                <span class="badge badge-plain">{stageLabel(t, item.stage)}</span>
+                <h2 class="item-title">
+                  {item.path ? (
+                    <a href={`/${lang}${item.path}`}>
+                      <Text value={item.name} lang={lang} />
+                    </a>
+                  ) : (
+                    <Text value={item.name} lang={lang} />
+                  )}
+                </h2>
+                {item.provider && <p class="text-muted">{item.provider.text}</p>}
+              </div>
+              <p>
+                <span class="text-label text-muted">{t('tracker.deadline')}</span>
+                <br />
+                {itemDeadlineText(t, lang, item, now)}
+              </p>
+              {item.steps.length > 1 && (
+                <PathSteps
+                  lang={lang}
+                  totalYears={item.totalYears}
+                  steps={item.steps.map((s) => ({
+                    level: s.level,
+                    name: s.name,
+                    provider: s.provider,
+                    years: s.years,
+                  }))}
+                />
+              )}
+              <div class="progress">
+                <progress
+                  class="progress-bar"
+                  max={Math.max(item.total, 1)}
+                  value={item.done}
+                  aria-label={t('tracker.progressLabel')}
+                ></progress>
+                <span class="text-small text-muted">{progressText(t, item)}</span>
+              </div>
+              {tasks.length > 0 && (
+                <ul class="tasks" aria-label={t('tracker.checklist')}>
+                  {tasks.map((task) => (
+                    <li class:list={['task', { done: task.done }]}>
+                      <span class="mark" aria-hidden="true">
+                        {task.done ? '✓' : ''}
+                      </span>
+                      <span>{taskLabel(t, lang, task)}</span>
+                      <span class="visually-hidden">
+                        {task.done ? t('shared.taskDone') : t('shared.taskOpen')}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      <p class="muted-note">{t('shared.footer')}</p>
+    </div>
+  )}
+</AppShell>
+
+<style>
+  .shared,
+  .head,
+  .items,
+  .item,
+  .item-head {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .shared {
+    gap: var(--space-5);
+    max-width: 48rem;
+  }
+  .items {
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .item {
+    gap: var(--space-4);
+    padding: var(--space-5);
+  }
+  .item-head {
+    justify-items: start;
+    gap: var(--space-2);
+  }
+  .item-title {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    overflow-wrap: anywhere;
+  }
+  .progress {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .tasks {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .task {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .mark {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--ink-muted);
+    border-radius: var(--radius-input);
+    font-weight: var(--weight-bold);
+  }
+  .task.done .mark {
+    border-color: var(--brand);
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+  .gone,
+  .empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    max-width: 40rem;
+  }
+</style>

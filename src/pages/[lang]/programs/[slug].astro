@@ -10,6 +10,7 @@ import Requirements from '../../../components/Requirements.astro';
 import ScholarshipList from '../../../components/ScholarshipList.astro';
 import SummaryBox from '../../../components/SummaryBox.astro';
 import Save from '../../../components/Save.astro';
+import Track from '../../../components/Track.astro';
 import Text from '../../../components/Text.astro';
 import { getTranslations, isLang } from '../../../i18n';
 import AppShell from '../../../layouts/AppShell.astro';
@@ -116,6 +117,7 @@ const pathLabel = (path: PathOption) => {
               p.applicationDeadline === null ? null : daysBetween(now, p.applicationDeadline),
           })}
         </Fact>
+        {page.paths.length === 0 && <Track slot="actions" lang={lang} type="program" id={p.id} />}
         <Save slot="actions" lang={lang} type="program" id={p.id} />
         {money?.tmt && (
           <p slot="actions" class="muted-note">
@@ -205,6 +207,13 @@ const pathLabel = (path: PathOption) => {
                       : t('path.notGuaranteed')}
                 </p>
                 <div class="path-actions">
+                  <Track
+                    lang={lang}
+                    type={path.kind === 'direct' ? 'program' : 'pathway'}
+                    id={path.kind === 'direct' ? path.bachelor.id : path.pathwayId}
+                    path
+                    label={pathLabel(path)}
+                  />
                   <CompareToggle lang={lang} compareKey={pathKey(path)} />
                 </div>
               </div>
@@ -333,6 +342,9 @@ const pathLabel = (path: PathOption) => {
   }
   .path-actions {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
   }
 </style>

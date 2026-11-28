@@ -1,0 +1,204 @@
+---
+/**
+ * My Clav › Share with parents: create a read-only link (the whole tracker or
+ * one application, in the parent's language, for 90 days), see active links,
+ * stop any of them. Plain forms to /api/tracker/share.
+ */
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import { LANG_NAMES, LANGS } from '../../../i18n/config';
+import ShareWithParents from '../../../islands/ShareWithParents';
+import MyLayout from '../../../layouts/MyLayout.astro';
+import { ensureProfile } from '../../../lib/account';
+import { getSignedIn, siteUrl } from '../../../lib/auth/server';
+import { myPath, signInPath } from '../../../lib/auth/urls';
+import { formatDate } from '../../../lib/format';
+import { getDb } from '../../../lib/server';
+import { listShareLinks, listTracker, SHARE_DAYS, shareTokenSchema } from '../../../lib/tracker';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+const signedIn = await getSignedIn(Astro.request.headers, Astro.response.headers);
+if (!signedIn) return Astro.redirect(signInPath(lang, { next: Astro.url.pathname }), 303);
+const db = getDb();
+const userId = signedIn.user.id;
+await ensureProfile(db, userId, lang);
+
+const [items, links] = await Promise.all([
+  listTracker(db, userId, lang),
+  listShareLinks(db, userId),
+]);
+const nameOf = new Map(items.map((i) => [i.id, i.name.text]));
+const chosen = Number(Astro.url.searchParams.get('item'));
+const preselect = items.some((i) => i.id === chosen) ? chosen : null;
+const created = shareTokenSchema.safeParse(Astro.url.searchParams.get('created'));
+const createdLink = created.success ? links.find((l) => l.token === created.data) : undefined;
+const error = Astro.url.searchParams.get('error');
+const here = Astro.url.pathname;
+const urlOf = (link: { lang: string; token: string }) =>
+  `${siteUrl()}/${link.lang}/share/${link.token}`;
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+const shareLabels = { copy: t('share.copy'), copied: t('share.copied'), share: t('share.send') };
+---
+
+<MyLayout lang={lang} tab="" title={`${t('share.title')} · ${t('my.title')}`}>
+  <Breadcrumb
+    lang={lang}
+    items={[{ href: myPath(lang), label: t('my.tab.tracker') }]}
+    current={t('share.title')}
+  />
+  <section id="share" class="card block" aria-labelledby="share-title">
+    <h2 id="share-title" class="section-title">
+      {t('share.title')}
+    </h2>
+    <p>{t('share.body', { days: SHARE_DAYS })}</p>
+    {error && (
+      <p class="notice" role="alert">
+        {error === 'limit'
+          ? t('share.error.limit')
+          : error === 'rate'
+            ? t('tracker.error.rate')
+            : t('tracker.error.generic')}
+      </p>
+    )}
+    {createdLink && (
+      <div class="notice notice-success created" role="status">
+        <p>{t('share.created')}</p>
+        <ShareWithParents
+          client:visible
+          url={urlOf(createdLink)}
+          label={t('share.linkLabel')}
+          message={t('share.message')}
+          labels={shareLabels}
+        />
+      </div>
+    )}
+    {items.length === 0 ? (
+      <p class="text-muted">{t('share.nothing')}</p>
+    ) : (
+      <form method="post" action="/api/tracker/share" class="stack-form">
+        <input type="hidden" name="action" value="create" />
+        <input type="hidden" name="lang" value={lang} />
+        <input type="hidden" name="back" value={here} />
+        <fieldset class="field">
+          <legend>{t('share.what')}</legend>
+          <label class="choice">
+            <input type="radio" name="scope" value="tracker" checked={preselect === null} />
+            {t('share.scope.tracker')}
+          </label>
+          <label class="choice">
+            <input type="radio" name="scope" value="item" checked={preselect !== null} />
+            {t('share.scope.item')}
+          </label>
+        </fieldset>
+        <div class="field">
+          <label for="share-item">{t('share.whichItem')}</label>
+          <select id="share-item" name="itemId" class="input">
+            {items.map((i) => (
+              <option value={String(i.id)} selected={i.id === preselect}>
+                {i.name.text}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div class="field">
+          <label for="share-lang">{t('share.parentLang')}</label>
+          <select id="share-lang" name="shareLang" class="input">
+            {LANGS.map((l) => (
+              <option value={l} selected={l === lang}>
+                {LANG_NAMES[l]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button type="submit" class="button">
+          {t('share.create')}
+        </button>
+      </form>
+    )}
+  </section>
+
+  <section class="card block" aria-labelledby="links-title">
+    <h2 id="links-title" class="section-title">
+      {t('share.active')}
+    </h2>
+    {links.length === 0 ? (
+      <p class="text-muted">{t('share.none')}</p>
+    ) : (
+      <ul class="links">
+        {links.map((link) => (
+          <li class="link">
+            <p class="link-what">
+              {link.scope === 'tracker'
+                ? t('share.scope.tracker')
+                : (nameOf.get(link.itemId ?? 0) ?? t('share.scope.item'))}
+            </p>
+            <p class="text-small text-muted">
+              {LANG_NAMES[link.lang]} ·{' '}
+              {t('share.expires', { date: formatDate(lang, iso(link.expiresAt)) })}
+            </p>
+            <ShareWithParents
+              client:visible
+              url={urlOf(link)}
+              label={t('share.linkLabel')}
+              message={t('share.message')}
+              labels={shareLabels}
+            />
+            <form method="post" action="/api/tracker/share">
+              <input type="hidden" name="action" value="revoke" />
+              <input type="hidden" name="token" value={link.token} />
+              <input type="hidden" name="lang" value={lang} />
+              <input type="hidden" name="back" value={here} />
+              <button type="submit" class="button button-quiet">
+                {t('share.revoke')}
+              </button>
+            </form>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</MyLayout>
+
+<style>
+  .block {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5);
+  }
+  .stack-form {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+  }
+  .stack-form .field {
+    width: 100%;
+    max-width: 28rem;
+  }
+  .created {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .links {
+    display: grid;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .link {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .link + .link {
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+  .link-what {
+    font-weight: var(--weight-semibold);
+  }
+</style>
