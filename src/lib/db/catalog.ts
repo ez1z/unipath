@@ -220,6 +220,9 @@ export async function getUniversityPage(
     db,
     lang,
     mergeRequests(
+      // The university and its country by name, not only through its programs:
+      // a new university with no published programs yet still has its texts.
+      { university: [u.id], country: [u.countryCode] },
       textRequest(own.map((program) => ({ program, ...self }))),
       textRequest(into),
       textRequest(outOf),
@@ -415,7 +418,12 @@ export async function getCollegePage(
   const texts = await loadTexts(
     db,
     lang,
-    mergeRequests(textRequest(own.map((program) => ({ program, ...self }))), textRequest(outOf)),
+    mergeRequests(
+      // The college and its country by name too: one with no programs yet still has its texts.
+      { college: [c.id], country: [c.countryCode] },
+      textRequest(own.map((program) => ({ program, ...self }))),
+      textRequest(outOf),
+    ),
     ['name'],
   );
 

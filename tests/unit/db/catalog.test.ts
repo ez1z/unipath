@@ -19,6 +19,7 @@ import {
   parseScholarshipFilters,
   parseUniversityFilters,
 } from '../../../src/lib/search/filters.ts';
+import { translations, universities } from '../../../src/lib/db/schema.ts';
 import { createTestDb, TODAY, type TestDb } from './test-db.ts';
 
 let t: TestDb;
@@ -106,6 +107,34 @@ describe('getUniversityPage', () => {
 
   test('an unpublished university is not found', async () => {
     expect(await getUniversityPage(t.db, 'demo-university-9', opts)).toBeNull();
+  });
+
+  // Regression: names were only looked up through the programs, so a new
+  // university (no programs yet) showed its English name on /tk and /ru.
+  test('a university with no programs still gets its own translated name', async () => {
+    await t.db.insert(universities).values({
+      id: 9901,
+      slug: 'no-programs-yet',
+      name: 'No Programs Yet University',
+      countryCode: 'TR',
+      city: 'Ankara',
+      lastChecked: TODAY,
+      sourceUrl: 'https://example.org/no-programs',
+      published: true,
+    });
+    await t.db.insert(translations).values([
+      {
+        entityType: 'university',
+        entityId: '9901',
+        lang: 'tk',
+        field: 'name',
+        text: 'Täze uniwersitet',
+      },
+    ]);
+    const page = await getUniversityPage(t.db, 'no-programs-yet', { ...opts, lang: 'tk' });
+    expect(page?.bachelors).toEqual([]);
+    expect(page?.university.name).toEqual({ text: 'Täze uniwersitet', fallback: false });
+    expect(page?.university.countryName.fallback).toBe(false);
   });
 });
 
