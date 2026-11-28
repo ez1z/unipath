@@ -91,7 +91,7 @@ Everything else in M4 runs locally (`pnpm e2e`); only real email needs a preview
 3. Trigger the cron once instead of waiting for 09:00 Ashgabat:
    Cloudflare dashboard → Workers → clavis → Settings → Triggers → the
    `0 4 * * *` cron → **Run** (or `wrangler dev --test-scheduled` locally and
-   open `/__scheduled?cron=0+4+*+*+*`).
+   open `/cdn-cgi/handler/scheduled?cron=0+4+*+*+*`).
 4. One email arrives, in your Profile language: "7 days left: …", with links to
    the item and to Profile. Run the trigger again: no second email.
 5. Share with parents → create a link → open it in a private window: stages,
