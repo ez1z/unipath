@@ -21,7 +21,7 @@ import {
   parsePendingAction,
   setSaved,
 } from '../../src/lib/account.ts';
-import type { Mail } from '../../src/lib/email.ts';
+import { emailAvailable, type Mail } from '../../src/lib/email.ts';
 import { createTestDb, type TestDb } from './db/test-db.ts';
 
 const SITE = 'http://localhost:4321';
@@ -114,6 +114,17 @@ async function countRows(table: string, column: string, value: string) {
 }
 
 describe('email code', () => {
+  test('is offered only with a sender: production has none, local tests have the mailbox', () => {
+    const production = { binding: false, from: '', devMailbox: false };
+    expect(emailAvailable(production)).toBe(false);
+    expect(emailAvailable({ ...production, from: 'no-reply@clavis.example' })).toBe(false);
+    expect(emailAvailable({ ...production, binding: true })).toBe(false);
+    expect(
+      emailAvailable({ binding: true, from: 'no-reply@clavis.example', devMailbox: false }),
+    ).toBe(true);
+    expect(emailAvailable({ ...production, devMailbox: true })).toBe(true);
+  });
+
   test('a 6-digit code by email, in the page language, signs in for 30 days', async () => {
     outbox.length = 0;
     await post('/email-otp/send-verification-otp', { email: 'aman@mail.test', type: 'sign-in' });

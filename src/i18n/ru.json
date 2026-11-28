@@ -40,6 +40,7 @@
   "signIn.telegram.title": "Войти через Telegram",
   "signIn.telegram.body": "Нажмите кнопку и подтвердите вход в Telegram. Clavis получает ваш Telegram ID, больше ничего не хранится.",
   "signIn.telegram.noScript": "Кнопке Telegram нужен JavaScript. Можно войти по email.",
+  "signIn.telegram.noScriptOnly": "Для кнопки Telegram нужен JavaScript. Включите его, чтобы войти.",
   "signIn.telegram.notSetUp": "Вход через Telegram здесь ещё не настроен. Войдите по email.",
   "signIn.back": "Другие способы входа",
   "save.save": "Сохранить",

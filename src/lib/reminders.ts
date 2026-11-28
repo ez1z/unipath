@@ -45,7 +45,8 @@ export type TelegramSender = (telegramId: string, text: string) => Promise<void>
 
 export interface ReminderDeps {
   db: Db;
-  mailer: Mailer;
+  /** Null when email isn't set up: email reminders then wait, unsent and unlogged. */
+  mailer: Mailer | null;
   /** e.g. https://clavis.example, for links in the message. */
   siteUrl: string;
   /** Today in Ashgabat, `YYYY-MM-DD`. */
@@ -175,7 +176,7 @@ export async function runReminders(deps: ReminderDeps): Promise<ReminderRun> {
     const canSend =
       item !== undefined &&
       (d.channel === 'email'
-        ? !isPlaceholderEmail(d.email)
+        ? mailer !== null && !isPlaceholderEmail(d.email)
         : d.channel === 'telegram' && telegramId !== undefined && Boolean(deps.telegram));
     if (!item || !canSend) {
       run.skipped++;
@@ -198,7 +199,7 @@ export async function runReminders(deps: ReminderDeps): Promise<ReminderRun> {
       profile: `${siteUrl}/${lang}/my/profile`,
     });
     try {
-      if (d.channel === 'email') await mailer.send(mail);
+      if (d.channel === 'email') await mailer?.send(mail);
       else await deps.telegram?.(telegramId ?? '', reminderText(mail));
       run.sent++;
     } catch (error) {

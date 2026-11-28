@@ -40,6 +40,7 @@
   "signIn.telegram.title": "Telegram bilen dowam et",
   "signIn.telegram.body": "Düwmä basyň we Telegram-da tassyklaň. Clavis diňe Telegram ID-ňizi alýar, başga hiç zat saklanmaýar.",
   "signIn.telegram.noScript": "Telegram düwmesine JavaScript gerek. Onuň ýerine email bilen girip bilersiňiz.",
+  "signIn.telegram.noScriptOnly": "Telegram düwmesi üçin JavaScript gerek. Girmek üçin ony açyň.",
   "signIn.telegram.notSetUp": "Bu ýerde Telegram bilen giriş entek sazlanmadyk. Email bilen giriň.",
   "signIn.back": "Girmegiň beýleki ýollary",
   "save.save": "Ýatda sakla",

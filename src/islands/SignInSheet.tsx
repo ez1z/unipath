@@ -1,7 +1,7 @@
 /**
  * The sign-in sheet: a modal dialog opened by SaveButton (and later by Track
  * and Discussions) when a signed-out student tries something. It says why,
- * then offers Telegram, email code and Google in that order.
+ * then offers Telegram, email code (when email is set up) and Google in that order.
  *
  * Email is done in place: the code is sent and checked through Better Auth's
  * endpoints, then `onSignedIn` finishes the action. Telegram and Google leave
@@ -17,6 +17,8 @@ export interface SignInSheetProps {
   telegramHref: string | null;
   /** The Google form's action; null when Google isn't set up. */
   googleAction: string | null;
+  /** False when no email sender is set up (auth/server.ts emailEnabled): no email option. */
+  emailCodes: boolean;
   next: string;
   action: string;
   strings: {
@@ -68,7 +70,7 @@ async function errorOf(response: Response, fallback: ErrorKind): Promise<ErrorKi
 }
 
 export default function SignInSheet(props: SignInSheetProps) {
-  const { lang, telegramHref, googleAction, next, action, strings: s } = props;
+  const { lang, telegramHref, googleAction, emailCodes, next, action, strings: s } = props;
   const dialog = useRef<HTMLDialogElement>(null);
   const codeInput = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>('start');
@@ -170,45 +172,49 @@ export default function SignInSheet(props: SignInSheetProps) {
             </p>
           )}
           {telegramHref && (
-            <>
-              <a class="button sheet-method" href={telegramHref}>
-                {s.telegram}
-              </a>
-              <p class="sheet-or" aria-hidden="true">
-                {s.or}
-              </p>
-            </>
+            <a class="button sheet-method" href={telegramHref}>
+              {s.telegram}
+            </a>
           )}
-          <form class="form" noValidate onSubmit={(e) => void sendCode(e)}>
-            <div class="field">
-              <label for="sheet-email">{s.emailLabel}</label>
-              <input
-                id="sheet-email"
-                class="input"
-                type="email"
-                name="email"
-                autoComplete="email"
-                inputMode="email"
-                required
-                value={email}
-                aria-invalid={error === 'email' || undefined}
-                onInput={(e) => setEmail(e.currentTarget.value)}
-              />
-            </div>
-            <button
-              type="submit"
-              class="button button-secondary sheet-method"
-              disabled={busy}
-              aria-busy={busy || undefined}
-            >
-              {s.email}
-            </button>
-          </form>
+          {emailCodes && telegramHref && (
+            <p class="sheet-or" aria-hidden="true">
+              {s.or}
+            </p>
+          )}
+          {emailCodes && (
+            <form class="form" noValidate onSubmit={(e) => void sendCode(e)}>
+              <div class="field">
+                <label for="sheet-email">{s.emailLabel}</label>
+                <input
+                  id="sheet-email"
+                  class="input"
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  required
+                  value={email}
+                  aria-invalid={error === 'email' || undefined}
+                  onInput={(e) => setEmail(e.currentTarget.value)}
+                />
+              </div>
+              <button
+                type="submit"
+                class="button button-secondary sheet-method"
+                disabled={busy}
+                aria-busy={busy || undefined}
+              >
+                {s.email}
+              </button>
+            </form>
+          )}
           {googleAction && (
             <>
-              <p class="sheet-or" aria-hidden="true">
-                {s.or}
-              </p>
+              {(telegramHref || emailCodes) && (
+                <p class="sheet-or" aria-hidden="true">
+                  {s.or}
+                </p>
+              )}
               <form method="post" action={googleAction}>
                 <input type="hidden" name="next" value={next} />
                 <input type="hidden" name="action" value={action} />

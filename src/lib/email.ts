@@ -1,8 +1,8 @@
 /**
  * The only two emails Clavis sends: sign-in codes and deadline reminders (M4).
  *
- * - Production: Cloudflare Email, sent from the Worker through a `send_email`
- *   binding (set up in DEPLOY.md).
+ * - Production: off for now (emailAvailable below; Eziz, 2026-11-28). When turned
+ *   on, Cloudflare Email through a `send_email` binding (DEPLOY.md "Turning email on").
  * - Local: printed to the console, and kept for a few minutes in a local KV
  *   "dev mailbox" so end-to-end tests can read the code. Nothing is sent.
  */
@@ -27,6 +27,19 @@ export interface Mailer {
 /** The part of Cloudflare Email's `send_email` binding Clavis uses. */
 export interface SendEmailBinding {
   send(message: { from: string; to: string; subject: string; text: string }): Promise<unknown>;
+}
+
+/**
+ * Whether email is offered at all (auth/server.ts emailEnabled): a sending
+ * binding with a From address, or the local test mailbox. Production has
+ * neither for now, so Clavis signs in with Telegram or Google only.
+ */
+export function emailAvailable(setup: {
+  binding: boolean;
+  from: string | undefined;
+  devMailbox: boolean;
+}): boolean {
+  return (setup.binding && Boolean(setup.from)) || setup.devMailbox;
 }
 
 export class MailRefused extends Error {}

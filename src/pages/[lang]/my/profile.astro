@@ -21,6 +21,7 @@ import {
 import { CODE_LENGTH } from '../../../lib/auth/auth';
 import {
   confirmEmailChange,
+  emailEnabled,
   getSignedIn,
   googleEnabled,
   linkedMethods,
@@ -52,6 +53,8 @@ const userId = signedIn.user.id;
 const here = myPath(lang, 'profile');
 const methods = await linkedMethods(signedIn);
 const hasEmail = methods.has('email');
+// Without an email sender there are no email codes or email reminders (auth/server.ts).
+const emailCodes = emailEnabled();
 const secure = siteUrl().startsWith('https://');
 const yearSeconds = 365 * 24 * 60 * 60;
 
@@ -78,7 +81,9 @@ if (Astro.request.method === 'POST') {
     if (parsed.success) {
       const patch = parsed.data;
       // A channel the student can't receive on is not kept.
-      if (patch.reminderChannel === 'email' && !hasEmail) delete patch.reminderChannel;
+      if (patch.reminderChannel === 'email' && (!hasEmail || !emailCodes)) {
+        delete patch.reminderChannel;
+      }
       if (patch.reminderChannel === 'telegram' && !methods.has('telegram')) {
         delete patch.reminderChannel;
       }
@@ -224,7 +229,7 @@ const email = isPlaceholderEmail(signedIn.user.email) ? null : signedIn.user.ema
         <p id="profile-reminders-hint" class="muted-note">
           {t('profile.remindersHint')}
         </p>
-        {REMINDER_CHANNELS.map((channel) => {
+        {REMINDER_CHANNELS.filter((channel) => channel !== 'email' || emailCodes).map((channel) => {
           const disabledKey = channelDisabled[channel];
           return (
             <label class="choice">
@@ -273,66 +278,68 @@ const email = isPlaceholderEmail(signedIn.user.email) ? null : signedIn.user.ema
           )}
         </li>
       )}
-      <li class="email-method">
-        <span class="method-name">
-          {t('profile.method.email')}
-          {email && <span class="muted-note block">{email}</span>}
-        </span>
-        {email ? (
-          <span class="badge badge-plain">{t('profile.method.linked')}</span>
-        ) : pendingEmail && emailError !== 'email' ? (
-          <form method="post" action={here} class="form inline-form" novalidate>
-            <p role="status">{t('profile.addEmail.sent', { email: pendingEmail })}</p>
-            <p class="muted-note">{t('profile.addEmail.noCode')}</p>
-            {emailError && (
-              <p class="form-error" role="alert">
-                {t(emailErrorKey[emailError])}
-              </p>
-            )}
-            <input type="hidden" name="intent" value="confirm-email" />
-            <input type="hidden" name="email" value={pendingEmail} />
-            <div class="field">
-              <label for="profile-code">{t('signIn.codeLabel')}</label>
-              <input
-                id="profile-code"
-                class="input"
-                type="text"
-                name="code"
-                inputmode="numeric"
-                autocomplete="one-time-code"
-                maxlength={CODE_LENGTH}
-                required
-              />
-            </div>
-            <button type="submit" class="button">
-              {t('profile.addEmail.confirm')}
-            </button>
-          </form>
-        ) : (
-          <form method="post" action={here} class="form inline-form" novalidate>
-            <input type="hidden" name="intent" value="add-email" />
-            {emailError && (
-              <p class="form-error" role="alert">
-                {t(emailErrorKey[emailError])}
-              </p>
-            )}
-            <div class="field">
-              <label for="profile-email">{t('signIn.emailLabel')}</label>
-              <input
-                id="profile-email"
-                class="input"
-                type="email"
-                name="email"
-                autocomplete="email"
-                required
-              />
-            </div>
-            <button type="submit" class="button button-secondary">
-              {t('profile.addEmail')}
-            </button>
-          </form>
-        )}
-      </li>
+      {(email || emailCodes) && (
+        <li class="email-method">
+          <span class="method-name">
+            {t('profile.method.email')}
+            {email && <span class="muted-note block">{email}</span>}
+          </span>
+          {email ? (
+            <span class="badge badge-plain">{t('profile.method.linked')}</span>
+          ) : pendingEmail && emailError !== 'email' ? (
+            <form method="post" action={here} class="form inline-form" novalidate>
+              <p role="status">{t('profile.addEmail.sent', { email: pendingEmail })}</p>
+              <p class="muted-note">{t('profile.addEmail.noCode')}</p>
+              {emailError && (
+                <p class="form-error" role="alert">
+                  {t(emailErrorKey[emailError])}
+                </p>
+              )}
+              <input type="hidden" name="intent" value="confirm-email" />
+              <input type="hidden" name="email" value={pendingEmail} />
+              <div class="field">
+                <label for="profile-code">{t('signIn.codeLabel')}</label>
+                <input
+                  id="profile-code"
+                  class="input"
+                  type="text"
+                  name="code"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength={CODE_LENGTH}
+                  required
+                />
+              </div>
+              <button type="submit" class="button">
+                {t('profile.addEmail.confirm')}
+              </button>
+            </form>
+          ) : (
+            <form method="post" action={here} class="form inline-form" novalidate>
+              <input type="hidden" name="intent" value="add-email" />
+              {emailError && (
+                <p class="form-error" role="alert">
+                  {t(emailErrorKey[emailError])}
+                </p>
+              )}
+              <div class="field">
+                <label for="profile-email">{t('signIn.emailLabel')}</label>
+                <input
+                  id="profile-email"
+                  class="input"
+                  type="email"
+                  name="email"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+              <button type="submit" class="button button-secondary">
+                {t('profile.addEmail')}
+              </button>
+            </form>
+          )}
+        </li>
+      )}
       {google && (
         <li>
           <span class="method-name">{t('profile.method.google')}</span>

@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { getAuth } from '../../../lib/auth/server';
+import { emailEnabled, getAuth } from '../../../lib/auth/server';
 import { clientIp } from '../../../lib/server';
 
 export const prerender = false;
@@ -16,6 +16,10 @@ const LIMITED = [
 
 /** Better Auth's handler for everything under /api/auth. Never cached. */
 export const ALL: APIRoute = async ({ request, url }) => {
+  // Email codes are off without a sender (auth/server.ts emailEnabled): no such routes.
+  if (!emailEnabled() && /^\/api\/auth\/(email-otp\/|sign-in\/email-otp$)/.test(url.pathname)) {
+    return new Response(null, { status: 404, headers: { 'Cache-Control': 'private, no-store' } });
+  }
   if (LIMITED.includes(url.pathname)) {
     const { success } = await env.AUTH_LIMITER.limit({ key: `auth:${clientIp(request)}` });
     if (!success) {

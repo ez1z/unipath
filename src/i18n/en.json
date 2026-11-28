@@ -40,6 +40,7 @@
   "signIn.telegram.title": "Continue with Telegram",
   "signIn.telegram.body": "Tap the button and confirm in Telegram. Clavis gets your Telegram ID, nothing else is kept.",
   "signIn.telegram.noScript": "The Telegram button needs JavaScript. You can sign in with email instead.",
+  "signIn.telegram.noScriptOnly": "The Telegram button needs JavaScript. Please turn it on to sign in.",
   "signIn.telegram.notSetUp": "Telegram sign-in isn't set up here yet. Use email instead.",
   "signIn.back": "Other ways to sign in",
   "save.save": "Save",

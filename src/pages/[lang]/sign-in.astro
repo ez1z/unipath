@@ -1,6 +1,6 @@
 ---
 /**
- * Sign-in without JavaScript: Telegram, email code, Google (in that order).
+ * Sign-in without JavaScript: Telegram, email code (when email is set up), Google.
  * The SignInSheet island offers the same on top of the page a student is on.
  * Forms post back here (Astro's origin check guards them); after sign-in the
  * student goes through /auth/continue, which finishes what they tried.
@@ -10,6 +10,7 @@ import AppShell from '../../layouts/AppShell.astro';
 import { parsePendingAction } from '../../lib/account';
 import { safeNextPath } from '../../lib/auth/next';
 import {
+  emailEnabled,
   getSignedIn,
   googleEnabled,
   redirectWithCookies,
@@ -85,6 +86,7 @@ const errorKey = error ? (errorKeys[error] ?? 'signIn.error.generic') : null;
 const why = action ? t('signIn.why.save') : t('signIn.why.default');
 const bot = telegramBotUsername();
 const google = googleEnabled();
+const emailCodes = emailEnabled();
 ---
 
 <AppShell lang={lang} title={t('signIn.metaTitle')} noindex>
@@ -106,38 +108,44 @@ const google = googleEnabled();
           </a>
         )}
 
-        <p class="or" aria-hidden="true">
-          {t('signIn.or')}
-        </p>
+        {emailCodes && bot && (
+          <p class="or" aria-hidden="true">
+            {t('signIn.or')}
+          </p>
+        )}
 
-        <form method="post" action={`/${lang}/sign-in`} class="form" novalidate>
-          <input type="hidden" name="intent" value="send" />
-          {next && <input type="hidden" name="next" value={next} />}
-          {action && <input type="hidden" name="action" value={action} />}
-          <div class="field">
-            <label for="sign-in-email">{t('signIn.emailLabel')}</label>
-            <input
-              id="sign-in-email"
-              class="input"
-              type="email"
-              name="email"
-              value={email}
-              autocomplete="email"
-              inputmode="email"
-              required
-              aria-invalid={error === 'email' ? 'true' : undefined}
-            />
-          </div>
-          <button type="submit" class="button button-secondary method">
-            {t('signIn.email')}
-          </button>
-        </form>
+        {emailCodes && (
+          <form method="post" action={`/${lang}/sign-in`} class="form" novalidate>
+            <input type="hidden" name="intent" value="send" />
+            {next && <input type="hidden" name="next" value={next} />}
+            {action && <input type="hidden" name="action" value={action} />}
+            <div class="field">
+              <label for="sign-in-email">{t('signIn.emailLabel')}</label>
+              <input
+                id="sign-in-email"
+                class="input"
+                type="email"
+                name="email"
+                value={email}
+                autocomplete="email"
+                inputmode="email"
+                required
+                aria-invalid={error === 'email' ? 'true' : undefined}
+              />
+            </div>
+            <button type="submit" class="button button-secondary method">
+              {t('signIn.email')}
+            </button>
+          </form>
+        )}
 
         {google && (
           <>
-            <p class="or" aria-hidden="true">
-              {t('signIn.or')}
-            </p>
+            {(bot || emailCodes) && (
+              <p class="or" aria-hidden="true">
+                {t('signIn.or')}
+              </p>
+            )}
             <form method="post" action={googlePath(lang)}>
               {next && <input type="hidden" name="next" value={next} />}
               {action && <input type="hidden" name="action" value={action} />}

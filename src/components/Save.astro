@@ -7,7 +7,7 @@
 import { getTranslations, type Lang } from '../i18n';
 import SaveButton from '../islands/SaveButton';
 import { serializePendingAction } from '../lib/account';
-import { googleEnabled, telegramBotUsername } from '../lib/auth/server';
+import { emailEnabled, googleEnabled, telegramBotUsername } from '../lib/auth/server';
 import { googlePath, telegramPath } from '../lib/auth/urls';
 import type { SavedItemType } from '../lib/db/values';
 
@@ -35,6 +35,7 @@ const action = serializePendingAction({ kind: 'save', item: { type, id } });
     action,
     telegramHref: telegramBotUsername() ? telegramPath(lang, { next: back, action }) : null,
     googleAction: googleEnabled() ? googlePath(lang) : null,
+    emailCodes: emailEnabled(),
     strings: {
       title: t('signIn.title'),
       why: t('signIn.why.save'),

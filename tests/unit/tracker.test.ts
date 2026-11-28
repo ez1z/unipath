@@ -366,6 +366,27 @@ describe('deadline reminders', () => {
     expect(logged.map((r) => r.daysBefore).sort((a, b) => a - b)).toEqual([1, 7, 30]);
   });
 
+  it('without an email sender, email reminders wait and go out once one is set up', async () => {
+    const me = await newUser('waiting@mail.test');
+    await updateProfile(t.db, me, { reminderChannel: 'email' });
+    const id = await track(me, 'program', 101);
+    await setDeadline(t.db, me, id, addDays(TODAY, 7));
+
+    const off = await runReminders({
+      db: t.db,
+      mailer: null,
+      siteUrl: 'https://clavis.test',
+      today: TODAY,
+    });
+    expect(off).toMatchObject({ sent: 0, failed: 0, skipped: 1 });
+    expect(await t.db.select().from(reminderLog).where(eq(reminderLog.trackerItemId, id))).toEqual(
+      [],
+    );
+
+    expect(await run(TODAY)).toMatchObject({ sent: 1 });
+    expect(mails[0]?.to).toBe('waiting@mail.test');
+  });
+
   it('a missed day is caught up, and a failed send is tried again', async () => {
     const me = await newUser();
     await updateProfile(t.db, me, { reminderChannel: 'email' });

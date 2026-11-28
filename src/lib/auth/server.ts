@@ -8,7 +8,13 @@ import { eq } from 'drizzle-orm';
 import * as z from 'zod';
 import type { Lang } from '../../i18n/config.ts';
 import { account } from '../db/schema.ts';
-import { consoleMailer, cloudflareMailer, type Mailer, type SendEmailBinding } from '../email.ts';
+import {
+  cloudflareMailer,
+  consoleMailer,
+  emailAvailable,
+  type Mailer,
+  type SendEmailBinding,
+} from '../email.ts';
 import { clientIp, getDb } from '../server.ts';
 import { CODE_LENGTH, createAuth, LANG_HEADER, type Auth } from './auth.ts';
 import { isPlaceholderEmail, type MarkUsed } from './telegram-plugin.ts';
@@ -30,6 +36,21 @@ const isLocalSite = () => /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(site
 /** Tests read sign-in codes from the local mailbox; never on a real domain. */
 export function devMailboxEnabled(): boolean {
   return vars['DEV_MAILBOX'] === '1' && isLocalSite() && !vars.EMAIL;
+}
+
+/**
+ * Whether email codes and email reminders are offered at all. Off unless a
+ * sender is set up: production has none for now (Cloudflare Email needs the
+ * paid Workers plan), so students sign in with Telegram or Google and get
+ * reminders by Telegram. On a local site the test mailbox counts as a sender.
+ * Adding the EMAIL binding and EMAIL_FROM (DEPLOY.md) turns it back on.
+ */
+export function emailEnabled(): boolean {
+  return emailAvailable({
+    binding: Boolean(vars.EMAIL),
+    from: vars['EMAIL_FROM'],
+    devMailbox: devMailboxEnabled(),
+  });
 }
 
 /** Cloudflare Email in production; the console (and dev mailbox) on a local site. */
@@ -171,6 +192,7 @@ export async function sendCode(
   rawEmail: unknown,
   change = false,
 ): Promise<{ ok: true; email: string } | { ok: false; error: CodeError }> {
+  if (!emailEnabled()) return { ok: false, error: 'generic' };
   const email = emailSchema.safeParse(rawEmail);
   if (!email.success) return { ok: false, error: 'email' };
   if (!(await authAllowed(request))) return { ok: false, error: 'rate' };
@@ -197,6 +219,7 @@ export async function signInWithCode(
   rawEmail: unknown,
   rawCode: unknown,
 ): Promise<CodeResult> {
+  if (!emailEnabled()) return { ok: false, error: 'generic' };
   const email = emailSchema.safeParse(rawEmail);
   if (!email.success) return { ok: false, error: 'email' };
   const otp = codeSchema.safeParse(rawCode);
@@ -221,6 +244,7 @@ export async function confirmEmailChange(
   rawEmail: unknown,
   rawCode: unknown,
 ): Promise<CodeResult> {
+  if (!emailEnabled()) return { ok: false, error: 'generic' };
   const email = emailSchema.safeParse(rawEmail);
   if (!email.success) return { ok: false, error: 'email' };
   const otp = codeSchema.safeParse(rawCode);

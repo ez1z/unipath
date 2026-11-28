@@ -12,7 +12,7 @@ import { getTranslations, isLang } from '../../../i18n';
 import AppShell from '../../../layouts/AppShell.astro';
 import { parsePendingAction } from '../../../lib/account';
 import { safeNextPath } from '../../../lib/auth/next';
-import { siteUrl, telegramBotUsername } from '../../../lib/auth/server';
+import { emailEnabled, siteUrl, telegramBotUsername } from '../../../lib/auth/server';
 import {
   newTelegramState,
   TELEGRAM_STATE_COOKIE,
@@ -79,7 +79,9 @@ if (bot) {
             data-auth-url={callback.href}
           />
           <noscript>
-            <p class="notice">{t('signIn.telegram.noScript')}</p>
+            <p class="notice">
+              {t(emailEnabled() ? 'signIn.telegram.noScript' : 'signIn.telegram.noScriptOnly')}
+            </p>
           </noscript>
         </div>
       </>
