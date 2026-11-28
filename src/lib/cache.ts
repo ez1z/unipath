@@ -23,12 +23,20 @@ export const TTL = {
   home: 300,
   search: 60,
   detail: 600,
+  discussions: 60,
 } as const;
 
 export interface CachePolicy {
   ttl: number;
   /** The query string the page actually reads, in a fixed order; part of the key. */
   query: string;
+  /**
+   * Shared only between signed-out visitors. A signed-in request is rendered
+   * fresh and kept private: a thread shows that viewer's own buttons (Helped me
+   * for the asker, their votes and reports), and a student who just posted
+   * should see the question on its board at once.
+   */
+  anonymousOnly?: boolean;
 }
 
 export type SearchTab = 'programs' | 'universities';
@@ -56,6 +64,7 @@ export const UNIVERSITY_TABS = [
   'costs',
   'requirements',
   'scholarships',
+  'discussion',
 ] as const;
 export type UniversityTab = (typeof UNIVERSITY_TABS)[number];
 
@@ -68,6 +77,14 @@ export function universityTab(params: URLSearchParams): UniversityTab {
 
 const SLUG = '[a-z0-9]+(?:-[a-z0-9]+)*';
 const DETAIL = new RegExp(`^/(universities|programs|colleges|scholarships)/${SLUG}$`);
+const BOARD = new RegExp(`^/discussions/(${SLUG})$`);
+const THREAD = new RegExp(`^/discussions/${SLUG}/[1-9][0-9]{0,9}$`);
+
+/** `?page=N` of a list, kept only when it is a real page number above 1. */
+function pageQuery(params: URLSearchParams): string {
+  const page = params.get('page') ?? '';
+  return /^[2-9]$|^[1-9][0-9]{1,2}$/.test(page) ? `page=${page}` : '';
+}
 
 /**
  * Whether and how a GET request may be served from the cache. Null means never
@@ -90,9 +107,19 @@ export function cachePolicy(url: URL): CachePolicy | null {
       query: serializeScholarshipFilters(parseScholarshipFilters(params)).toString(),
     };
   }
+  // Discussions: a student who just posted sees it at once; visitors share a copy.
+  if (rest === '/discussions') return { ttl: TTL.discussions, query: '', anonymousOnly: true };
+  if (THREAD.test(rest)) return { ttl: TTL.discussions, query: '', anonymousOnly: true };
+  const board = BOARD.exec(rest);
+  if (board && board[1] !== 'ask') {
+    return { ttl: TTL.discussions, query: pageQuery(params), anonymousOnly: true };
+  }
   const detail = DETAIL.exec(rest);
   if (detail) {
     const tab = detail[1] === 'universities' ? universityTab(params) : 'programs';
+    if (tab === 'discussion') {
+      return { ttl: TTL.discussions, query: 'tab=discussion', anonymousOnly: true };
+    }
     return { ttl: TTL.detail, query: tab === 'programs' ? '' : `tab=${tab}` };
   }
   return null;
@@ -195,6 +222,10 @@ export async function withPageCache(
 ): Promise<Response> {
   const url = new URL(request.url);
   const policy = request.method === 'GET' ? cachePolicy(url) : null;
+  if (policy?.anonymousOnly && hasSessionCookie(request)) {
+    const response = await render();
+    return markPrivate(response);
+  }
   if (!policy || !ctx) {
     const response = await render();
     return policy ? markBypass(response) : response;
@@ -227,6 +258,18 @@ function forBrowser(response: Response, status: 'hit' | 'miss'): Response {
   const out = new Response(response.body, response);
   out.headers.set('Cache-Control', BROWSER_CACHE_CONTROL);
   out.headers.set(CACHE_STATUS_HEADER, status);
+  return out;
+}
+
+/** Better Auth's session cookie (`clavis.session_token`, `__Secure-` on https). */
+export function hasSessionCookie(request: Request): boolean {
+  return /(?:^|;\s*)(?:__Secure-)?clavis\.session_token=/.test(request.headers.get('Cookie') ?? '');
+}
+
+function markPrivate(response: Response): Response {
+  const out = new Response(response.body, response);
+  out.headers.set(CACHE_STATUS_HEADER, 'bypass');
+  out.headers.set('Cache-Control', 'private, no-store');
   return out;
 }
 

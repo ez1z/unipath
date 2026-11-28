@@ -30,6 +30,33 @@ describe('cachePolicy', () => {
     }
   });
 
+  test('Discussions: boards and threads for a minute; Ask never', () => {
+    expect(policy('/en/discussions')).toEqual({
+      ttl: TTL.discussions,
+      query: '',
+      anonymousOnly: true,
+    });
+    expect(policy('/en/discussions/tests?page=2&x=1')).toEqual({
+      ttl: TTL.discussions,
+      query: 'page=2',
+      anonymousOnly: true,
+    });
+    expect(policy('/en/discussions/tests?page=1')?.query).toBe('');
+    expect(policy('/en/discussions/tests/12?error=daily')).toEqual({
+      ttl: TTL.discussions,
+      query: '',
+      anonymousOnly: true,
+    });
+    expect(policy('/en/discussions/ask')).toBeNull();
+    expect(policy('/en/discussions/ask?topic=tests')).toBeNull();
+    expect(policy('/en/discussions/tests/0')).toBeNull();
+    expect(policy('/en/universities/demo-university-1?tab=discussion')).toEqual({
+      ttl: TTL.discussions,
+      query: 'tab=discussion',
+      anonymousOnly: true,
+    });
+  });
+
   test('account, share, admin, compare and report pages are never cached', () => {
     for (const path of [
       '/en/compare?ids=101',
@@ -46,6 +73,7 @@ describe('cachePolicy', () => {
       '/api/report',
       '/api/save?type=program&id=101',
       '/api/me',
+      '/api/discussions/similar?q=visa',
       '/api/auth/get-session',
       '/api/dev/mailbox?to=a@b.c',
       '/xx/search',
@@ -187,6 +215,28 @@ describe('withPageCache', () => {
     await settle();
     expect(store.size).toBe(0);
     expect(post.headers.get(CACHE_STATUS_HEADER)).toBeNull();
+  });
+
+  test('a thread is shared only between signed-out visitors', async () => {
+    const { ctx, store, settle } = fakeContext();
+    const url = `${ORIGIN}/en/discussions/tests/12`;
+    let renders = 0;
+    const render = () => Promise.resolve(html(`thread ${++renders}`));
+
+    const signedIn = await withPageCache(
+      new Request(url, { headers: { Cookie: 'theme=dark; __Secure-clavis.session_token=abc' } }),
+      render,
+      ctx,
+    );
+    await settle();
+    expect(store.size).toBe(0);
+    expect(signedIn.headers.get('Cache-Control')).toBe('private, no-store');
+
+    await withPageCache(new Request(url, { headers: { Cookie: 'theme=dark' } }), render, ctx);
+    await settle();
+    const anonymous = await withPageCache(new Request(url), render, ctx);
+    expect(anonymous.headers.get(CACHE_STATUS_HEADER)).toBe('hit');
+    expect(await anonymous.text()).toBe('thread 2');
   });
 
   test('without a cache (dev) cached routes are marked bypass', async () => {
