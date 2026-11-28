@@ -3,7 +3,7 @@
  * Ashgabat is UTC+5 with no daylight saving.
  *
  * - 04:00 (09:00 Ashgabat): deadline reminders, by the Telegram bot (or email, when set up).
- * - 23:00 (04:00 Ashgabat, the quietest hour): D1 backup to R2.
+ * - 23:00 (04:00 Ashgabat, the quietest hour): D1 backup to R2, when R2 is set up.
  */
 import { emailEnabled, getMailer, getTelegramSender, siteUrl } from './auth/server.ts';
 import { BACKUP_CRON, runBackup } from './backup.ts';
@@ -28,7 +28,13 @@ export async function runScheduled(cron: string, env: Env): Promise<void> {
     );
   }
   if (cron === BACKUP_CRON) {
-    const backup = await runBackup(env.DB, env.FILES, today());
+    // No R2 bucket in production for now (server.ts filesBucket): D1 Time Travel only.
+    const files = (env as { FILES?: R2Bucket }).FILES;
+    if (!files) {
+      console.info('[clavis backup] skipped: file storage (R2) is off');
+      return;
+    }
+    const backup = await runBackup(env.DB, files, today());
     console.info(
       `[clavis backup] wrote ${backup.key} (${backup.bytes} bytes), removed ${backup.deleted.length} old`,
     );

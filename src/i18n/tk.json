@@ -780,6 +780,7 @@
   "admin.image.failed": "Ýükläp bolmady. Başga surat synanyşyň.",
   "admin.image.noWebp": "Bu brauzer WebP suratlaryny döredip bilmeýär. Chrome, Edge ýa-da Firefox ulanyň.",
   "admin.image.needsScript": "Suraty üýtgetmek üçin JavaScript gerek.",
+  "admin.image.filesOff": "Suratlar öçük: faýl ammary heniz sazlanmady. Öň saklanan surat galýar.",
   "admin.queue.mistakes": "Habar berlen ýalňyşlar",
   "admin.queue.reports": "Şikaýat edilen ýazgylar",
   "admin.queue.badges": "Nyşanlar",

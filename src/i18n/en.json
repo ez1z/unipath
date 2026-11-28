@@ -780,6 +780,7 @@
   "admin.image.failed": "The upload failed. Try another picture.",
   "admin.image.noWebp": "This browser can't make WebP pictures. Use Chrome, Edge or Firefox.",
   "admin.image.needsScript": "Changing the picture needs JavaScript.",
+  "admin.image.filesOff": "Pictures are off: file storage isn't set up yet. A picture saved earlier is kept.",
   "admin.queue.mistakes": "Reported mistakes",
   "admin.queue.reports": "Reported posts",
   "admin.queue.badges": "Badges",

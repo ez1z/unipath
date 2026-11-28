@@ -7,6 +7,7 @@
 import ImageUpload from '../../islands/ImageUpload';
 import { getTranslations, LANG_NAMES, type Lang } from '../../i18n';
 import type { Field, FormErrors, FormValues, Section, Translated } from '../../lib/admin/form';
+import { filesBucket } from '../../lib/server';
 
 interface Props {
   lang: Lang;
@@ -20,6 +21,8 @@ interface Props {
 const { lang, sections, values, errors, lastCheckedWas } = Astro.props;
 const t = getTranslations(lang);
 const LANG_COLUMNS = ['en', 'tk', 'ru'] as const;
+/** No R2 bucket (lib/server.ts filesBucket): pictures can't be uploaded. */
+const filesOn = filesBucket() !== null;
 
 const str = (name: string) => {
   const v = values[name];
@@ -130,18 +133,28 @@ const imageLabels = {
             <span class="form-label" id={`${id(field.name)}-label`}>
               {t(field.label)}
             </span>
-            <ImageUpload
-              client:visible
-              name={field.name}
-              kind={field.image}
-              value={str(field.name)}
-              labelledBy={`${id(field.name)}-label`}
-              labels={imageLabels}
-            />
-            <noscript>
-              <input type="hidden" name={field.name} value={str(field.name)} />
-              <p class="muted-note">{t('admin.image.needsScript')}</p>
-            </noscript>
+            {filesOn ? (
+              <>
+                <ImageUpload
+                  client:visible
+                  name={field.name}
+                  kind={field.image}
+                  value={str(field.name)}
+                  labelledBy={`${id(field.name)}-label`}
+                  labels={imageLabels}
+                />
+                <noscript>
+                  <input type="hidden" name={field.name} value={str(field.name)} />
+                  <p class="muted-note">{t('admin.image.needsScript')}</p>
+                </noscript>
+              </>
+            ) : (
+              <>
+                {/* Keeps a picture saved earlier, so saving the form never clears it. */}
+                <input type="hidden" name={field.name} value={str(field.name)} />
+                <p class="muted-note">{t('admin.image.filesOff')}</p>
+              </>
+            )}
           </>
         ) : (
           <>

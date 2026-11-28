@@ -3,7 +3,7 @@ import { env } from 'cloudflare:workers';
 import { auditInsert } from '../../../lib/admin/audit';
 import { requireAdmin } from '../../../lib/admin/guard';
 import { checkImage, IMAGE_LIMITS, type ImageKind } from '../../../lib/admin/images';
-import { getDb } from '../../../lib/server';
+import { filesBucket, getDb } from '../../../lib/server';
 
 export const prerender = false;
 
@@ -18,6 +18,8 @@ const json = (body: unknown, status = 200) =>
 export const POST: APIRoute = async ({ request }) => {
   const admin = await requireAdmin(request);
   if (admin instanceof Response) return json({ error: 'forbidden' }, 403);
+  const files = filesBucket();
+  if (!files) return json({ error: 'files-off' }, 503);
   const limit = await env.WRITE_LIMITER.limit({ key: `write:${admin.adminId}` });
   if (!limit.success) return json({ error: 'rate' }, 429);
 
@@ -35,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!check.ok) return json({ error: check.reason }, 422);
 
   const key = `${IMAGE_LIMITS[imageKind].prefix}${crypto.randomUUID()}.webp`;
-  await env.FILES.put(key, bytes, {
+  await files.put(key, bytes, {
     httpMetadata: {
       contentType: 'image/webp',
       cacheControl: 'public, max-age=31536000, immutable',

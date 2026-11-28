@@ -226,6 +226,10 @@ the demo data. No real database is touched.
 
 ### Logo and photo
 
+Only with file storage (R2) on. While it is off (DEPLOY.md), the form shows
+"Pictures are off" instead, saving keeps any stored picture key, and
+`/files/…` answers 404.
+
 1. On a university, choose a large JPEG or PNG as Logo, then as Photo: the
    browser shrinks them (128 px, 1200 px) and uploads WebP. Save.
 2. The public page shows the photo across the top and the logo by the name.

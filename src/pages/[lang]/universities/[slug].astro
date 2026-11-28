@@ -20,7 +20,7 @@ import { daysBetween } from '../../../lib/dates';
 import { threadsTagged } from '../../../lib/discussions';
 import { formatNumber } from '../../../lib/format';
 import { deadlineText, moneyText, rateNote } from '../../../lib/view';
-import { getDb, today } from '../../../lib/server';
+import { filesBucket, getDb, today } from '../../../lib/server';
 
 export const prerender = false;
 
@@ -42,6 +42,8 @@ const threads =
     : [];
 
 const u = page?.university;
+/** Pictures live in R2; with file storage off (lib/server.ts filesBucket) none are shown. */
+const filesOn = filesBucket() !== null;
 const s = page?.summary;
 const base = `/${lang}/universities/${slug}`;
 const tabHref = (name: (typeof UNIVERSITY_TABS)[number]) =>
@@ -79,7 +81,7 @@ const allPrograms = page ? [...page.bachelors, ...page.preYears] : [];
     />
     <DetailLayout>
       <header slot="head" class="head">
-        {u.photoKey && (
+        {filesOn && u.photoKey && (
           <img
             class="photo"
             src={`/files/${u.photoKey}`}
@@ -91,7 +93,7 @@ const allPrograms = page ? [...page.bachelors, ...page.preYears] : [];
           />
         )}
         <div class="title-row">
-          {u.logoKey && (
+          {filesOn && u.logoKey && (
             <img
               class="logo"
               src={`/files/${u.logoKey}`}

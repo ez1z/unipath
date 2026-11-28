@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
 import { PUBLIC_IMAGE_KEY } from '../../lib/admin/images';
+import { filesBucket } from '../../lib/server';
 
 export const prerender = false;
 
@@ -10,8 +10,9 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ params, request }) => {
   const key = params['key'] ?? '';
-  if (!PUBLIC_IMAGE_KEY.test(key)) return new Response('Not found', { status: 404 });
-  const object = await env.FILES.get(key, { onlyIf: request.headers });
+  const files = filesBucket();
+  if (!files || !PUBLIC_IMAGE_KEY.test(key)) return new Response('Not found', { status: 404 });
+  const object = await files.get(key, { onlyIf: request.headers });
   if (!object) return new Response('Not found', { status: 404 });
 
   const headers = new Headers({

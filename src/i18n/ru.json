@@ -780,6 +780,7 @@
   "admin.image.failed": "Загрузка не удалась. Попробуйте другое изображение.",
   "admin.image.noWebp": "Этот браузер не умеет создавать WebP. Используйте Chrome, Edge или Firefox.",
   "admin.image.needsScript": "Чтобы сменить изображение, нужен JavaScript.",
+  "admin.image.filesOff": "Изображения отключены: хранилище файлов ещё не настроено. Сохранённое ранее изображение останется.",
   "admin.queue.mistakes": "Сообщения об ошибках",
   "admin.queue.reports": "Жалобы на сообщения",
   "admin.queue.badges": "Значки",
