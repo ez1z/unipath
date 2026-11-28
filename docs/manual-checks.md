@@ -181,3 +181,92 @@ check the real Telegram apps.
   referrers (`strict-origin-when-cross-origin` or `same-origin`, not `no-referrer`).
 - M8's CSP hash for the inline theme script must be taken from the current
   `THEME_SCRIPT` (it now also reads Telegram's light/dark).
+- **Another bot's Mini App** could open a Clavis `/tg` link inside its own
+  webview with launch data signed for that bot's user. Clavis checks the
+  signature against its own bot token, so the data is refused; what remains
+  is that a webview the other bot already controls can show Clavis. Nothing
+  more is done about it: a real launch from the Clavis bot always replaces
+  the session, and `start_param` can't be required because menu-button
+  launches don't carry one.
+
+## M7 · Admin and import
+
+Everything here runs on the local site (`pnpm preview` or `pnpm dev`) with
+the demo data. No real database is touched.
+
+### Before you start
+
+1. Sign in once on the local site with any email (the code is in the console).
+2. `pnpm make-admin you@example.com`, then open `/admin`. Your Profile
+   language is the admin's language.
+3. Students who open `/admin` get a plain "Not found"; signed out, `/admin`
+   asks you to sign in and comes back.
+
+### Records
+
+1. `/admin/universities`: search "Demo", filter by country, Drafts only and
+   "Not checked for 12 months" (Demo University 5 is flagged).
+2. Open Demo University 2. English, Turkmen and Russian names sit side by side
+   (one under another on a phone). Change the Russian name and the city, save:
+   "Saved". Open the public page in Russian: the new name and city are there at
+   once, without a rebuild.
+3. Leave Last checked as it was and save: it becomes today. Type another date
+   and save: your date stays.
+4. Untick Published, empty Source and tick Published again: saving is refused
+   with "Add a source before publishing", read out with the field.
+5. Set Ministry status to Approved with an empty Basis: refused.
+6. Programs: leave Tuition empty and save; the public page says "Cost not
+   confirmed". Pathways: a bachelor's → bachelor's pair is refused.
+7. Delete: a program a student tracks can't be deleted ("Unpublish it
+   instead"); a new test record can, after ticking the confirmation.
+8. "History" on any record opens its audit-log rows with the changed fields.
+
+### Logo and photo
+
+1. On a university, choose a large JPEG or PNG as Logo, then as Photo: the
+   browser shrinks them (128 px, 1200 px) and uploads WebP. Save.
+2. The public page shows the photo across the top and the logo by the name.
+   `/files/logos/…webp` is served with `Cache-Control: … immutable`.
+3. In a browser whose canvas can't encode WebP (try Safari), the upload says
+   to use another browser instead of sending a PNG.
+4. Old pictures stay in R2 when replaced (keys are never reused, so cached
+   copies can't go stale). Clean-up is a manual R2 task, if it is ever needed.
+
+### Queues
+
+1. Report a mistake on any public page. `/admin/mistakes` lists it with links
+   to the record and its admin form; "Fixed" and "Not a mistake" close it.
+2. Report a reply three times from three accounts: it is hidden. In
+   `/admin/reports`, "Keep and show" brings it back; those three reports no
+   longer count, so it takes three new reports to hide it again. "Hide" keeps
+   it hidden; "Delete for good" removes it (and its votes).
+3. Request "Studies here" from Profile. `/admin/badges` shows the request with
+   the note; Approve puts the badge on that student's posts; Remove takes it
+   away. Give the Clavis team badge by account email.
+
+### Settings and audit
+
+1. `/admin/settings`: set 19.5 manat for a dollar and a date; program pages
+   show manat beside dollars with that date. Empty the rate: dollars only.
+2. `/admin/audit` lists every write above, newest first, with who made it.
+   Imports and `make-admin` show as "Script".
+
+### Imports
+
+1. `pnpm db:import docs/examples/records.example.json --dry-run` prints the 7
+   drafts it would create. Run it without `--dry-run`: they appear in `/admin`
+   as drafts and nowhere on the site. Run it again: all 7 are "Skipped".
+2. Break the file (an unknown country, a slug that points nowhere, an extra
+   field): nothing is imported, and every problem is listed with its place.
+3. `pnpm db:import file.json --sql out.sql` writes SQL and touches no database.
+4. `pnpm db:import-moe list.csv` (columns: name, country, ranking source,
+   position): dry run, prints matches and writes `list.review.csv` for the
+   rest. `--apply` sets the matches to Approved with "QS 312"-style bases.
+5. File format for people and AI assistants: `docs/data-format.md`.
+
+### Backups
+
+1. `pnpm db:backup` writes `backups/<today>.sql` to the local R2 bucket
+   (`--print` shows it). Sessions and sign-in codes are left out.
+2. The cron `0 23 * * *` (04:00 in Ashgabat) does the same in production and
+   keeps the newest 30. Restoring is in DEPLOY.md (M8).

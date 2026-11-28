@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 4321;
+const SCRIPTS = /-scripts\.spec\.ts$/;
 const isCI = !!process.env['CI'];
 
 export default defineConfig({
@@ -16,6 +17,7 @@ export default defineConfig({
   projects: [
     {
       name: 'phone',
+      testIgnore: SCRIPTS,
       use: {
         ...devices['Pixel 7'],
         viewport: { width: 390, height: 844 },
@@ -23,6 +25,17 @@ export default defineConfig({
     },
     {
       name: 'desktop',
+      testIgnore: SCRIPTS,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1440, height: 900 },
+      },
+    },
+    {
+      // Local scripts (import, backup) on the shared local database: once, at the end.
+      name: 'scripts',
+      testMatch: SCRIPTS,
+      dependencies: ['phone', 'desktop'],
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1440, height: 900 },
