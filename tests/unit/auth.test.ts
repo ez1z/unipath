@@ -174,8 +174,12 @@ describe('email code', () => {
 
 describe('Telegram Login Widget', () => {
   // A different auth_date per call: each piece of signed data is accepted only once.
-  let tick = 0;
-  const now = () => String(Math.floor(Date.now() / 1000) - tick++);
+  // Strictly decreasing, so two calls either side of a second boundary still differ.
+  let last = Number.POSITIVE_INFINITY;
+  const now = () => {
+    last = Math.min(Math.floor(Date.now() / 1000), last - 1);
+    return String(last);
+  };
   const callback = async (
     fields: Record<string, string>,
     {
