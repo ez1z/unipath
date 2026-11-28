@@ -25,6 +25,9 @@
     "db:generate": "drizzle-kit generate",
     "db:seed": "node scripts/seed.ts",
     "db:backup": "node scripts/backup-now.ts",
+    "db:import": "node scripts/import-records.ts",
+    "db:import-moe": "node scripts/import-moe-list.ts",
+    "make-admin": "node scripts/make-admin.ts",
     "lighthouse": "node scripts/lighthouse.ts"
   },
   "devDependencies": {

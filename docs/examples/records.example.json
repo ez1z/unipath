@@ -1,0 +1,102 @@
+{
+  "$schema": "../records.schema.json",
+  "format": "clavis-records/1",
+  "source": "Example file: made-up records showing every field. Not real data.",
+  "universities": [
+    {
+      "slug": "example-university-a",
+      "name": {
+        "en": "Example University A",
+        "tk": "Mysal uniwersiteti A",
+        "ru": "Пример университета A"
+      },
+      "country": "TR",
+      "city": "Example City",
+      "type": "public",
+      "website": "https://example.org/university-a",
+      "ministry_status": "approved",
+      "ministry_basis": "Example list, position 1",
+      "rankings": { "qs": 900 },
+      "source_url": "https://example.org/university-a/facts",
+      "last_checked": "2026-11-01"
+    }
+  ],
+  "colleges": [
+    {
+      "slug": "example-college-a",
+      "name": { "en": "Example Pathway College A" },
+      "country": "GB",
+      "city": "Example Town",
+      "source_url": "https://example.org/college-a"
+    }
+  ],
+  "programs": [
+    {
+      "slug": "example-university-a-computing-bsc",
+      "name": { "en": "Computing (BSc)", "ru": "Информатика (бакалавриат)" },
+      "university": "example-university-a",
+      "level": "bachelor",
+      "field": "computing",
+      "language_of_study": "en",
+      "duration_years": 4,
+      "tuition_per_year_usd": null,
+      "intakes": [9],
+      "application_deadline": "2027-06-30",
+      "pre_year_required": "unknown",
+      "requirements": {
+        "ielts_min": 6,
+        "other_tests": [{ "name": "SAT", "min": "1100" }],
+        "documents": ["passport", "school_certificate", "transcript", "motivation_letter"]
+      },
+      "source_url": "https://example.org/university-a/computing"
+    },
+    {
+      "slug": "example-university-a-turkish-year",
+      "name": { "en": "Turkish language year" },
+      "university": "example-university-a",
+      "level": "language",
+      "language_of_study": "tr",
+      "duration_years": 1,
+      "tuition_per_year_usd": 2000,
+      "intakes": [9, 2],
+      "source_url": "https://example.org/university-a/language-year"
+    },
+    {
+      "slug": "example-college-a-foundation",
+      "name": { "en": "Foundation in Engineering" },
+      "college": "example-college-a",
+      "level": "foundation",
+      "field": "engineering",
+      "language_of_study": "en",
+      "duration_years": 1,
+      "source_url": "https://example.org/college-a/foundation"
+    }
+  ],
+  "pathways": [
+    {
+      "from": "example-university-a-turkish-year",
+      "to": "example-university-a-computing-bsc",
+      "entry_guaranteed": false
+    }
+  ],
+  "scholarships": [
+    {
+      "slug": "example-scholarship-a",
+      "name": { "en": "Example Scholarship A" },
+      "provider": "Example Foundation",
+      "country": "TR",
+      "coverage": "partial",
+      "covers": ["tuition"],
+      "covers_pre_year": "no",
+      "amount_text": { "en": "Half of tuition" },
+      "deadline": "2027-03-01",
+      "open_to_turkmen": "unknown",
+      "eligibility": {
+        "en": ["Finished school with good marks", "Under 21 on 1 September"]
+      },
+      "how_to_apply": { "en": "Apply online on the provider's page." },
+      "programs": ["example-university-a-computing-bsc"],
+      "source_url": "https://example.org/scholarship-a"
+    }
+  ]
+}
