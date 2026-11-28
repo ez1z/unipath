@@ -5,7 +5,7 @@ import { createTestDb, type TestDb } from './db/test-db';
 let t: TestDb;
 beforeAll(async () => {
   t = await createTestDb();
-});
+}, 60_000);
 afterAll(() => t.dispose());
 
 describe('sitemap', () => {

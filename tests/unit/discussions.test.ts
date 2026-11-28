@@ -72,7 +72,7 @@ async function answer(userId: string, threadId: number, body = 'Check the offici
 
 beforeAll(async () => {
   t = await createTestDb();
-});
+}, 60_000);
 afterAll(async () => {
   await t.dispose();
 });

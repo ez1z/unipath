@@ -62,7 +62,7 @@ async function track(userId: string, type: 'program' | 'pathway' | 'scholarship'
 
 beforeAll(async () => {
   t = await createTestDb();
-});
+}, 60_000);
 afterAll(async () => {
   await t.dispose();
 });
