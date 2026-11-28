@@ -97,7 +97,9 @@ export const universities = sqliteTable(
     city: text('city').notNull(),
     type: text('type', { enum: UNIVERSITY_TYPES }),
     website: text('website'),
+    /** R2 keys (`logos/…webp`, 128 px; `photos/…webp`, up to 1200 px), uploaded in /admin. */
     logoKey: text('logo_key'),
+    photoKey: text('photo_key'),
     ministryStatus: text('ministry_status', { enum: MINISTRY_STATUSES })
       .notNull()
       .default('unchecked'),
@@ -647,11 +649,15 @@ export const reports = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     reason: text('reason').notNull(),
+    /** Set when an admin keeps the post visible: reviewed reports no longer count toward hiding. */
+    reviewed: integer('reviewed', { mode: 'boolean' }).notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [
     uniqueIndex('reports_target_reporter_unique').on(t.targetType, t.targetId, t.reporterId),
     index('reports_created_idx').on(t.createdAt),
+    // The admin queue: posts with reports nobody has reviewed yet.
+    index('reports_reviewed_target_idx').on(t.reviewed, t.targetType, t.targetId),
     check('reports_target_type', oneOf(t.targetType, REPORT_TARGETS)),
   ],
 );

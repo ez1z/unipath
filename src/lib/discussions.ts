@@ -701,7 +701,7 @@ export type ReportInput = z.infer<typeof reportSchema>;
 
 /**
  * One report per user per post. At three, the post is hidden until an admin
- * reviews it (M7). Returns the thread, to go back to.
+ * reviews it in /admin/reports. Returns the thread, to go back to.
  */
 export async function reportPost(
   db: Db,
@@ -740,7 +740,14 @@ export async function reportPost(
   const [count] = await db
     .select({ n: sql<number>`count(*)` })
     .from(reports)
-    .where(and(eq(reports.targetType, input.targetType), eq(reports.targetId, input.targetId)));
+    .where(
+      and(
+        eq(reports.targetType, input.targetType),
+        eq(reports.targetId, input.targetId),
+        // Reports an admin already looked at (and kept the post) don't count again.
+        eq(reports.reviewed, false),
+      ),
+    );
   const hidden = Number(count?.n ?? 0) >= REPORTS_TO_HIDE;
   if (hidden) {
     if (input.targetType === 'thread') {
