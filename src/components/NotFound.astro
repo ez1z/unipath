@@ -15,8 +15,10 @@ const t = getTranslations(lang);
   <h1 class="page-title">{t('notFound.title')}</h1>
   <div class="body">
     <EmptyState
+      mark
       title={t('notFound.body')}
       action={{ href: `/${lang}/search`, label: t('notFound.search') }}
+      secondary={{ href: `/${lang}`, label: t('notFound.home') }}
     />
   </div>
 </AppShell>

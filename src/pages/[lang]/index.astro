@@ -4,6 +4,8 @@ import ThreadList from '../../components/ThreadList.astro';
 import { latestThreads } from '../../lib/discussions';
 import ScholarshipCard from '../../components/ScholarshipCard.astro';
 import SearchBox from '../../components/SearchBox.astro';
+import Icon from '../../components/Icon.astro';
+import Logo from '../../components/Logo.astro';
 import Text from '../../components/Text.astro';
 import { getTranslations, isLang, type MessageKey } from '../../i18n';
 import NextDeadline from '../../islands/NextDeadline';
@@ -49,6 +51,7 @@ const quizCountries = countries
   <div class="hero-band">
     <section class="hero">
       <h1 class="headline">{t('home.headline')}</h1>
+      <p class="lead">{t('home.lead')}</p>
       <SearchBox lang={lang} id="home-q" />
       <ul class="chips" aria-label={t('home.chips')}>
         <li>
@@ -70,10 +73,13 @@ const quizCountries = countries
     </section>
     <div class="hero-side">
       <NextDeadline client:load path={`/${lang}/my/next`} />
+      <div class="hero-art" aria-hidden="true">
+        <Logo markOnly size="large" />
+      </div>
     </div>
   </div>
 
-  <section class="block" aria-labelledby="matches-title">
+  <section class="block quiz-card" aria-labelledby="matches-title">
     <h2 id="matches-title" class="section-title">
       {t('quiz.title')}
     </h2>
@@ -122,6 +128,10 @@ const quizCountries = countries
             <span class="tile-name">
               <Text value={country.name} lang={lang} />
             </span>
+            <span class="tile-cta">
+              {t('home.country.cta')}
+              <Icon name="arrow" />
+            </span>
           </a>
         </li>
       ))}
@@ -161,7 +171,26 @@ const quizCountries = countries
     </div>
   )}
 
-  <p class="trust">{t('home.trust')}</p>
+  <ul class="trust" aria-label={t('home.trust')}>
+    <li>
+      <span class="trust-icon">
+        <Icon name="shield" />
+      </span>
+      <a href={`/${lang}/how-we-check`}>{t('home.trust.ministry')}</a>
+    </li>
+    <li>
+      <span class="trust-icon">
+        <Icon name="no-ads" />
+      </span>
+      <span>{t('home.trust.noAds')}</span>
+    </li>
+    <li>
+      <span class="trust-icon">
+        <Icon name="gift" />
+      </span>
+      <span>{t('home.trust.free')}</span>
+    </li>
+  </ul>
 </AppShell>
 
 <style>
@@ -177,6 +206,20 @@ const quizCountries = countries
     font-weight: var(--weight-semibold);
     letter-spacing: -0.01em;
     text-wrap: balance;
+  }
+  .lead {
+    max-width: 40ch;
+    color: var(--ink-muted);
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+  }
+  .hero-art {
+    display: none;
+  }
+  .quiz-card {
+    padding: var(--space-5);
+    border-radius: var(--radius-card-large);
+    background: var(--brand-soft);
   }
   .chips {
     display: flex;
@@ -242,6 +285,20 @@ const quizCountries = countries
   .tile-name {
     font-weight: var(--weight-semibold);
   }
+  .tile-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: auto;
+    color: var(--brand);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--weight-semibold);
+  }
+  .tile-cta :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
   .grid {
     display: grid;
     gap: var(--space-4);
@@ -257,9 +314,28 @@ const quizCountries = countries
     display: none;
   }
   .trust {
-    margin-top: var(--space-6);
-    color: var(--ink-muted);
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .trust li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
     font-weight: var(--weight-medium);
+  }
+  .trust-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-badge);
+    background: var(--brand-soft);
+    color: var(--brand);
   }
   .hero-side:has(.next-card) {
     margin-bottom: var(--space-4);
@@ -278,6 +354,32 @@ const quizCountries = countries
     }
     .hero-side:has(.next-card) {
       margin-bottom: 0;
+    }
+    /* Signed out or no deadline: the logo mark on its sun disc fills the right side. */
+    .hero-band:not(:has(.next-card)) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-6);
+    }
+    .hero-band:not(:has(.next-card)) .hero-art {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20rem;
+      height: 20rem;
+      border-radius: var(--radius-badge);
+      background: var(--logo-sun);
+    }
+    .hero-art :global(.logo) {
+      height: 11rem;
+    }
+    .quiz-card {
+      padding: var(--space-6);
+    }
+    .trust {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
     }
     .headline {
       font-size: var(--text-display);

@@ -208,7 +208,15 @@ const sortHidden = [...canonical].filter(([k]) => k !== PARAM.sort && k !== PARA
         )}
       </div>
 
-      {total === 0 ? (
+      {total === 0 && filterCount === 0 && !q ? (
+        <EmptyState
+          mark
+          title={t('search.soon.title')}
+          body={t('search.soon.body')}
+          action={{ href: `/${lang}/discussions`, label: t('soon.ask') }}
+          secondary={{ href: `/${lang}/how-we-check`, label: t('footer.howWeCheck') }}
+        />
+      ) : total === 0 ? (
         <EmptyState
           title={t('search.empty.title')}
           body={t('search.empty.body')}

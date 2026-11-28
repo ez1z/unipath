@@ -37,6 +37,9 @@
       grid-template-areas:
         'head side'
         'content side';
+      /* When the side column is the taller one, its extra height goes to the
+         content row: an auto head row would grow and leave a gap under the title. */
+      grid-template-rows: auto 1fr;
       align-items: start;
       column-gap: var(--space-6);
     }

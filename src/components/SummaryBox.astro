@@ -32,19 +32,19 @@ const t = getTranslations(lang);
     </div>
   )}
   <p class="meta">
-    <span>{t('common.lastChecked', { date: formatDate(lang, lastChecked) })}</span>
+    <span class="item">{t('common.lastChecked', { date: formatDate(lang, lastChecked) })}</span>
     {sourceUrl && (
-      <>
-        <span aria-hidden="true">·</span>
+      <span class="item">
         <a href={sourceUrl} rel="noopener noreferrer" target="_blank">
           {t('common.source')}
         </a>
-      </>
+      </span>
     )}
-    <span aria-hidden="true">·</span>
-    <a href={reportHref} rel="nofollow">
-      {t('common.reportMistake')}
-    </a>
+    <span class="item report">
+      <a href={reportHref} rel="nofollow">
+        {t('common.reportMistake')}
+      </a>
+    </span>
   </p>
 </section>
 
@@ -73,6 +73,20 @@ const t = getTranslations(lang);
     color: var(--ink-muted);
     font-size: var(--text-small);
     line-height: var(--leading-small);
+  }
+  .item {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+  /* Each separator belongs to the item after it, so a wrapped line never ends on a dot. */
+  .item + .item:not(.report)::before {
+    content: '·';
+    margin-inline-end: var(--space-2);
+  }
+  /* "Report a mistake" is an action, not a fact: always its own line. */
+  .report {
+    flex-basis: 100%;
   }
   .meta a {
     display: inline-flex;

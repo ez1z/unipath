@@ -316,10 +316,12 @@ const myAutoName = viewerId ? authorName(t, { id: viewerId, nickname: null }) : 
       line-height: var(--leading-h2);
     }
   }
+  /* No top margin of its own: .stack spaces it from the heading. */
   .replies {
     display: grid;
     gap: var(--space-3);
-    margin: 0;
+    margin-inline: 0;
+    margin-bottom: 0;
     padding: 0;
     list-style: none;
   }

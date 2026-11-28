@@ -6,6 +6,7 @@
  * student goes through /auth/continue, which finishes what they tried.
  */
 import { getTranslations, isLang, type MessageKey } from '../../i18n';
+import Logo from '../../components/Logo.astro';
 import AppShell from '../../layouts/AppShell.astro';
 import { parsePendingAction } from '../../lib/account';
 import { safeNextPath } from '../../lib/auth/next';
@@ -91,6 +92,9 @@ const emailCodes = emailEnabled();
 
 <AppShell lang={lang} title={t('signIn.metaTitle')} noindex>
   <div class="sign-in">
+    <span class="mark" aria-hidden="true">
+      <Logo markOnly size="large" />
+    </span>
     <h1 class="page-title">{t('signIn.title')}</h1>
 
     {step === 'start' ? (
@@ -210,6 +214,20 @@ const emailCodes = emailEnabled();
 </AppShell>
 
 <style>
+  .mark {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    width: 5rem;
+    height: 5rem;
+    border-radius: var(--radius-badge);
+    background: var(--logo-sun);
+  }
+  .mark :global(.logo) {
+    height: 2.5rem;
+  }
   .sign-in {
     display: grid;
     gap: var(--space-4);

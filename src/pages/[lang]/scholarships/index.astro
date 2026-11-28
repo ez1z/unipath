@@ -94,7 +94,15 @@ more.set(PARAM.page, String(f.page + 1));
       <h2 id="results-count" class="text-title count">
         {t('search.count.scholarships', { n: results.total })}
       </h2>
-      {results.total === 0 ? (
+      {results.total === 0 && filterCount === 0 ? (
+        <EmptyState
+          mark
+          title={t('scholarships.soon.title')}
+          body={t('scholarships.soon.body')}
+          action={{ href: `/${lang}/discussions`, label: t('soon.ask') }}
+          secondary={{ href: `/${lang}/how-we-check`, label: t('footer.howWeCheck') }}
+        />
+      ) : results.total === 0 ? (
         <EmptyState
           title={t('search.empty.title')}
           body={t('search.empty.body')}

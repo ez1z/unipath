@@ -1,10 +1,13 @@
 ---
 import { getTranslations, type Lang, type MessageKey } from '../i18n';
 import AppShell from '../layouts/AppShell.astro';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
 
 /**
- * A static text page (About, How we check, Privacy): a title and sections of
- * translated paragraphs. Prerendered once per language.
+ * A static text page (About, How we check, Privacy): a title with the logo mark,
+ * the first paragraph as a lead, sections as cards, and Clavis's three promises
+ * beside them on desktop. Prerendered once per language.
  */
 interface Section {
   title?: MessageKey;
@@ -18,31 +21,135 @@ interface Props {
 }
 const { lang, metaTitle, title, sections } = Astro.props;
 const t = getTranslations(lang);
+const promises = [
+  { icon: 'shield', key: 'home.trust.ministry' },
+  { icon: 'no-ads', key: 'home.trust.noAds' },
+  { icon: 'gift', key: 'home.trust.free' },
+] as const;
 ---
 
 <AppShell lang={lang} title={t(metaTitle)}>
-  <article class="content">
-    <h1 class="page-title">{t(title)}</h1>
-    {sections.map((section) => (
-      <section>
-        {section.title && <h2 class="text-h2">{t(section.title)}</h2>}
-        {section.body.map((key) => (
-          <p>{t(key)}</p>
+  <div class="page">
+    <header class="head">
+      <span class="art" aria-hidden="true">
+        <Logo markOnly size="large" />
+      </span>
+      <h1 class="page-title">{t(title)}</h1>
+    </header>
+    <article class="content">
+      {sections.map((section, i) => (
+        <section class:list={['section', { plain: i === 0 && !section.title }]}>
+          {section.title && <h2 class="text-h2">{t(section.title)}</h2>}
+          {section.body.map((key, j) => (
+            <p class:list={{ lead: i === 0 && j === 0 }}>{t(key)}</p>
+          ))}
+        </section>
+      ))}
+      <slot />
+    </article>
+    <aside class="promises" aria-label={t('home.trust')}>
+      <ul>
+        {promises.map((p) => (
+          <li>
+            <span class="icon-wrap">
+              <Icon name={p.icon} />
+            </span>
+            <span>{t(p.key)}</span>
+          </li>
         ))}
-      </section>
-    ))}
-    <slot />
-  </article>
+      </ul>
+    </aside>
+  </div>
 </AppShell>
 
 <style>
-  .content {
+  .page {
     display: grid;
     gap: var(--space-5);
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+  .art {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: var(--radius-badge);
+    background: var(--logo-sun);
+  }
+  .art :global(.logo) {
+    height: 2.75rem;
+  }
+  .content {
+    display: grid;
+    gap: var(--space-4);
     max-width: 44rem;
   }
-  section {
+  .section {
     display: grid;
     gap: var(--space-3);
+    padding: var(--space-5);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+  }
+  .section.plain {
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+  .lead {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    font-weight: var(--weight-medium);
+  }
+  .promises ul {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: var(--space-5);
+    border-radius: var(--radius-card);
+    background: var(--brand-soft);
+    list-style: none;
+  }
+  .promises li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-weight: var(--weight-medium);
+  }
+  .icon-wrap {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-badge);
+    background: var(--surface-raised);
+    color: var(--brand);
+  }
+  @media (min-width: 1024px) {
+    .page {
+      grid-template-columns: minmax(0, 44rem) minmax(16rem, 22rem);
+      justify-content: space-between;
+      column-gap: var(--space-6);
+    }
+    .head {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: center;
+    }
+    .promises {
+      position: sticky;
+      top: var(--space-5);
+      align-self: start;
+    }
   }
 </style>

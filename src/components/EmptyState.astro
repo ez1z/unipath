@@ -1,19 +1,43 @@
 ---
+import Logo from './Logo.astro';
+
+/**
+ * Empty results, empty lists and "not found". With `mark`, the logo mark sits
+ * on the soft sun disc from the logo artwork: used where the page would
+ * otherwise feel blank (nothing published yet, page not found).
+ */
 interface Props {
   title: string;
   body?: string;
   action?: { href: string; label: string } | undefined;
+  /** A second, quieter link (e.g. "Ask in the Forum"). */
+  secondary?: { href: string; label: string } | undefined;
+  mark?: boolean;
 }
-const { title, body, action } = Astro.props;
+const { title, body, action, secondary, mark = false } = Astro.props;
 ---
 
-<div class="empty">
+<div class:list={['empty', { 'with-mark': mark }]}>
+  {mark && (
+    <span class="sun" aria-hidden="true">
+      <Logo markOnly size="large" />
+    </span>
+  )}
   <p class="text-title">{title}</p>
-  {body && <p class="text-muted">{body}</p>}
-  {action && (
-    <a class="button button-secondary" href={action.href}>
-      {action.label}
-    </a>
+  {body && <p class="text-muted body">{body}</p>}
+  {(action || secondary) && (
+    <div class="actions">
+      {action && (
+        <a class="button button-secondary" href={action.href}>
+          {action.label}
+        </a>
+      )}
+      {secondary && (
+        <a class="link-action" href={secondary.href}>
+          {secondary.label}
+        </a>
+      )}
+    </div>
   )}
 </div>
 
@@ -27,5 +51,41 @@ const { title, body, action } = Astro.props;
     border-radius: var(--radius-card);
     background: var(--surface-raised);
     border: 1px dashed var(--border);
+  }
+  .with-mark {
+    align-items: center;
+    padding-block: var(--space-6);
+    text-align: center;
+    border-style: solid;
+  }
+  .with-mark .body {
+    max-width: 36rem;
+  }
+  .sun {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 7rem;
+    height: 7rem;
+    margin-bottom: var(--space-2);
+    border-radius: var(--radius-badge);
+    background: var(--logo-sun);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: inherit;
+    gap: var(--space-2) var(--space-4);
+  }
+  .with-mark .actions {
+    justify-content: center;
+  }
+  .link-action {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+    font-weight: var(--weight-semibold);
   }
 </style>
