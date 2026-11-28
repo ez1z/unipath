@@ -67,14 +67,23 @@ function devToken(): string {
   return token.trim();
 }
 
-async function telegramCallback(id: string, next = '/en/auth/continue', token = devToken()) {
-  const params = await signLoginWidget(
+/**
+ * Does what the Login Widget does: opens our Telegram page (telegram.org is
+ * blocked, so nothing leaves the machine), takes the return URL from the widget
+ * (it holds the one-time state our page set in a cookie), and adds signed data.
+ */
+async function telegramSignIn(page: Page, id: string, token = devToken()) {
+  await page.route('https://telegram.org/**', (route) => route.abort());
+  await page.goto('/en/sign-in/telegram');
+  const authUrl = await page.locator('script[data-telegram-login]').getAttribute('data-auth-url');
+  if (!authUrl) throw new Error('No Telegram widget on the page');
+  const url = new URL(authUrl);
+  const signed = await signLoginWidget(
     { id, first_name: 'Test', auth_date: String(Math.floor(Date.now() / 1000)) },
     token,
   );
-  params.set('next', next);
-  params.set('fail', '/en/sign-in');
-  return `/api/auth/telegram/callback?${params}`;
+  for (const [key, value] of signed) url.searchParams.set(key, value);
+  await page.goto(`${url.pathname}${url.search}`);
 }
 
 test.describe('sign-in page', () => {
@@ -197,7 +206,7 @@ test.describe('Save with the sign-in sheet', () => {
 test.describe('Telegram (local stand-in token)', () => {
   test('signed login data signs in', async ({ page }, info) => {
     const telegramId = String(800_000_000 + Math.floor(Math.random() * 1_000_000) + info.retry);
-    await page.goto(await telegramCallback(telegramId));
+    await telegramSignIn(page, telegramId);
     await expect(page).toHaveURL(/\/en\/my$/);
     await expect(
       page.getByRole('heading', { level: 1, name: msg('en', 'my.title') }),
@@ -208,8 +217,21 @@ test.describe('Telegram (local stand-in token)', () => {
     await expect(page.getByText(msg('en', 'profile.reminder.needsEmail'))).toBeVisible();
   });
 
+  test('a link that did not start on our Telegram page is refused', async ({ page }) => {
+    const signed = await signLoginWidget(
+      { id: '800998', auth_date: String(Math.floor(Date.now() / 1000)) },
+      devToken(),
+    );
+    signed.set('next', '/en/auth/continue');
+    signed.set('fail', '/en/sign-in');
+    await page.goto(`/api/auth/telegram/callback?${signed}`);
+    await expect(page).toHaveURL(/\/en\/sign-in\?error=telegram-failed/);
+    await page.goto('/en/my');
+    await expect(page).toHaveURL(/\/en\/sign-in/);
+  });
+
   test('data signed with another token is refused', async ({ page }) => {
-    await page.goto(await telegramCallback('800999', '/en/auth/continue', '1:not-the-bot'));
+    await telegramSignIn(page, '800999', '1:not-the-bot');
     await expect(page).toHaveURL(/\/en\/sign-in\?error=telegram-failed/);
     await expect(page.getByRole('alert')).toHaveText(msg('en', 'signIn.error.telegram-failed'));
   });

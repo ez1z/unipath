@@ -11,7 +11,7 @@ import { account } from '../db/schema.ts';
 import { consoleMailer, cloudflareMailer, type Mailer, type SendEmailBinding } from '../email.ts';
 import { clientIp, getDb } from '../server.ts';
 import { CODE_LENGTH, createAuth, LANG_HEADER, type Auth } from './auth.ts';
-import { isPlaceholderEmail } from './telegram-plugin.ts';
+import { isPlaceholderEmail, type MarkUsed } from './telegram-plugin.ts';
 
 /** `env` with the optional parts typed loosely (the email binding exists only in production). */
 const vars = env as unknown as Record<string, string | undefined> & {
@@ -46,6 +46,13 @@ export function telegramBotUsername(): string | null {
   return vars['TELEGRAM_BOT_USERNAME'] || null;
 }
 
+/** KV is eventually consistent, so this stops replays from history, not a race of two tabs. */
+const markUsedInKv: MarkUsed = async (key, ttlSeconds) => {
+  if ((await env.KV.get(key)) !== null) return false;
+  await env.KV.put(key, '1', { expirationTtl: Math.max(60, ttlSeconds) });
+  return true;
+};
+
 let auth: Auth | null = null;
 
 export function getAuth(): Auth {
@@ -58,6 +65,7 @@ export function getAuth(): Auth {
     secret,
     mailer: mailer(),
     telegramBotToken: vars['TELEGRAM_BOT_TOKEN'],
+    telegramMarkUsed: markUsedInKv,
     google: googleEnabled()
       ? {
           clientId: vars['GOOGLE_CLIENT_ID'] ?? '',

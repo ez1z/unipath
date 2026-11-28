@@ -13,6 +13,12 @@ import AppShell from '../../../layouts/AppShell.astro';
 import { parsePendingAction } from '../../../lib/account';
 import { safeNextPath } from '../../../lib/auth/next';
 import { siteUrl, telegramBotUsername } from '../../../lib/auth/server';
+import {
+  newTelegramState,
+  TELEGRAM_STATE_COOKIE,
+  TELEGRAM_STATE_PATH,
+  TELEGRAM_STATE_SECONDS,
+} from '../../../lib/auth/telegram-plugin';
 import { continuePath, signInPath } from '../../../lib/auth/urls';
 
 export const prerender = false;
@@ -31,6 +37,19 @@ const bot = telegramBotUsername();
 const callback = new URL('/api/auth/telegram/callback', siteUrl());
 callback.searchParams.set('next', continuePath(lang, to));
 callback.searchParams.set('fail', signInPath(lang, to));
+
+// One-time state, checked by the callback (see telegram-plugin.ts).
+if (bot) {
+  const state = newTelegramState();
+  callback.searchParams.set('state', state);
+  Astro.cookies.set(TELEGRAM_STATE_COOKIE, state, {
+    path: TELEGRAM_STATE_PATH,
+    maxAge: TELEGRAM_STATE_SECONDS,
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: siteUrl().startsWith('https://'),
+  });
+}
 ---
 
 <AppShell lang={lang} title={t('signIn.metaTitle')} noindex>

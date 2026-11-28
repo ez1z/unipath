@@ -33,10 +33,14 @@ preview deployment, never with real keys committed to the repo.
    Confirm in Telegram: you land on My Clav.
 4. In D1: the `user` row has email `tg-<id>@telegram.invalid`, empty `name`
    and no `image` (no real name or photo is kept).
-5. Check that Telegram keeps our `next` and `fail` parameters when it sends the
-   browser back (`/api/auth/telegram/callback?next=…&id=…`). If it drops them,
-   you still land on Home, signed in; tell Claude so the return path can move
-   into a cookie.
+5. **Telegram must keep our query parameters.** The return URL carries
+   `state`, `next` and `fail`. If Telegram drops them, every Telegram sign-in
+   fails with "Telegram sign-in failed": tell Claude, so the state can move
+   into the cookie alone.
+6. Sign out, then sign in with Telegram again right away: it must work. Each
+   piece of signed data is accepted only once; if Telegram sends exactly the
+   same data again, tell Claude.
+7. Open an old callback link from browser history: it is refused.
 
 ### Google
 
@@ -73,6 +77,7 @@ preview deployment, never with real keys committed to the repo.
 ### Locally, without real keys
 
 - Email: codes print in the `pnpm preview` console (`[clavis mail]`).
-- Telegram: `pnpm exec node scripts/dev-telegram-login.ts 42 en` prints a
-  signed sign-in link for Telegram user 42; open it while preview runs.
+- Telegram: open `/en/sign-in/telegram`, copy the widget's `data-auth-url`
+  from DevTools, then `pnpm exec node scripts/dev-telegram-login.ts "<url>" 42`
+  prints a signed link for Telegram user 42 (steps at the top of the script).
 - Google: the button stays hidden until both Google secrets are set.

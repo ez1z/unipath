@@ -6,7 +6,12 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { createAuth, type Auth } from '../../src/lib/auth/auth.ts';
 import { safeNextPath } from '../../src/lib/auth/next.ts';
-import { isPlaceholderEmail, placeholderEmail } from '../../src/lib/auth/telegram-plugin.ts';
+import {
+  isPlaceholderEmail,
+  newTelegramState,
+  placeholderEmail,
+  TELEGRAM_STATE_COOKIE,
+} from '../../src/lib/auth/telegram-plugin.ts';
 import { signLoginWidget } from '../../src/lib/auth/telegram.ts';
 import {
   deleteAccount,
@@ -24,6 +29,15 @@ const BOT_TOKEN = '123456:test-only-fake-token';
 let t: TestDb;
 let auth: Auth;
 const outbox: Mail[] = [];
+const usedTelegramData = new Set<string>();
+
+/** Signed Telegram data plus the one-time state the Telegram page would have set. */
+function withState(params: URLSearchParams, cookie?: string) {
+  const state = newTelegramState();
+  params.set('state', state);
+  const cookies = [cookie, `${TELEGRAM_STATE_COOKIE}=${state}`].filter(Boolean).join('; ');
+  return { query: params.toString(), cookie: cookies };
+}
 
 beforeAll(async () => {
   t = await createTestDb();
@@ -33,6 +47,11 @@ beforeAll(async () => {
     secret: 'test-secret-test-secret-test-secret-0123',
     mailer: { send: (mail) => Promise.resolve(void outbox.push(mail)) },
     telegramBotToken: BOT_TOKEN,
+    telegramMarkUsed: (key) => {
+      if (usedTelegramData.has(key)) return Promise.resolve(false);
+      usedTelegramData.add(key);
+      return Promise.resolve(true);
+    },
     google: { clientId: 'fake-google-client-id', clientSecret: 'fake-google-secret' },
   });
 }, 60_000);
@@ -154,7 +173,9 @@ describe('email code', () => {
 });
 
 describe('Telegram Login Widget', () => {
-  const now = () => String(Math.floor(Date.now() / 1000));
+  // A different auth_date per call: each piece of signed data is accepted only once.
+  let tick = 0;
+  const now = () => String(Math.floor(Date.now() / 1000) - tick++);
   const callback = async (
     fields: Record<string, string>,
     {
@@ -166,8 +187,11 @@ describe('Telegram Login Widget', () => {
     const params = await signLoginWidget(fields, token);
     params.set('next', next);
     params.set('fail', '/en/sign-in');
-    return get(`/telegram/callback?${params}`, cookie);
+    const request = withState(params, cookie);
+    return get(`/telegram/callback?${request.query}`, request.cookie);
   };
+  const sessionCookies = (response: Response) =>
+    response.headers.getSetCookie().filter((c) => c.startsWith('clavis.session_token='));
 
   test('valid data signs in a new user; only the Telegram id is kept', async () => {
     const response = await callback({
@@ -200,9 +224,10 @@ describe('Telegram Login Widget', () => {
     const params = await signLoginWidget({ id: '700300', auth_date: now() }, BOT_TOKEN);
     params.set('id', '700301');
     params.set('fail', '/en/sign-in');
-    const tampered = await get(`/telegram/callback?${params}`);
+    const request = withState(params);
+    const tampered = await get(`/telegram/callback?${request.query}`, request.cookie);
     expect(tampered.headers.get('Location')).toBe('/en/sign-in?error=telegram-failed');
-    expect(tampered.headers.getSetCookie()).toEqual([]);
+    expect(sessionCookies(tampered)).toEqual([]);
 
     const old = String(Math.floor(Date.now() / 1000) - 25 * 60 * 60);
     const expired = await callback({ id: '700302', auth_date: old });
@@ -213,6 +238,53 @@ describe('Telegram Login Widget', () => {
 
     const missing = await get('/telegram/callback?next=/en/my&fail=/en/sign-in');
     expect(missing.headers.get('Location')).toBe('/en/sign-in?error=telegram-failed');
+  });
+
+  test('older than an hour, or used before, is refused', async () => {
+    const hourAgo = String(Math.floor(Date.now() / 1000) - 61 * 60);
+    const late = await callback({ id: '700310', auth_date: hourAgo });
+    expect(late.headers.get('Location')).toBe('/en/sign-in?error=telegram-expired');
+
+    // The same signed data again (say, from browser history) doesn't sign in twice.
+    const params = await signLoginWidget({ id: '700311', auth_date: now() }, BOT_TOKEN);
+    params.set('fail', '/en/sign-in');
+    const first = withState(new URLSearchParams(params));
+    expect(
+      sessionCookies(await get(`/telegram/callback?${first.query}`, first.cookie)),
+    ).toHaveLength(1);
+    const second = withState(new URLSearchParams(params));
+    const replay = await get(`/telegram/callback?${second.query}`, second.cookie);
+    expect(replay.headers.get('Location')).toBe('/en/sign-in?error=telegram-expired');
+    expect(sessionCookies(replay)).toEqual([]);
+  });
+
+  test('a link built elsewhere (no matching state) neither links nor signs in', async () => {
+    // Someone signs their own Telegram data and gets a signed-in student to open it.
+    const victim = await signInWithEmail('victim@mail.test');
+    const me = await session(victim);
+    const params = await signLoginWidget({ id: '700320', auth_date: now() }, BOT_TOKEN);
+    params.set('next', '/en/my');
+    params.set('fail', '/en/sign-in');
+
+    const noState = await get(`/telegram/callback?${params}`, victim);
+    expect(noState.headers.get('Location')).toBe('/en/sign-in?error=telegram-failed');
+
+    // The student has a state cookie from their own visit, but the link has another.
+    params.set('state', newTelegramState());
+    const wrong = await get(
+      `/telegram/callback?${params}`,
+      `${victim}; ${TELEGRAM_STATE_COOKIE}=${newTelegramState()}`,
+    );
+    expect(wrong.headers.get('Location')).toBe('/en/sign-in?error=telegram-failed');
+    expect(await countRows('account', 'user_id', me?.user.id ?? '')).toBe(0);
+
+    // Signed out, the same link doesn't sign the browser in to the other account.
+    const signedOut = await get(`/telegram/callback?${params}`);
+    expect(sessionCookies(signedOut)).toEqual([]);
+    // The state is cleared after any try.
+    expect(wrong.headers.getSetCookie().join()).toMatch(
+      new RegExp(`${TELEGRAM_STATE_COOKIE}=;.*Max-Age=0`, 'i'),
+    );
   });
 
   test('never redirects off the site', async () => {
@@ -380,5 +452,6 @@ async function callback2(cookie: string) {
     BOT_TOKEN,
   );
   params.set('next', '/en/my');
-  await get(`/telegram/callback?${params}`, cookie);
+  const request = withState(params, cookie);
+  await get(`/telegram/callback?${request.query}`, request.cookie);
 }

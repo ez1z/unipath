@@ -14,7 +14,7 @@ import type { Db } from '../db/client.ts';
 import * as schema from '../db/schema.ts';
 import { resolveLang, type Lang } from '../../i18n/config.ts';
 import { signInCodeMail, type Mailer } from '../email.ts';
-import { telegramPlugin } from './telegram-plugin.ts';
+import { telegramPlugin, type MarkUsed } from './telegram-plugin.ts';
 
 export const SESSION_DAYS = 30;
 export const CODE_LENGTH = 6;
@@ -33,6 +33,8 @@ export interface AuthConfig {
   secret: string;
   mailer: Mailer;
   telegramBotToken?: string | undefined;
+  /** Remembers used Telegram login data (KV in the Worker), so it can't be replayed. */
+  telegramMarkUsed: MarkUsed;
   google?: { clientId: string; clientSecret: string } | undefined;
 }
 
@@ -111,7 +113,7 @@ export function createAuth(config: AuthConfig) {
         },
         changeEmail: { enabled: true, verifyCurrentEmail: false },
       }),
-      telegramPlugin({ botToken: config.telegramBotToken }),
+      telegramPlugin({ botToken: config.telegramBotToken, markUsed: config.telegramMarkUsed }),
     ],
   } satisfies BetterAuthOptions;
 
