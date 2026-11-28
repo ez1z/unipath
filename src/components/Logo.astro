@@ -1,47 +1,76 @@
 ---
 /**
- * Clavis logo: pointed iwan arch with a coral doorway on a threshold line,
- * plus the lowercase "clavis" wordmark. Colours come from tokens: the arch turns
- * cream in dark theme, the doorway never changes.
+ * Clavis logo: a columned university building with a coral flag, standing on an
+ * open book whose pages part around a winding road; plus the "Clavis" wordmark.
+ * Paths are traced from the logo artwork (logo-paths.ts). Colours come from
+ * tokens: the dark-green parts turn cream in dark theme (like the app icon on
+ * green); the leaf-green pages and the coral flag never change.
  */
+import { MARK, MARK_FLAG, MARK_INK, MARK_LEAF, WORD, WORD_PATH } from './logo-paths';
+
 interface Props {
   /** Hide the wordmark and show only the mark. */
   markOnly?: boolean;
+  /** header (default), large (footer, sign-in) or small (admin bar). */
+  size?: 'small' | 'header' | 'large';
 }
-const { markOnly = false } = Astro.props;
+const { markOnly = false, size = 'header' } = Astro.props;
+
+// Lockup geometry, in mark units: the wordmark is about half the mark's height
+// and sits level with the building, as in the artwork.
+const gap = MARK.w * 0.08;
+const wordScale = (MARK.h * 0.52) / WORD.h;
+const wordY = MARK.h * 0.3;
+const width = markOnly ? MARK.w : MARK.w + gap + WORD.w * wordScale;
+const viewBox = `0 0 ${width.toFixed(1)} ${MARK.h}`;
 ---
 
-<span class="logo">
-  <svg class="mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true" focusable="false">
-    <path class="arch" d="M10 52V32Q10 15 32 6Q54 15 54 32V52z"></path>
-    <path class="door" d="M19 52V33Q19 21 32 14Q45 21 45 33V52z"></path>
-    <rect class="arch" x="6" y="52" width="52" height="4" rx="2"></rect>
-  </svg>
-  {!markOnly && <span class="wordmark">clavis</span>}
-</span>
+<svg
+  class:list={['logo', `logo-${size}`, { 'logo-mark-only': markOnly }]}
+  viewBox={viewBox}
+  aria-hidden="true"
+  focusable="false"
+>
+  <g fill-rule="evenodd">
+    <path class="leaf" d={MARK_LEAF}></path>
+    <path class="ink" d={MARK_INK}></path>
+    <path class="flag" d={MARK_FLAG}></path>
+  </g>
+  {!markOnly && (
+    <path
+      class="ink"
+      fill-rule="evenodd"
+      transform={`translate(${(MARK.w + gap).toFixed(1)} ${wordY.toFixed(1)}) scale(${wordScale.toFixed(4)})`}
+      d={WORD_PATH}
+    />
+  )}
+</svg>
 
 <style>
   .logo {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    color: var(--ink);
-  }
-  .mark {
+    display: block;
     flex-shrink: 0;
-    width: 2rem;
-    height: 2rem;
+    width: auto;
+    height: 2.25rem;
   }
-  .arch {
-    fill: var(--logo-arch);
+  .logo-small {
+    height: 1.75rem;
   }
-  .door {
-    fill: var(--logo-door);
+  .logo-large {
+    height: 3.5rem;
   }
-  .wordmark {
-    font-size: 1.5rem;
-    line-height: 1;
-    font-weight: var(--weight-semibold);
-    letter-spacing: -0.02em;
+  .ink {
+    fill: var(--logo-ink);
+  }
+  .leaf {
+    fill: var(--logo-leaf);
+  }
+  .flag {
+    fill: var(--logo-flag);
+  }
+  @media (min-width: 1024px) {
+    .logo-header {
+      height: 2.5rem;
+    }
   }
 </style>

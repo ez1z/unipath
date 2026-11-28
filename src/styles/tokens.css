@@ -20,13 +20,24 @@
   --border: #dcd4c2;
   --danger: #b3261e;
 
+  /* Footer band: deep green with cream text in both themes, like the app icon.
+     --footer-ink on --footer-bg is 8.4:1, --footer-muted 6.3:1. */
+  --footer-bg: #234f3b;
+  --footer-ink: #faf3e3;
+  --footer-muted: #cbd8c6;
+  --footer-line: #3b6650;
+
   /* Elevation: sheets, popovers and the compare bar (not in SPEC's table; no text sits on these). */
   --scrim: rgb(0 0 0 / 0.4);
   --shadow-raised: 0 12px 40px rgb(0 0 0 / 0.22);
 
-  /* Logo: arch swaps to cream on dark; the doorway is never recoloured. */
-  --logo-arch: #234f3b;
-  --logo-door: #e4775a;
+  /* Logo: the dark-green building and book turn cream on dark; the leaf-green
+     pages and the coral flag are never recoloured. */
+  --logo-ink: #234f3b;
+  --logo-leaf: #86ae80;
+  --logo-flag: #e4775a;
+  /* The soft sun disc behind the mark in the logo artwork (decorative, no text on it). */
+  --logo-sun: #f3e4cc;
 
   /* Type */
   --font-sans:
@@ -91,7 +102,10 @@
     --on-accent: #16261d;
     --border: #2e3d35;
     --danger: #f2b8b5;
-    --logo-arch: #faf3e3;
+    --logo-ink: #faf3e3;
+    --logo-sun: #1f3328;
+    --footer-bg: #0b140f;
+    --footer-line: #24352c;
   }
 }
 
@@ -108,5 +122,8 @@
   --on-accent: #16261d;
   --border: #2e3d35;
   --danger: #f2b8b5;
-  --logo-arch: #faf3e3;
+  --logo-ink: #faf3e3;
+  --logo-sun: #1f3328;
+  --footer-bg: #0b140f;
+  --footer-line: #24352c;
 }

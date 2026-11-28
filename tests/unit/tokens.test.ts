@@ -83,10 +83,12 @@ describe('design tokens', () => {
     expect(darkBySystem).toEqual(darkByAttribute);
   });
 
-  it('keep the logo doorway coral in both themes', () => {
-    expect(light['--logo-door']).toBe('#e4775a');
-    expect(darkByAttribute['--logo-door']).toBe('#e4775a');
-    expect(darkByAttribute['--logo-arch']).toBe('#faf3e3');
+  it('keep the logo flag coral and the pages leaf green in both themes', () => {
+    expect(light['--logo-flag']).toBe('#e4775a');
+    expect(darkByAttribute['--logo-flag']).toBe('#e4775a');
+    expect(darkByAttribute['--logo-leaf']).toBe(light['--logo-leaf']);
+    expect(light['--logo-ink']).toBe('#234f3b');
+    expect(darkByAttribute['--logo-ink']).toBe('#faf3e3');
   });
 
   for (const [name, theme] of [
