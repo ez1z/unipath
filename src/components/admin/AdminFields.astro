@@ -1,0 +1,284 @@
+---
+/**
+ * Renders the sections of an admin form (lib/admin/form.ts). Translated
+ * fields show English (the record's own text), Turkmen and Russian side by
+ * side. Errors sit under their field and are announced with it.
+ */
+import ImageUpload from '../../islands/ImageUpload';
+import { getTranslations, LANG_NAMES, type Lang } from '../../i18n';
+import type { Field, FormErrors, FormValues, Section, Translated } from '../../lib/admin/form';
+
+interface Props {
+  lang: Lang;
+  sections: Section[];
+  values: FormValues;
+  errors: FormErrors;
+  /** The last-checked date the form showed, so an untouched date becomes today on save. */
+  lastCheckedWas: string;
+}
+
+const { lang, sections, values, errors, lastCheckedWas } = Astro.props;
+const t = getTranslations(lang);
+const LANG_COLUMNS = ['en', 'tk', 'ru'] as const;
+
+const str = (name: string) => {
+  const v = values[name];
+  return typeof v === 'string' ? v : '';
+};
+const arr = (name: string) => {
+  const v = values[name];
+  return Array.isArray(v) ? v : [];
+};
+const tr = (name: string): Translated => {
+  const v = values[name];
+  return v && typeof v === 'object' && !Array.isArray(v) ? v : { en: '', tk: '', ru: '' };
+};
+const errorOf = (name: string) => {
+  const e = errors[name];
+  return e ? t(e.key, e.params) : null;
+};
+const id = (name: string) => `f-${name}`;
+const describedBy = (field: Field) =>
+  [
+    field.hint ? `${id(field.name)}-hint` : null,
+    errors[field.name] ? `${id(field.name)}-error` : null,
+  ]
+    .filter(Boolean)
+    .join(' ') || undefined;
+const groups = (field: Field & { options: { group?: string }[] }) => [
+  ...new Set(field.options.map((o) => o.group ?? '')),
+];
+const imageLabels = {
+  choose: t('admin.image.choose'),
+  uploading: t('admin.image.uploading'),
+  done: t('admin.image.done'),
+  remove: t('admin.image.remove'),
+  failed: t('admin.image.failed'),
+  noWebp: t('admin.image.noWebp'),
+};
+---
+
+{sections.map((section) => (
+  <fieldset class="admin-section">
+    <legend class="section-title">{t(section.legend)}</legend>
+    {section.fields.map((field) => (
+      <div class="field">
+        {field.kind === 'translated' ? (
+          <fieldset class="field" aria-describedby={describedBy(field)}>
+            <legend>
+              {t(field.label)}
+              {field.required && <span class="muted-note"> ({t('admin.requiredEnglish')})</span>}
+            </legend>
+            <div class="langs">
+              {LANG_COLUMNS.map((code) => (
+                <div class="field">
+                  <label for={id(`${field.name}_${code}`)}>{LANG_NAMES[code]}</label>
+                  {field.multiline ? (
+                    <textarea
+                      id={id(`${field.name}_${code}`)}
+                      class="input"
+                      name={`${field.name}_${code}`}
+                      rows={field.rows ?? 3}
+                      lang={code}
+                      aria-invalid={code === 'en' && errors[field.name] ? 'true' : undefined}
+                    >
+                        {tr(field.name)[code]}
+                      </textarea>
+                  ) : (
+                    <input
+                      id={id(`${field.name}_${code}`)}
+                      class="input"
+                      name={`${field.name}_${code}`}
+                      value={tr(field.name)[code]}
+                      lang={code}
+                      aria-invalid={code === 'en' && errors[field.name] ? 'true' : undefined}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </fieldset>
+        ) : field.kind === 'checkbox' ? (
+          <label class="choice">
+            <input
+              type="checkbox"
+              name={field.name}
+              checked={values[field.name] === true}
+              aria-describedby={describedBy(field)}
+            />
+            {t(field.label)}
+          </label>
+        ) : field.kind === 'checkboxes' ? (
+          <fieldset class="field" aria-describedby={describedBy(field)}>
+            <legend>{t(field.label)}</legend>
+            <div class="choices">
+              {field.options.map((option) => (
+                <label class="choice">
+                  <input
+                    type="checkbox"
+                    name={field.name}
+                    value={option.value}
+                    checked={arr(field.name).includes(option.value)}
+                  />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : field.kind === 'image' ? (
+          <>
+            <span class="form-label" id={`${id(field.name)}-label`}>
+              {t(field.label)}
+            </span>
+            <ImageUpload
+              client:visible
+              name={field.name}
+              kind={field.image}
+              value={str(field.name)}
+              labelledBy={`${id(field.name)}-label`}
+              labels={imageLabels}
+            />
+            <noscript>
+              <input type="hidden" name={field.name} value={str(field.name)} />
+              <p class="muted-note">{t('admin.image.needsScript')}</p>
+            </noscript>
+          </>
+        ) : (
+          <>
+            <label for={id(field.name)}>
+              {t(field.label)}
+              {field.required && <span class="muted-note"> *</span>}
+            </label>
+            {field.kind === 'select' ? (
+              <select
+                id={id(field.name)}
+                class="input"
+                name={field.name}
+                aria-invalid={errors[field.name] ? 'true' : undefined}
+                aria-describedby={describedBy(field)}
+              >
+                {field.blank && <option value="">{t(field.blank)}</option>}
+                {groups(field).map((group) =>
+                  group ? (
+                    <optgroup label={group}>
+                      {field.options
+                        .filter((o) => o.group === group)
+                        .map((o) => (
+                          <option value={o.value} selected={str(field.name) === o.value}>
+                            {o.label}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ) : (
+                    field.options
+                      .filter((o) => !o.group)
+                      .map((o) => (
+                        <option value={o.value} selected={str(field.name) === o.value}>
+                          {o.label}
+                        </option>
+                      ))
+                  ),
+                )}
+              </select>
+            ) : field.kind === 'multiselect' ? (
+              <select
+                id={id(field.name)}
+                class="input multi"
+                name={field.name}
+                multiple
+                size={field.size ?? 6}
+                aria-describedby={describedBy(field)}
+              >
+                {field.options.map((o) => (
+                  <option value={o.value} selected={arr(field.name).includes(o.value)}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            ) : field.kind === 'textarea' ? (
+              <textarea
+                id={id(field.name)}
+                class="input"
+                name={field.name}
+                rows={field.rows ?? 3}
+                aria-invalid={errors[field.name] ? 'true' : undefined}
+                aria-describedby={describedBy(field)}
+              >
+                  {str(field.name)}
+                </textarea>
+            ) : (
+              <input
+                id={id(field.name)}
+                class="input"
+                name={field.name}
+                type={
+                  field.kind === 'url'
+                    ? 'url'
+                    : field.kind === 'date'
+                      ? 'date'
+                      : field.kind === 'number'
+                        ? 'number'
+                        : 'text'
+                }
+                value={str(field.name)}
+                step={field.kind === 'number' ? field.step : undefined}
+                min={field.kind === 'number' ? field.min : undefined}
+                max={field.kind === 'number' ? field.max : undefined}
+                maxlength={field.kind === 'text' ? field.maxLength : undefined}
+                inputmode={field.kind === 'number' ? 'decimal' : undefined}
+                aria-invalid={errors[field.name] ? 'true' : undefined}
+                aria-describedby={describedBy(field)}
+              />
+            )}
+            {field.name === 'last_checked' && (
+              <input type="hidden" name="last_checked_was" value={lastCheckedWas} />
+            )}
+          </>
+        )}
+        {field.hint && (
+          <p id={`${id(field.name)}-hint`} class="muted-note">
+            {t(field.hint)}
+          </p>
+        )}
+        {errorOf(field.name) && (
+          <p id={`${id(field.name)}-error`} class="form-error">
+            {errorOf(field.name)}
+          </p>
+        )}
+      </div>
+    ))}
+  </fieldset>
+))}
+
+<style>
+  .admin-section {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    min-width: 0;
+  }
+  .admin-section > legend {
+    padding-inline: var(--space-2);
+  }
+  .langs {
+    display: grid;
+    gap: var(--space-3);
+  }
+  @media (min-width: 48rem) {
+    .langs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-5);
+  }
+  .multi {
+    min-height: 10rem;
+  }
+</style>

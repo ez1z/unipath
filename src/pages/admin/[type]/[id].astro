@@ -1,0 +1,198 @@
+---
+/**
+ * /admin/<type>/<id> (or /new): the edit form for one record, all three
+ * languages side by side. Saving checks the publish rule (a source is
+ * needed), sets Last checked to today unless it was changed by hand, writes
+ * an audit row, and bumps data_version so public pages show the change on
+ * their next view.
+ */
+import { env } from 'cloudflare:workers';
+import AdminFields from '../../../components/admin/AdminFields.astro';
+import { getTranslations } from '../../../i18n';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { afterAdminWrite } from '../../../lib/admin/after-save';
+import { isStale, text, type FormErrors, type FormValues } from '../../../lib/admin/form';
+import { requireAdmin } from '../../../lib/admin/guard';
+import { isAdminType } from '../../../lib/admin/record-type';
+import { RECORD_TYPES } from '../../../lib/admin/types';
+import { getDb, today } from '../../../lib/server';
+
+export const prerender = false;
+
+const type = Astro.params['type'];
+if (!isAdminType(type)) return new Response('Not found', { status: 404 });
+const admin = await requireAdmin(Astro.request, Astro.response.headers);
+if (admin instanceof Response) return admin;
+const { lang, adminId } = admin;
+const t = getTranslations(lang);
+const record = RECORD_TYPES[type];
+const db = getDb();
+const now = today();
+
+const rawId = Astro.params['id'];
+const isNew = rawId === 'new';
+const id = isNew ? null : Number(rawId);
+if (!isNew && (!Number.isInteger(id) || (id ?? 0) <= 0)) {
+  return new Response('Not found', { status: 404 });
+}
+const stored = id === null ? null : await record.load(db, id);
+if (id !== null && !stored) return new Response('Not found', { status: 404 });
+
+let values: FormValues = stored ?? record.empty(now);
+let errors: FormErrors = {};
+let lastCheckedWas = typeof values['last_checked'] === 'string' ? values['last_checked'] : now;
+let deleteError: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const limit = await env.WRITE_LIMITER.limit({ key: `write:${adminId}` });
+  if (!limit.success) {
+    errors = { form: { key: 'admin.error.rate' } };
+  } else {
+    const form = await Astro.request.formData();
+    const intent = text(form, 'intent');
+
+    if (intent === 'delete' && id !== null) {
+      if (text(form, 'confirm') !== 'on') {
+        deleteError = t('admin.error.confirmDelete');
+      } else {
+        const removed = await record.remove(db, adminId, id);
+        if (removed.ok) {
+          await afterAdminWrite(db, env.KV, { catalogue: record.searchable });
+          return Astro.redirect(`/admin/${type}?deleted=1`, 303);
+        }
+        deleteError = t(removed.error);
+      }
+    } else {
+      const parsed = record.parse(form, now);
+      values = parsed.values;
+      errors = parsed.errors;
+      if (Object.keys(errors).length === 0) {
+        const result = await parsed.save(db, adminId, id, stored);
+        if (result.ok) {
+          await afterAdminWrite(db, env.KV, { catalogue: record.searchable });
+          return Astro.redirect(`/admin/${type}/${result.id}?saved=1`, 303);
+        }
+        errors = result.errors;
+      }
+      // Show the date as the admin typed it, and keep what the form first showed.
+      if ('last_checked' in values)
+        values = { ...values, last_checked: text(form, 'last_checked') };
+      lastCheckedWas = text(form, 'last_checked_was');
+    }
+  }
+}
+
+const sections = await record.sections(db, lang, t);
+const title = isNew
+  ? t('admin.new', { what: t(record.singularKey) })
+  : String((values['name'] as { en?: string } | undefined)?.en ?? t(record.singularKey));
+const publicPath = stored ? record.publicPath(stored, lang) : null;
+const stale = typeof stored?.['last_checked'] === 'string' && isStale(stored['last_checked'], now);
+const saved = Astro.url.searchParams.get('saved') === '1' && Astro.request.method === 'GET';
+const entityType = {
+  universities: 'university',
+  colleges: 'college',
+  programs: 'program',
+  pathways: 'pathway',
+  scholarships: 'scholarship',
+}[type];
+const formError = errors['form'];
+const errorCount = Object.keys(errors).length;
+---
+
+<AdminLayout lang={lang} title={title} section={`/admin/${type}`}>
+  <p>
+    <a href={`/admin/${type}`}>← {t(record.pluralKey)}</a>
+  </p>
+  <h1 class="page-title">{title}</h1>
+  <div class="meta">
+    {stored && stored['published'] === false && (
+      <span class="badge badge-plain">{t('admin.draft')}</span>
+    )}
+    {stale && <span class="badge stale">{t('admin.stale')}</span>}
+    {publicPath && <a href={publicPath}>{t('admin.viewOnSite')}</a>}
+    {id !== null && <a href={`/admin/audit?type=${entityType}&id=${id}`}>{t('admin.history')}</a>}
+  </div>
+
+  {saved && (
+    <p class="notice notice-success" role="status">
+      {t('admin.saved')}
+    </p>
+  )}
+  {errorCount > 0 && (
+    <div class="notice" role="alert">
+      <p class="form-error">{t('admin.error.summary', { n: errorCount })}</p>
+      {formError && <p>{t(formError.key, formError.params)}</p>}
+    </div>
+  )}
+
+  <form class="edit" method="post" novalidate>
+    <input type="hidden" name="intent" value="save" />
+    <AdminFields
+      lang={lang}
+      sections={sections}
+      values={values}
+      errors={errors}
+      lastCheckedWas={lastCheckedWas}
+    />
+    <div class="actions">
+      <button class="button" type="submit">
+        {isNew ? t('admin.create') : t('admin.save')}
+      </button>
+      <a class="button button-quiet" href={`/admin/${type}`}>
+        {t('admin.cancel')}
+      </a>
+    </div>
+  </form>
+
+  {id !== null && (
+    <form class="delete" method="post">
+      <h2 class="section-title">{t('admin.delete.title')}</h2>
+      <p class="muted-note">{t('admin.delete.hint')}</p>
+      <input type="hidden" name="intent" value="delete" />
+      <label class="choice">
+        <input type="checkbox" name="confirm" />
+        {t('admin.delete.confirm')}
+      </label>
+      {deleteError && (
+        <p class="form-error" role="alert">
+          {deleteError}
+        </p>
+      )}
+      <button class="button button-secondary" type="submit">
+        {t('admin.delete.button')}
+      </button>
+    </form>
+  )}
+</AdminLayout>
+
+<style>
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+  }
+  .stale {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .edit {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 64rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .delete {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+    max-width: 40rem;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+</style>

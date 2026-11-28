@@ -120,7 +120,12 @@ function byOpenThenDeadline(a: ScholarshipSummary, b: ScholarshipSummary): numbe
 // ---------------------------------------------------------------------------
 
 export interface UniversityPage {
-  university: UniversityCard & { type: UniversityType | null; website: string | null };
+  university: UniversityCard & {
+    type: UniversityType | null;
+    website: string | null;
+    /** R2 key of the header photo (/files/photos/…), or null. */
+    photoKey: string | null;
+  };
   /** Its bachelor's programs, by name. */
   bachelors: ProgramListItem[];
   /** Its own foundation and language programs, then college pre-years that lead into its bachelor's. */
@@ -344,6 +349,7 @@ export async function getUniversityPage(
       },
       ranking: rankingPosition(u),
       logoKey: u.logoKey,
+      photoKey: u.photoKey,
       lastChecked: u.lastChecked,
       sourceUrl: u.sourceUrl,
       type: u.type,

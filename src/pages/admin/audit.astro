@@ -1,0 +1,142 @@
+---
+/** /admin/audit: every admin write, newest first; filter by one record. */
+import { inArray } from 'drizzle-orm';
+import { getTranslations } from '../../i18n';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { AUDIT_PAGE_SIZE, listAudit } from '../../lib/admin/audit';
+import { requireAdmin } from '../../lib/admin/guard';
+import { user } from '../../lib/db/schema';
+import { postDate } from '../../lib/discussions-view';
+import { getDb } from '../../lib/server';
+
+export const prerender = false;
+
+const admin = await requireAdmin(Astro.request, Astro.response.headers);
+if (admin instanceof Response) return admin;
+const { lang } = admin;
+const t = getTranslations(lang);
+const db = getDb();
+const q = Astro.url.searchParams;
+const entityType = (q.get('type') ?? '').slice(0, 40) || null;
+const entityId = (q.get('id') ?? '').slice(0, 200) || null;
+const page = Math.max(1, Math.min(1000, Number(q.get('page')) || 1));
+
+const found = await listAudit(db, { entityType, entityId, page });
+const rows = found.slice(0, AUDIT_PAGE_SIZE);
+const more = found.length > AUDIT_PAGE_SIZE;
+const adminIds = [...new Set(rows.map((r) => r.adminId).filter((id): id is string => !!id))];
+const admins = new Map<string, string>(
+  adminIds.length
+    ? (
+        await db
+          .select({ id: user.id, email: user.email })
+          .from(user)
+          .where(inArray(user.id, adminIds))
+      ).map((u) => [u.id, u.email] as [string, string])
+    : [],
+);
+const pageHref = (n: number) => {
+  const next = new URLSearchParams(q);
+  next.set('page', String(n));
+  return `?${next.toString()}`;
+};
+const show = (value: unknown) =>
+  value === null || value === undefined || value === ''
+    ? '∅'
+    : typeof value === 'string'
+      ? value
+      : JSON.stringify(value);
+const recordHref = (type: string, id: string) =>
+  `/admin/audit?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`;
+---
+
+<AdminLayout lang={lang} title={t('admin.audit.title')} section="/admin/audit">
+  <h1 class="page-title">{t('admin.audit.title')}</h1>
+  {entityType && (
+    <p>
+      {t('admin.audit.filtered', { what: `${entityType}${entityId ? ` #${entityId}` : ''}` })}{' '}
+      <a href="/admin/audit">{t('admin.audit.all')}</a>
+    </p>
+  )}
+  {rows.length === 0 ? (
+    <p class="text-muted">{t('admin.none')}</p>
+  ) : (
+    <ol class="log">
+      {rows.map((r) => (
+        <li class="entry">
+          <p>
+            <strong>{r.action}</strong> ·{' '}
+            <a href={recordHref(r.entityType, r.entityId)}>
+              {r.entityType} #{r.entityId}
+            </a>
+          </p>
+          <p class="muted-note">
+            {postDate(lang, r.createdAt)} ·{' '}
+            {r.adminId ? (admins.get(r.adminId) ?? r.adminId) : t('admin.audit.script')}
+          </p>
+          {r.diff && Object.keys(r.diff).length > 0 && (
+            <details>
+              <summary>{t('admin.audit.changes', { n: Object.keys(r.diff).length })}</summary>
+              <dl class="diff">
+                {Object.entries(r.diff).map(([field, change]) => (
+                  <div>
+                    <dt>{field}</dt>
+                    <dd>
+                      {Array.isArray(change) && change.length === 2
+                        ? `${show(change[0])} → ${show(change[1])}`
+                        : show(change)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          )}
+        </li>
+      ))}
+    </ol>
+  )}
+  <nav class="pager" aria-label={t('admin.pages')}>
+    {page > 1 && (
+      <a class="button button-quiet" href={pageHref(page - 1)}>
+        {t('admin.previous')}
+      </a>
+    )}
+    {more && (
+      <a class="button button-quiet" href={pageHref(page + 1)}>
+        {t('admin.next')}
+      </a>
+    )}
+  </nav>
+</AdminLayout>
+
+<style>
+  .log {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .entry {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .diff {
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 0;
+  }
+  .diff dt {
+    font-weight: var(--weight-semibold);
+  }
+  .diff dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .pager {
+    display: flex;
+    gap: var(--space-3);
+  }
+</style>

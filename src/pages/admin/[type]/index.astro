@@ -1,0 +1,226 @@
+---
+/**
+ * /admin/<type>: one list for each record type, with search and filters in
+ * the URL (a plain GET form). Drafts and records not checked for 12 months
+ * are marked.
+ */
+import { getTranslations, type MessageKey } from '../../../i18n';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { countryOptions } from '../../../lib/admin/choices';
+import { formatDate } from '../../../lib/format';
+import { requireAdmin } from '../../../lib/admin/guard';
+import { isAdminType, type ListFilter } from '../../../lib/admin/record-type';
+import { RECORD_TYPES } from '../../../lib/admin/types';
+import { MINISTRY_STATUSES, PROGRAM_LEVELS } from '../../../lib/db/values';
+import { getDb, today } from '../../../lib/server';
+
+export const prerender = false;
+
+const type = Astro.params['type'];
+if (!isAdminType(type)) return new Response('Not found', { status: 404 });
+const admin = await requireAdmin(Astro.request, Astro.response.headers);
+if (admin instanceof Response) return admin;
+const { lang } = admin;
+const t = getTranslations(lang);
+const record = RECORD_TYPES[type];
+const db = getDb();
+const now = today();
+
+const q = Astro.url.searchParams;
+const filter: ListFilter = {
+  q: (q.get('q') ?? '').trim().slice(0, 100),
+  country: (q.get('country') ?? '').toUpperCase().slice(0, 2),
+  published: ['yes', 'no'].includes(q.get('published') ?? '') ? (q.get('published') ?? '') : '',
+  stale: q.get('stale') === '1',
+  status: q.get('status') ?? '',
+  level: q.get('level') ?? '',
+  page: Math.max(1, Math.min(1000, Number(q.get('page')) || 1)),
+};
+const { rows, more } = await record.list(db, lang, filter, now);
+const countries = record.filters.includes('country') ? await countryOptions(db, lang) : [];
+const has = (name: string) => record.filters.includes(name as never);
+const pageHref = (page: number) => {
+  const next = new URLSearchParams(q);
+  next.set('page', String(page));
+  return `?${next.toString()}`;
+};
+const notice: MessageKey | null = q.get('deleted') ? 'admin.deleted' : null;
+---
+
+<AdminLayout lang={lang} title={t(record.pluralKey)} section={`/admin/${type}`}>
+  <div class="head">
+    <h1 class="page-title">{t(record.pluralKey)}</h1>
+    <a class="button" href={`/admin/${type}/new`}>
+      {t('admin.new', { what: t(record.singularKey) })}
+    </a>
+  </div>
+  {notice && (
+    <p class="notice notice-success" role="status">
+      {t(notice)}
+    </p>
+  )}
+
+  <form class="filters" method="get" role="search" aria-label={t('admin.filters')}>
+    <div class="field">
+      <label for="q">{t('admin.search')}</label>
+      <input id="q" class="input" type="search" name="q" value={filter.q} />
+    </div>
+    {has('country') && (
+      <div class="field">
+        <label for="country">{t('admin.field.country')}</label>
+        <select id="country" class="input" name="country">
+          <option value="">{t('admin.all')}</option>
+          {countries.map((c) => (
+            <option value={c.value} selected={filter.country === c.value}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+    {has('status') && (
+      <div class="field">
+        <label for="status">{t('admin.field.ministryStatus')}</label>
+        <select id="status" class="input" name="status">
+          <option value="">{t('admin.all')}</option>
+          {MINISTRY_STATUSES.map((s) => (
+            <option value={s} selected={filter.status === s}>
+              {t(`ministry.${s}`)}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+    {has('level') && (
+      <div class="field">
+        <label for="level">{t('admin.field.level')}</label>
+        <select id="level" class="input" name="level">
+          <option value="">{t('admin.all')}</option>
+          {PROGRAM_LEVELS.map((l) => (
+            <option value={l} selected={filter.level === l}>
+              {t(`level.${l}`)}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+    {has('published') && (
+      <div class="field">
+        <label for="published">{t('admin.field.published')}</label>
+        <select id="published" class="input" name="published">
+          <option value="">{t('admin.all')}</option>
+          <option value="yes" selected={filter.published === 'yes'}>
+            {t('admin.publishedOnly')}
+          </option>
+          <option value="no" selected={filter.published === 'no'}>
+            {t('admin.draftsOnly')}
+          </option>
+        </select>
+      </div>
+    )}
+    {has('stale') && (
+      <label class="choice">
+        <input type="checkbox" name="stale" value="1" checked={filter.stale} />
+        {t('admin.staleOnly')}
+      </label>
+    )}
+    <button class="button button-secondary" type="submit">
+      {t('admin.apply')}
+    </button>
+  </form>
+
+  {rows.length === 0 ? (
+    <p class="text-muted">{t('admin.none')}</p>
+  ) : (
+    <ul class="rows">
+      {rows.map((row) => (
+        <li class="row">
+          <div class="row-main">
+            <a class="row-title" href={`/admin/${type}/${row.id}`}>
+              {row.title}
+            </a>
+            <span class="muted-note">{row.details}</span>
+          </div>
+          <div class="row-badges">
+            {row.published === false && <span class="badge badge-plain">{t('admin.draft')}</span>}
+            {row.stale && <span class="badge stale">{t('admin.stale')}</span>}
+            {row.lastChecked && (
+              <span class="muted-note">
+                {t('admin.checked', { date: formatDate(lang, row.lastChecked) })}
+              </span>
+            )}
+            {row.publicPath && <a href={`/${lang}${row.publicPath}`}>{t('admin.viewOnSite')}</a>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  )}
+  <nav class="pager" aria-label={t('admin.pages')}>
+    {filter.page > 1 && (
+      <a class="button button-quiet" href={pageHref(filter.page - 1)}>
+        {t('admin.previous')}
+      </a>
+    )}
+    {more && (
+      <a class="button button-quiet" href={pageHref(filter.page + 1)}>
+        {t('admin.next')}
+      </a>
+    )}
+  </nav>
+</AdminLayout>
+
+<style>
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-3);
+  }
+  .filters .field {
+    min-width: 12rem;
+  }
+  .rows {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .row-main {
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+  .row-title {
+    font-weight: var(--weight-semibold);
+  }
+  .row-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+  }
+  .stale {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .pager {
+    display: flex;
+    gap: var(--space-3);
+  }
+</style>

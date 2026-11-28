@@ -1,0 +1,140 @@
+---
+/**
+ * /admin/settings: the USD → TMT rate used to show manat next to dollars,
+ * with the date it was checked (shown on the site with the amount). Empty
+ * rate: the site stops showing manat amounts.
+ */
+import { eq, inArray } from 'drizzle-orm';
+import { env } from 'cloudflare:workers';
+import { getTranslations, type MessageKey } from '../../i18n';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { afterAdminWrite } from '../../lib/admin/after-save';
+import { auditInsert } from '../../lib/admin/audit';
+import { isDate, optionalNumber, text } from '../../lib/admin/form';
+import { requireAdmin } from '../../lib/admin/guard';
+import { runBatch } from '../../lib/admin/record-type';
+import { settings } from '../../lib/db/schema';
+import { getDb, today } from '../../lib/server';
+
+export const prerender = false;
+
+const admin = await requireAdmin(Astro.request, Astro.response.headers);
+if (admin instanceof Response) return admin;
+const { lang, adminId } = admin;
+const t = getTranslations(lang);
+const db = getDb();
+const KEYS = ['usd_tmt_rate', 'usd_tmt_rate_date'] as const;
+
+const rows = await db
+  .select()
+  .from(settings)
+  .where(inArray(settings.key, [...KEYS]));
+const stored = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+let rate = stored['usd_tmt_rate'] ?? '';
+let date = stored['usd_tmt_rate_date'] ?? today();
+const errors: Partial<Record<'rate' | 'date' | 'form', MessageKey>> = {};
+
+if (Astro.request.method === 'POST') {
+  const limit = await env.WRITE_LIMITER.limit({ key: `write:${adminId}` });
+  const form = await Astro.request.formData();
+  rate = text(form, 'rate');
+  date = text(form, 'date');
+  const value = optionalNumber(rate, 0.0001, 1_000_000);
+  if (!limit.success) errors.form = 'admin.error.rate';
+  if (value === undefined) errors.rate = 'admin.error.number';
+  if (value !== null && value !== undefined && !isDate(date)) errors.date = 'admin.error.date';
+  if (Object.keys(errors).length === 0 && value !== undefined) {
+    const next = value === null ? null : String(value);
+    const diff = {
+      usd_tmt_rate: [stored['usd_tmt_rate'] ?? null, next],
+      usd_tmt_rate_date: [stored['usd_tmt_rate_date'] ?? null, next === null ? null : date],
+    };
+    const upsert = (key: string, v: string) =>
+      db
+        .insert(settings)
+        .values({ key, value: v })
+        .onConflictDoUpdate({ target: settings.key, set: { value: v } });
+    await runBatch(db, [
+      ...(next === null
+        ? KEYS.map((key) => db.delete(settings).where(eq(settings.key, key)))
+        : [upsert('usd_tmt_rate', next), upsert('usd_tmt_rate_date', date)]),
+      auditInsert(db, {
+        adminId,
+        action: 'settings',
+        entityType: 'settings',
+        entityId: 'usd_tmt_rate',
+        diff,
+      }),
+    ]);
+    await afterAdminWrite(db, env.KV, { catalogue: false });
+    return Astro.redirect('/admin/settings?saved=1', 303);
+  }
+}
+const saved = Astro.url.searchParams.get('saved') === '1' && Astro.request.method === 'GET';
+const describe = (name: 'rate' | 'date', hint: boolean) =>
+  [hint ? `${name}-hint` : null, errors[name] ? `${name}-error` : null].filter(Boolean).join(' ') ||
+  undefined;
+---
+
+<AdminLayout lang={lang} title={t('admin.settings.title')} section="/admin/settings">
+  <h1 class="page-title">{t('admin.settings.title')}</h1>
+  {saved && (
+    <p class="notice notice-success" role="status">
+      {t('admin.saved')}
+    </p>
+  )}
+  {errors.form && (
+    <p class="form-error" role="alert">
+      {t(errors.form)}
+    </p>
+  )}
+  <form method="post" class="form settings" novalidate>
+    <h2 class="section-title">{t('admin.settings.rateTitle')}</h2>
+    <div class="field">
+      <label for="rate">{t('admin.settings.rate')}</label>
+      <input
+        id="rate"
+        class="input"
+        name="rate"
+        inputmode="decimal"
+        value={rate}
+        aria-invalid={errors.rate ? 'true' : undefined}
+        aria-describedby={describe('rate', true)}
+      />
+      <p id="rate-hint" class="muted-note">
+        {t('admin.settings.rateHint')}
+      </p>
+      {errors.rate && (
+        <p id="rate-error" class="form-error">
+          {t(errors.rate)}
+        </p>
+      )}
+    </div>
+    <div class="field">
+      <label for="date">{t('admin.settings.date')}</label>
+      <input
+        id="date"
+        class="input"
+        type="date"
+        name="date"
+        value={date}
+        aria-invalid={errors.date ? 'true' : undefined}
+        aria-describedby={describe('date', false)}
+      />
+      {errors.date && (
+        <p id="date-error" class="form-error">
+          {t(errors.date)}
+        </p>
+      )}
+    </div>
+    <button class="button" type="submit">
+      {t('admin.save')}
+    </button>
+  </form>
+</AdminLayout>
+
+<style>
+  .settings {
+    max-width: 32rem;
+  }
+</style>
