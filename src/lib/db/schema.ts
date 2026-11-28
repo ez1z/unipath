@@ -137,6 +137,8 @@ export const pathwayColleges = sqliteTable(
   (t) => [
     uniqueIndex('pathway_colleges_slug_unique').on(t.slug),
     index('pathway_colleges_country_idx').on(t.countryCode),
+    // Sitemap: published colleges.
+    index('pathway_colleges_published_idx').on(t.published),
     publishNeedsSource('pathway_colleges', t),
   ],
 );

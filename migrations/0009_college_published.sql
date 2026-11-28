@@ -1,0 +1,1 @@
+CREATE INDEX `pathway_colleges_published_idx` ON `pathway_colleges` (`published`);

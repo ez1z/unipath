@@ -92,6 +92,7 @@ function pageQuery(params: URLSearchParams): string {
  */
 export function cachePolicy(url: URL): CachePolicy | null {
   if (url.pathname === COUNT_PATH) return countPolicy(url.searchParams);
+  if (url.pathname === SITEMAP_PATH) return { ttl: TTL.detail, query: '' };
   const { lang, rest } = splitLangPath(url.pathname);
   if (lang === null) return null;
   const params = url.searchParams;
@@ -124,6 +125,9 @@ export function cachePolicy(url: URL): CachePolicy | null {
   }
   return null;
 }
+
+/** pages/sitemap.xml.ts: lists published records, so it follows data_version. */
+export const SITEMAP_PATH = '/sitemap.xml';
 
 /** Live result count for the filter sheet (pages/api/search/count.ts). */
 export const COUNT_PATH = '/api/search/count';
@@ -250,7 +254,9 @@ function isStorable(response: Response): boolean {
   return (
     response.status === 200 &&
     !response.headers.has('Set-Cookie') &&
-    (type.startsWith('text/html') || type.startsWith('application/json'))
+    (type.startsWith('text/html') ||
+      type.startsWith('application/json') ||
+      type.startsWith('application/xml'))
   );
 }
 
