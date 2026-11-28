@@ -813,5 +813,8 @@
   "admin.audit.filtered": "Показано: {what}.",
   "admin.audit.all": "Показать всё",
   "admin.audit.changes": "Изменений: {n}",
-  "admin.audit.script": "Скрипт"
+  "admin.audit.script": "Скрипт",
+  "serverError.title": "Что-то пошло не так",
+  "serverError.body": "Сейчас не удалось открыть эту страницу. Попробуйте ещё раз через минуту.",
+  "serverError.home": "На главную"
 }

@@ -1,0 +1,15 @@
+---
+import NotFound from '../components/NotFound.astro';
+import { LANG_COOKIE, resolveLang, splitLangPath } from '../i18n';
+
+// Rendered per request so the page speaks the language of the address
+// (/ru/… → Russian), else the saved language, else Turkmen.
+export const prerender = false;
+
+const lang =
+  splitLangPath(Astro.url.pathname).lang ?? resolveLang(Astro.cookies.get(LANG_COOKIE)?.value);
+Astro.response.status = 404;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<NotFound lang={lang} />

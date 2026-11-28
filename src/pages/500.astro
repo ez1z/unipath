@@ -1,0 +1,35 @@
+---
+import EmptyState from '../components/EmptyState.astro';
+import { getTranslations, LANG_COOKIE, resolveLang, splitLangPath } from '../i18n';
+import AppShell from '../layouts/AppShell.astro';
+
+// Shown when a page fails on the server. It never shows the error itself:
+// details go to the Worker log only.
+export const prerender = false;
+
+interface Props {
+  error: unknown;
+}
+
+const lang =
+  splitLangPath(Astro.url.pathname).lang ?? resolveLang(Astro.cookies.get(LANG_COOKIE)?.value);
+const t = getTranslations(lang);
+console.error('page error', Astro.url.pathname, Astro.props.error);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<AppShell lang={lang} title={`${t('serverError.title')} – Clavis`} noindex>
+  <h1 class="page-title">{t('serverError.title')}</h1>
+  <div class="body">
+    <EmptyState
+      title={t('serverError.body')}
+      action={{ href: `/${lang}`, label: t('serverError.home') }}
+    />
+  </div>
+</AppShell>
+
+<style>
+  .body {
+    margin-top: var(--space-4);
+  }
+</style>

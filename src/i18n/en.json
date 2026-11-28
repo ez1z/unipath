@@ -813,5 +813,8 @@
   "admin.audit.filtered": "Showing {what}.",
   "admin.audit.all": "Show everything",
   "admin.audit.changes": "Changes: {n}",
-  "admin.audit.script": "Script"
+  "admin.audit.script": "Script",
+  "serverError.title": "Something went wrong",
+  "serverError.body": "We couldn't open this page just now. Please try again in a minute.",
+  "serverError.home": "Go to the home page"
 }

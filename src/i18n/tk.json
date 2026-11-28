@@ -813,5 +813,8 @@
   "admin.audit.filtered": "Görkezilýän: {what}.",
   "admin.audit.all": "Hemmesini görkez",
   "admin.audit.changes": "Üýtgeşmeler: {n}",
-  "admin.audit.script": "Skript"
+  "admin.audit.script": "Skript",
+  "serverError.title": "Näsazlyk ýüze çykdy",
+  "serverError.body": "Bu sahypany häzir açyp bilmedik. Bir minutdan gaýtadan synanyşyň.",
+  "serverError.home": "Baş sahypa geç"
 }
