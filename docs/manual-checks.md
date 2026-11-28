@@ -270,3 +270,34 @@ the demo data. No real database is touched.
    (`--print` shows it). Sessions and sign-in codes are left out.
 2. The cron `0 23 * * *` (04:00 in Ashgabat) does the same in production and
    keeps the newest 30. Restoring is in DEPLOY.md (M8).
+
+## M8 · Launch hardening
+
+Automatic (`pnpm e2e`, m8.spec.ts): axe finds no serious issues on public and
+account pages in light and dark; the CSP blocks nothing the site uses (and does
+block an injected script); security headers on every kind of response; 404 in
+the address's language; sitemap and robots.txt.
+
+Needs a person, after the first deploy (DEPLOY.md):
+
+1. **Telegram Web**: open the Mini App at web.telegram.org. It shows inside the
+   frame (frame-ancestors allows only that site). Then open
+   `https://clavis.example` inside some other site's `<iframe>`: the browser
+   refuses.
+2. **Telegram Login Widget** on `/en/sign-in/telegram`: the button shows and
+   sign-in works. The browser console shows no "Content Security Policy" lines.
+3. **Google sign-in** (if set up): the round trip ends signed in.
+4. **Email**: a sign-in code arrives in Gmail and Mail.ru inboxes, not spam, from
+   `EMAIL_FROM`.
+5. **Headers**: <https://securityheaders.com> on the home page shows CSP,
+   HSTS, nosniff, Referrer-Policy and Permissions-Policy.
+6. **Search engines**: submit `https://clavis.example/sitemap.xml` in Google
+   Search Console and Yandex Webmaster. Check that the three languages are
+   listed as alternates.
+7. **Screen reader** (VoiceOver on iPhone or TalkBack): Home → Search → a
+   program → Track it. Every control has a name, and the order makes sense.
+8. **Lighthouse** against the live site:
+   `LIGHTHOUSE_ORIGIN=https://clavis.example pnpm lighthouse` (Slow 3G phone).
+   Performance 90+ and first content in under 2 seconds on every page it lists.
+9. **Restore drill**: restore last night's R2 backup into a new database
+   (DEPLOY.md step 10) and open a few pages against it before trusting it.
