@@ -81,3 +81,21 @@ preview deployment, never with real keys committed to the repo.
   from DevTools, then `pnpm exec node scripts/dev-telegram-login.ts "<url>" 42`
   prints a signed link for Telegram user 42 (steps at the top of the script).
 - Google: the button stays hidden until both Google secrets are set.
+
+## M4 · Tracker and reminders
+
+Everything else in M4 runs locally (`pnpm e2e`); only real email needs a preview.
+
+1. Sign in by email, Profile → reminders **By email**.
+2. Track a program, open it, set **your own deadline** to 7 days from today.
+3. Trigger the cron once instead of waiting for 09:00 Ashgabat:
+   Cloudflare dashboard → Workers → clavis → Settings → Triggers → the
+   `0 4 * * *` cron → **Run** (or `wrangler dev --test-scheduled` locally and
+   open `/__scheduled?cron=0+4+*+*+*`).
+4. One email arrives, in your Profile language: "7 days left: …", with links to
+   the item and to Profile. Run the trigger again: no second email.
+5. Share with parents → create a link → open it in a private window: stages,
+   deadlines and checklists show, your notes don't. **Stop this link**: the
+   page says the link no longer works.
+
+Locally, reminders print to the `pnpm preview` console (`[clavis mail] reminder`).
