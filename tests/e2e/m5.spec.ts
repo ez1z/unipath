@@ -137,6 +137,9 @@ test('ask, reply, Helped me and Helpful', async ({ page, browser }, info) => {
 });
 
 test('three reports hide a reply until the team reviews it', async ({ page, browser }, info) => {
+  // Five students sign in one after another: about 8 s alone, but past 30 s when
+  // the full suite (with the axe sweeps of m8.spec.ts) loads the machine.
+  test.slow();
   await signInByEmail(page, uniqueEmail(info, 'reported-asker'));
   const { href } = await askByApi(page, `Is a paid agent worth it ${Date.now()}?`);
   const spammer = await student(browser, info, 'spammer', 1);
