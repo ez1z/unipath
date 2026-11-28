@@ -11,12 +11,15 @@ preview deployment, never with real keys committed to the repo.
 
 - A deployed preview with `SITE_URL` set to its https address.
 - Wrangler secrets set (see DEPLOY.md, written in M8): `BETTER_AUTH_SECRET`,
-  `TELEGRAM_BOT_TOKEN`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and the
-  `EMAIL` send_email binding with `EMAIL_FROM`.
+  `TELEGRAM_BOT_TOKEN`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Email is
+  off in production (2026-11-28), so there is no email binding.
 - `DEV_MAILBOX` must **not** be set in production (it also switches itself off
   on any non-localhost `SITE_URL`).
 
-### Email code
+### Email code (only once email is turned on, DEPLOY.md "Turning email on")
+
+While email is off: `/tk/sign-in` shows no email form, Profile has no email
+field and no "By email" reminder choice.
 
 1. Open `/tk/sign-in`, enter your own email, tap **Email bilen dowam et**.
 2. An email arrives from `EMAIL_FROM` within a minute, in Turkmen, with a
@@ -287,8 +290,8 @@ Needs a person, after the first deploy (DEPLOY.md):
 2. **Telegram Login Widget** on `/en/sign-in/telegram`: the button shows and
    sign-in works. The browser console shows no "Content Security Policy" lines.
 3. **Google sign-in** (if set up): the round trip ends signed in.
-4. **Email**: a sign-in code arrives in Gmail and Mail.ru inboxes, not spam, from
-   `EMAIL_FROM`.
+4. **No email**: the sign-in page, the save sheet and Profile offer no email
+   option, and `POST /api/auth/email-otp/send-verification-otp` answers 404.
 5. **Headers**: <https://securityheaders.com> on the home page shows CSP,
    HSTS, nosniff, Referrer-Policy and Permissions-Policy.
 6. **Search engines**: submit `https://clavis.example/sitemap.xml` in Google

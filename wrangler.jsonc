@@ -77,7 +77,10 @@
       "vars": {
         "SITE_URL": "https://clavis.example",
         "TELEGRAM_BOT_USERNAME": "clavis_bot",
-        "EMAIL_FROM": "no-reply@clavis.example",
+        // Email is off in production (Eziz, 2026-11-28): sign-in with Telegram or Google,
+        // reminders by Telegram. To turn it on, set an address here and add the
+        // send_email binding below (DEPLOY.md, "Turning email on").
+        "EMAIL_FROM": "",
         // Off: the local test mailbox ("1") never exists in production.
         "DEV_MAILBOX": "",
       },
@@ -91,8 +94,6 @@
       ],
       "r2_buckets": [{ "binding": "FILES", "bucket_name": "clavis-files-production" }],
       "kv_namespaces": [{ "binding": "KV", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }],
-      // Sign-in codes and deadline reminders (Cloudflare Email Service).
-      "send_email": [{ "name": "EMAIL" }],
       "ratelimits": [
         {
           "name": "REPORT_LIMITER",
