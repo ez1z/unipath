@@ -44,6 +44,8 @@
   ],
   // Local defaults. Secrets (BETTER_AUTH_SECRET, TELEGRAM_BOT_TOKEN, GOOGLE_CLIENT_ID,
   // GOOGLE_CLIENT_SECRET) live in .dev.vars locally and in Wrangler secrets in production.
+  // TELEGRAM_BOT_TOKEN checks Telegram sign-in (Login Widget, Mini App) and sends Telegram
+  // reminders; on localhost reminders only print to the console.
   // DEV_MAILBOX lets local tests read sign-in codes; it only works on localhost.
   "vars": {
     "SITE_URL": "http://localhost:4321",

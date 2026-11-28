@@ -40,7 +40,7 @@ export function dueReminder(daysLeft: number): ReminderDays | null {
   return null;
 }
 
-/** Sends a Telegram bot message (M6). Absent: Telegram reminders wait for the next run. */
+/** Sends a Telegram bot message (lib/telegram-bot.ts). Absent: Telegram reminders wait for the next run. */
 export type TelegramSender = (telegramId: string, text: string) => Promise<void>;
 
 export interface ReminderDeps {

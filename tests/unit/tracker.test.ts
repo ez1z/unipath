@@ -420,4 +420,43 @@ describe('deadline reminders', () => {
     expect(withBot.sent).toBe(1);
     expect(sent).toEqual(['42:7 days left: Business Administration']);
   });
+
+  it('a Telegram reminder goes out once, in the student’s language, and again after a bot error', async () => {
+    const me = await newUser('tg-4321@telegram.invalid');
+    await updateProfile(t.db, me, { reminderChannel: 'telegram', preferredLang: 'ru' });
+    await t.db.insert(account).values({
+      id: 'acc-tg-4321',
+      accountId: '4321',
+      providerId: 'telegram',
+      userId: me,
+      updatedAt: new Date(),
+    });
+    const id = await track(me, 'program', 101);
+    await setDeadline(t.db, me, id, addDays(TODAY, 1));
+
+    const sent: { chatId: string; text: string }[] = [];
+    let botDown = true;
+    const runWithBot = (today: string) =>
+      runReminders({
+        db: t.db,
+        mailer,
+        siteUrl: 'https://clavis.test',
+        today,
+        telegram: async (chatId, text) => {
+          if (botDown) throw new Error('Telegram sendMessage 502');
+          sent.push({ chatId, text });
+        },
+      });
+
+    expect(await runWithBot(TODAY)).toMatchObject({ sent: 0, failed: 1 });
+    botDown = false;
+    expect(await runWithBot(TODAY)).toMatchObject({ sent: 1, failed: 0 });
+    expect(await runWithBot(TODAY)).toMatchObject({ sent: 0 });
+    expect(sent).toHaveLength(1);
+    expect(sent[0]?.chatId).toBe('4321');
+    expect(sent[0]?.text).toContain('Остался 1 день');
+    expect(sent[0]?.text).toContain(`https://clavis.test/ru/my/tracker/${id}`);
+    // Never by email: the address is a placeholder.
+    expect(mails).toEqual([]);
+  });
 });
