@@ -238,6 +238,11 @@ const email = isPlaceholderEmail(signedIn.user.email) ? null : signedIn.user.ema
               <span>
                 {t(`profile.reminder.${channel}` as MessageKey)}
                 {disabledKey && <span class="muted-note block">{t(disabledKey)}</span>}
+                {channel === 'telegram' && !disabledKey && bot && (
+                  <span class="muted-note block">
+                    {t('profile.reminder.telegramHint', { bot })}
+                  </span>
+                )}
               </span>
             </label>
           );

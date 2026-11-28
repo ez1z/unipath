@@ -3,6 +3,7 @@ import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import { LANGS, DEFAULT_LANG, getTranslations, localizePath, type Lang } from '../i18n';
+import TelegramApp from '../components/TelegramApp.astro';
 import { THEME_COOKIE, THEME_SCRIPT, themeFromCookie } from '../lib/theme';
 
 interface Props {
@@ -49,5 +50,6 @@ const theme = perVisitor ? themeFromCookie(Astro.cookies.get(THEME_COOKIE)?.valu
   </head>
   <body>
     <slot />
+    <TelegramApp />
   </body>
 </html>

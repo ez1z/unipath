@@ -5,6 +5,7 @@
  * phone's own share sheet where there is one.
  */
 import { useState } from 'react';
+import { inTelegramApp, shareInTelegram } from '../lib/telegram-app';
 import { useHydrated } from './hydrated';
 
 export interface ShareWithParentsProps {
@@ -16,20 +17,10 @@ export interface ShareWithParentsProps {
   labels: { copy: string; copied: string; share: string };
 }
 
-interface TelegramWebApp {
-  openTelegramLink?: (url: string) => void;
-  initData?: string;
-}
-
-function telegramApp(): TelegramWebApp | null {
-  const app = (window as unknown as { Telegram?: { WebApp?: TelegramWebApp } }).Telegram?.WebApp;
-  return app?.initData ? app : null;
-}
-
 export default function ShareWithParents({ url, label, message, labels }: ShareWithParentsProps) {
   const [canShare, setCanShare] = useState(false);
   const enhanced = useHydrated(() =>
-    setCanShare(telegramApp() !== null || typeof navigator.share === 'function'),
+    setCanShare(inTelegramApp() || typeof navigator.share === 'function'),
   );
   const [copied, setCopied] = useState(false);
   const id = `share-${url.slice(-8)}`;
@@ -45,12 +36,7 @@ export default function ShareWithParents({ url, label, message, labels }: ShareW
   }
 
   async function share() {
-    const telegram = telegramApp();
-    if (telegram?.openTelegramLink) {
-      const query = new URLSearchParams({ url, text: message });
-      telegram.openTelegramLink(`https://t.me/share/url?${query.toString()}`);
-      return;
-    }
+    if (shareInTelegram(url, message)) return;
     try {
       await navigator.share({ url, text: message });
     } catch {

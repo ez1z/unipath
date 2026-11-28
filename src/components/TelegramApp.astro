@@ -1,0 +1,12 @@
+---
+/**
+ * Starts the Telegram Mini App bridge (lib/telegram-app.ts) on every page.
+ * Outside Telegram it only reads the URL hash and sessionStorage, then stops.
+ */
+---
+
+<script>
+  import { startTelegramApp } from '../lib/telegram-app';
+
+  startTelegramApp();
+</script>

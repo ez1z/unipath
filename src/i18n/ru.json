@@ -611,5 +611,11 @@
   "email.reminder.progress": "Ваш список дел: готово {done} из {total}.",
   "email.reminder.open": "Открыть: {url}",
   "email.reminder.why": "Вы получили это письмо, потому что отслеживаете эту заявку на Clavis и выбрали напоминания по email: за 30, 7 и 1 день до срока, больше ничего.",
-  "email.reminder.stop": "Отключить напоминания можно в профиле: {url}"
+  "email.reminder.stop": "Отключить напоминания можно в профиле: {url}",
+  "signIn.error.telegram-app": "Не удалось войти через Telegram. Закройте Clavis и откройте снова из бота.",
+  "tg.metaTitle": "Clavis в Telegram",
+  "tg.opening": "Открываем Clavis…",
+  "tg.outside": "Эта страница открывает Clavis внутри Telegram. Откройте её из бота Clavis или перейдите на сайт.",
+  "tg.toSite": "Перейти на сайт",
+  "profile.reminder.telegramHint": "Напоминания приходят от @{bot}. Если вы ещё не писали боту, откройте чат и нажмите «Старт»."
 }

@@ -611,5 +611,11 @@
   "email.reminder.progress": "Your checklist: {done} of {total} done.",
   "email.reminder.open": "Open it: {url}",
   "email.reminder.why": "You get this because you track this application on Clavis and chose email reminders: 30, 7 and 1 day before a deadline, nothing else.",
-  "email.reminder.stop": "Turn reminders off in Profile: {url}"
+  "email.reminder.stop": "Turn reminders off in Profile: {url}",
+  "signIn.error.telegram-app": "Couldn't sign you in through Telegram. Close Clavis and open it again from the bot.",
+  "tg.metaTitle": "Clavis in Telegram",
+  "tg.opening": "Opening Clavis…",
+  "tg.outside": "This page opens Clavis inside Telegram. Open it from the Clavis bot, or use the website.",
+  "tg.toSite": "Go to the website",
+  "profile.reminder.telegramHint": "Reminders come from @{bot}. If you have never written to it, open the chat once and tap Start."
 }

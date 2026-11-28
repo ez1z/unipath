@@ -611,5 +611,11 @@
   "email.reminder.progress": "Işleriň sanawy: {total} işden {done} sanysy edildi.",
   "email.reminder.open": "Açmak: {url}",
   "email.reminder.why": "Bu haty alýarsyňyz, sebäbi Clavis-de bu arzany yzarlaýarsyňyz we email arkaly ýatlatmalary saýladyňyz: möhletden 30, 7 we 1 gün öň, başga hiç zat.",
-  "email.reminder.stop": "Ýatlatmalary Profilde öçürip bilersiňiz: {url}"
+  "email.reminder.stop": "Ýatlatmalary Profilde öçürip bilersiňiz: {url}",
+  "signIn.error.telegram-app": "Telegram arkaly girip bolmady. Clavis-i ýapyň we botdan täzeden açyň.",
+  "tg.metaTitle": "Clavis Telegram-da",
+  "tg.opening": "Clavis açylýar…",
+  "tg.outside": "Bu sahypa Clavis-i Telegram-yň içinde açýar. Ony Clavis botundan açyň ýa-da saýta geçiň.",
+  "tg.toSite": "Saýta geç",
+  "profile.reminder.telegramHint": "Ýatlatmalar @{bot} botdan gelýär. Eger bota entek ýazmadyk bolsaňyz, söhbetdeşligi bir gezek açyň we «Start» basyň."
 }

@@ -79,6 +79,7 @@ const errorKeys: Record<string, MessageKey> = {
   'telegram-failed': 'signIn.error.telegram-failed',
   'telegram-expired': 'signIn.error.telegram-expired',
   'telegram-taken': 'signIn.error.telegram-taken',
+  'telegram-app': 'signIn.error.telegram-app',
 };
 const errorKey = error ? (errorKeys[error] ?? 'signIn.error.generic') : null;
 const why = action ? t('signIn.why.save') : t('signIn.why.default');

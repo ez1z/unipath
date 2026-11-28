@@ -1,0 +1,153 @@
+---
+/**
+ * `/tg`: where the Telegram Mini App opens (set as the bot's Mini App URL).
+ *
+ * Telegram puts its signed launch data in the URL hash, which browsers never
+ * send to the server. So:
+ *
+ * 1. GET shows "Opening Clavis…"; a small script (lib/telegram-app.ts) reads
+ *    `tgWebAppData` from the hash (or from sessionStorage, when the student
+ *    comes back here to sign in again) and posts it to this page.
+ * 2. POST checks it on the server with the bot token (HMAC, under 24 hours
+ *    old), signs in silently, and redirects into `/[lang]`.
+ *
+ * The language comes from Telegram the first time; after that the student's
+ * Profile language is kept. Opened outside Telegram, the page says so and
+ * links to the website. Never cached (middleware: private, no-store).
+ */
+import { isAPIError } from 'better-auth/api';
+import { eq } from 'drizzle-orm';
+import Logo from '../components/Logo.astro';
+import { getTranslations, LANG_COOKIE, resolveLang, type Lang } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ensureProfile, parsePendingAction } from '../lib/account';
+import { safeNextPath } from '../lib/auth/next';
+import { checkMiniApp, getAuth, redirectWithCookies, siteUrl } from '../lib/auth/server';
+import { langFromTelegram } from '../lib/auth/telegram';
+import { INIT_DATA_MAX_LENGTH } from '../lib/auth/telegram-plugin';
+import { continuePath, signInPath } from '../lib/auth/urls';
+import { profiles } from '../lib/db/schema';
+import { getDb } from '../lib/server';
+
+export const prerender = false;
+
+const savedLang: Lang = resolveLang(Astro.cookies.get(LANG_COOKIE)?.value);
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData().catch(() => null);
+  const field = (name: string) => {
+    const value = form?.get(name);
+    return typeof value === 'string' ? value : null;
+  };
+  const initData = field('initData') ?? '';
+  const next = safeNextPath(field('next'));
+  const rawAction = field('action');
+  const action = parsePendingAction(rawAction) ? rawAction : null;
+  const failed = (error: 'telegram-app' | 'rate') =>
+    redirectWithCookies(signInPath(savedLang, { next, action }, { error }), []);
+
+  if (!initData || initData.length > INIT_DATA_MAX_LENGTH) return failed('telegram-app');
+  // Signature first (no database), then a limit per Telegram user; the endpoint checks again.
+  const checked = await checkMiniApp(initData);
+  if (!checked.ok) return failed(checked.reason === 'rate' ? 'rate' : 'telegram-app');
+
+  let result: { userId: string; created: boolean; languageCode: string | null } | null = null;
+  let cookies: string[] = [];
+  try {
+    const { response, headers } = await getAuth().api.telegramWebApp({
+      body: { initData },
+      headers: Astro.request.headers,
+      returnHeaders: true,
+    });
+    if (response.ok) {
+      result = response;
+      cookies = headers.getSetCookie();
+    }
+  } catch (error) {
+    if (!isAPIError(error)) throw error;
+  }
+  if (!result) return failed('telegram-app');
+
+  // Telegram's language for a new student; a returning one keeps their Profile language.
+  const db = getDb();
+  const existing = result.created
+    ? undefined
+    : await db
+        .select({ lang: profiles.preferredLang })
+        .from(profiles)
+        .where(eq(profiles.userId, result.userId))
+        .get();
+  const lang: Lang = existing?.lang ?? langFromTelegram(result.languageCode) ?? savedLang;
+  await ensureProfile(db, result.userId, lang);
+
+  const secure = siteUrl().startsWith('https://') ? '; Secure' : '';
+  cookies.push(`${LANG_COOKIE}=${lang}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`);
+  const goTo = next || action ? continuePath(lang, { next, action }) : `/${lang}`;
+  return redirectWithCookies(goTo, cookies);
+}
+
+const lang = savedLang;
+const t = getTranslations(lang);
+const next = safeNextPath(Astro.url.searchParams.get('next'));
+const rawAction = Astro.url.searchParams.get('action');
+const action = parsePendingAction(rawAction) ? rawAction : null;
+---
+
+<BaseLayout lang={lang} title={t('tg.metaTitle')} noindex>
+  <main class="tg-entry">
+    <Logo />
+    <form id="tg-form" method="post" action="/tg" hidden>
+      <input type="hidden" name="initData" value="" />
+      {next && <input type="hidden" name="next" value={next} />}
+      {action && <input type="hidden" name="action" value={action} />}
+    </form>
+    <p id="tg-opening" class="text-muted" role="status">
+      {t('tg.opening')}
+    </p>
+    <div id="tg-outside" class="outside" hidden>
+      <p>{t('tg.outside')}</p>
+      <a class="button" href={`/${lang}`}>
+        {t('tg.toSite')}
+      </a>
+    </div>
+    <noscript>
+      <p>{t('tg.outside')}</p>
+      <a class="button" href={`/${lang}`}>
+        {t('tg.toSite')}
+      </a>
+    </noscript>
+  </main>
+</BaseLayout>
+
+<script>
+  import { launchData } from '../lib/telegram-app';
+
+  const data = launchData();
+  const form = document.getElementById('tg-form');
+  const input = form?.querySelector<HTMLInputElement>('input[name="initData"]');
+  if (data && form instanceof HTMLFormElement && input) {
+    input.value = data.initData;
+    form.submit();
+  } else {
+    document.getElementById('tg-opening')?.setAttribute('hidden', '');
+    document.getElementById('tg-outside')?.removeAttribute('hidden');
+  }
+</script>
+
+<style>
+  .tg-entry {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+    align-content: center;
+    min-height: 100dvh;
+    padding: var(--space-5);
+    text-align: center;
+  }
+  .outside {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+    max-width: 26rem;
+  }
+</style>
