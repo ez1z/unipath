@@ -99,3 +99,85 @@ Everything else in M4 runs locally (`pnpm e2e`); only real email needs a preview
    page says the link no longer works.
 
 Locally, reminders print to the `pnpm preview` console (`[clavis mail] reminder`).
+
+## M6 · Telegram Mini App
+
+Locally everything runs with stand-ins (`pnpm e2e` → `tests/e2e/m6.spec.ts`,
+unit tests in `tests/unit/telegram*.test.ts` and `auth.test.ts`). These steps
+check the real Telegram apps.
+
+### Before you start
+
+- The bot from @BotFather, its token as the `TELEGRAM_BOT_TOKEN` Wrangler
+  secret, and `TELEGRAM_BOT_USERNAME` set (both also used by the Login Widget, M3).
+- A deployed preview on https.
+- In @BotFather: `/mybots` → the bot → **Bot Settings** → **Configure Mini App**
+  (or **Menu Button**) → URL `https://<preview-domain>/tg`. Optionally
+  `/newapp` for a `t.me/<bot>/<app>` link with the same URL.
+
+### Sign-in and language
+
+1. On a phone with Telegram in **Russian**, open the bot and tap the Mini App
+   button. "Открываем Clavis…" flashes, then Home opens in Russian. No sign-in
+   screen appears.
+2. Open My Clav: you are signed in. In D1 the new `user` row has email
+   `tg-<your id>@telegram.invalid`, empty `name`, no `image`; `profiles.preferred_lang` is `ru`.
+3. Profile → Language → English → Save. Close the Mini App and open it again:
+   Home is in English (your Profile choice now wins over Telegram's language).
+4. If you also signed in on the website with the Login Widget using the same
+   Telegram account, it is the **same** account (same saved items).
+5. Open `https://<preview-domain>/tg` in a normal browser: it says to open it
+   from the bot, with a link to the website.
+
+### Back button and theme
+
+1. On Home there is no back button in Telegram's header. Open Search: a back
+   arrow appears; tap it: you are back on Home. Open a program from Search,
+   tap back twice: Search, then Home.
+2. Switch Telegram to night mode (Settings → Chat Settings / Appearance) while
+   Clavis is open: Clavis turns dark, and Telegram's header matches Clavis's
+   background. Switch back: light again.
+3. Profile → Theme → Light: Clavis stays light even in Telegram's night mode
+   (your choice wins). Set it back to "System" to follow Telegram again.
+
+### Share via Telegram
+
+1. Track any program → **Share with parents** → **Create link** → **Send**.
+2. Telegram's own "share to chat" picker opens (Clavis stays open behind it).
+   Send it to yourself: the message has the parent link and "My applications
+   on Clavis"; it opens the read-only page.
+
+### Reminders from the bot
+
+1. In the bot chat, press **Start** once (a bot can only write to people who
+   have). Inside the Mini App, choosing Profile → reminders **In Telegram**
+   also asks Telegram for that permission.
+2. Track a program, set your own deadline to 7 days from today, save.
+3. Run the cron (Cloudflare dashboard → Workers → clavis → Settings →
+   Triggers → `0 4 * * *` → **Run**).
+4. A message from the bot arrives, in your Profile language: "7 days left: …"
+   with links to the item and to Profile. Run the cron again: no second message.
+5. Block the bot and run the cron with a 1-day deadline: the Worker log shows
+   `Telegram sendMessage 403`, and the reminder is retried on the next daily
+   run (unblock the bot to receive it). The token never appears in the log.
+
+### Locally, without a real bot
+
+- `pnpm exec node scripts/dev-telegram-webapp.ts 100000002 ru dark` prints a
+  `/tg#tgWebAppData=…` link signed with the made-up token in `.dev.vars`.
+  Open it with `pnpm preview` running: you land on `/ru`, signed in, in dark.
+  (A plain browser has no Telegram header, so the back button and share
+  sheet are only checked by the e2e test's stand-in and on a real phone.)
+- Telegram reminders print to the console (`[clavis telegram]`); nothing is sent.
+
+### Known limit and notes for M8
+
+- **Telegram Web** (web.telegram.org in a browser) runs Mini Apps inside a
+  frame. M8's CSP must allow `frame-ancestors https://web.telegram.org` (and
+  only that). Browsers that block third-party cookies may still not keep the
+  sign-in there; the phone and desktop apps are not affected.
+- The back button tells "first page after `/tg`" from the rest by the
+  same-origin referrer, so M8's `Referrer-Policy` must keep same-origin
+  referrers (`strict-origin-when-cross-origin` or `same-origin`, not `no-referrer`).
+- M8's CSP hash for the inline theme script must be taken from the current
+  `THEME_SCRIPT` (it now also reads Telegram's light/dark).
