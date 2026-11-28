@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import {
   dataCheckString,
+  langFromTelegram,
   signInitData,
   signLoginWidget,
   TELEGRAM_MAX_AGE_SECONDS,
@@ -113,5 +114,81 @@ describe('Mini App initData', () => {
     expect((await verifyInitData(noUser, TOKEN, NOW)).ok).toBe(false);
     const broken = await signInitData({ user: '{', auth_date: String(NOW) }, TOKEN);
     expect((await verifyInitData(broken, TOKEN, NOW)).ok).toBe(false);
+  });
+});
+
+describe('Mini App initData, more cases', () => {
+  const user = JSON.stringify({ id: 42, first_name: 'A', language_code: 'en' });
+
+  test('just inside and just outside 24 hours', async () => {
+    const edge = await signInitData(
+      { user, auth_date: String(NOW - TELEGRAM_MAX_AGE_SECONDS) },
+      TOKEN,
+    );
+    expect((await verifyInitData(edge, TOKEN, NOW)).ok).toBe(true);
+    const late = await signInitData(
+      { user, auth_date: String(NOW - TELEGRAM_MAX_AGE_SECONDS - 1) },
+      TOKEN,
+    );
+    expect(await verifyInitData(late, TOKEN, NOW)).toEqual({ ok: false, reason: 'expired' });
+  });
+
+  test('a date far in the future is refused', async () => {
+    const future = await signInitData({ user, auth_date: String(NOW + 3600) }, TOKEN);
+    expect(await verifyInitData(future, TOKEN, NOW)).toEqual({ ok: false, reason: 'expired' });
+  });
+
+  test('tampered auth_date, removed field, or added field', async () => {
+    const data = await signInitData({ user, auth_date: String(NOW - 100), query_id: 'q' }, TOKEN);
+    const newer = new URLSearchParams(data);
+    newer.set('auth_date', String(NOW));
+    expect((await verifyInitData(newer.toString(), TOKEN, NOW)).ok).toBe(false);
+    const fewer = new URLSearchParams(data);
+    fewer.delete('query_id');
+    expect((await verifyInitData(fewer.toString(), TOKEN, NOW)).ok).toBe(false);
+    const more = new URLSearchParams(data);
+    more.set('start_param', 'x');
+    expect((await verifyInitData(more.toString(), TOKEN, NOW)).ok).toBe(false);
+  });
+
+  test('another bot, no hash, no token', async () => {
+    const data = await signInitData({ user, auth_date: String(NOW) }, '999:other-bot');
+    expect(await verifyInitData(data, TOKEN, NOW)).toEqual({ ok: false, reason: 'bad-hash' });
+    const noHash = new URLSearchParams(data);
+    noHash.delete('hash');
+    expect(await verifyInitData(noHash.toString(), TOKEN, NOW)).toEqual({
+      ok: false,
+      reason: 'missing',
+    });
+    expect(await verifyInitData(data, undefined, NOW)).toEqual({ ok: false, reason: 'no-token' });
+  });
+
+  test('Login Widget data is not accepted as initData (different keys)', async () => {
+    const widget = await signLoginWidget({ id: '42', auth_date: String(NOW) }, TOKEN);
+    widget.set('user', JSON.stringify({ id: 42 }));
+    expect((await verifyInitData(widget.toString(), TOKEN, NOW)).ok).toBe(false);
+  });
+
+  test('a user id that is not a number is refused', async () => {
+    const data = await signInitData(
+      { user: JSON.stringify({ id: '42' }), auth_date: String(NOW) },
+      TOKEN,
+    );
+    expect((await verifyInitData(data, TOKEN, NOW)).ok).toBe(false);
+  });
+});
+
+describe('language from Telegram', () => {
+  test.each([
+    ['ru', 'ru'],
+    ['en-US', 'en'],
+    ['tk', 'tk'],
+    ['RU', 'ru'],
+    ['uk', null],
+    ['tr', null],
+    ['', null],
+    [null, null],
+  ])('%s -> %s', (code, lang) => {
+    expect(langFromTelegram(code)).toBe(lang);
   });
 });

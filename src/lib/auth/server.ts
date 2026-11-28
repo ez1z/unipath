@@ -12,6 +12,9 @@ import { consoleMailer, cloudflareMailer, type Mailer, type SendEmailBinding } f
 import { clientIp, getDb } from '../server.ts';
 import { CODE_LENGTH, createAuth, LANG_HEADER, type Auth } from './auth.ts';
 import { isPlaceholderEmail, type MarkUsed } from './telegram-plugin.ts';
+import { verifyInitData, type TelegramCheck } from './telegram.ts';
+import type { TelegramSender } from '../reminders.ts';
+import { botSender, consoleTelegramSender } from '../telegram-bot.ts';
 
 /** `env` with the optional parts typed loosely (the email binding exists only in production). */
 const vars = env as unknown as Record<string, string | undefined> & {
@@ -37,6 +40,17 @@ export function getMailer(): Mailer {
   return {
     send: () => Promise.reject(new Error('Email is not set up: add the EMAIL binding (DEPLOY.md)')),
   };
+}
+
+/**
+ * The bot that sends Telegram reminders: the real Bot API on a real domain
+ * with a token, the console (and dev mailbox) on a local site, else none
+ * (Telegram reminders then wait, unsent and unlogged, until it is set up).
+ */
+export function getTelegramSender(): TelegramSender | null {
+  if (isLocalSite()) return consoleTelegramSender(devMailboxEnabled() ? env.KV : null);
+  const token = vars['TELEGRAM_BOT_TOKEN'];
+  return token ? botSender(token) : null;
 }
 
 export function googleEnabled(): boolean {
@@ -120,6 +134,18 @@ export type CodeResult = { ok: true; cookies: string[] } | { ok: false; error: C
 /** Per-IP limit on sending and trying codes (the same limiter as /api/auth). */
 export async function authAllowed(request: Request): Promise<boolean> {
   return (await env.AUTH_LIMITER.limit({ key: `auth:${clientIp(request)}` })).success;
+}
+
+/**
+ * The Mini App signs in on every open, and many students share a few IP
+ * addresses (VPNs, mobile carriers), so `/tg` limits per Telegram user, after
+ * the signature check, instead of per IP.
+ */
+export async function checkMiniApp(initData: string): Promise<TelegramCheck> {
+  const result = await verifyInitData(initData, vars['TELEGRAM_BOT_TOKEN']);
+  if (!result.ok) return result;
+  const limit = await env.AUTH_LIMITER.limit({ key: `tg:${result.telegramId}` });
+  return limit.success ? result : { ok: false, reason: 'rate' };
 }
 
 function headersFor(request: Request, lang: Lang): Headers {

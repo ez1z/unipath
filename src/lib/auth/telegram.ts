@@ -12,6 +12,8 @@
  * names, usernames and photos are never stored (SPEC: store the minimum).
  */
 
+import { isLang, type Lang } from '../../i18n/config.ts';
+
 /** Login data older than this is refused. */
 export const TELEGRAM_MAX_AGE_SECONDS = 24 * 60 * 60;
 /** A little clock skew between Telegram and the Worker is fine; a date far ahead is not. */
@@ -19,7 +21,7 @@ const MAX_FUTURE_SKEW_SECONDS = 5 * 60;
 
 export type TelegramCheck =
   | { ok: true; telegramId: string; authDate: number }
-  | { ok: false; reason: 'missing' | 'bad-hash' | 'expired' | 'no-token' };
+  | { ok: false; reason: 'missing' | 'bad-hash' | 'expired' | 'no-token' | 'rate' };
 
 const encoder = new TextEncoder();
 
@@ -129,6 +131,15 @@ export async function verifyInitData(
     nowSeconds,
   );
   return result.ok ? { ...result, languageCode } : result;
+}
+
+/**
+ * Clavis's language for a Telegram `language_code` (an IETF tag such as
+ * "ru" or "en-US"), or null when Clavis has no version in it.
+ */
+export function langFromTelegram(code: string | null | undefined): Lang | null {
+  const base = code?.trim().toLowerCase().split(/[-_]/)[0];
+  return isLang(base) ? base : null;
 }
 
 /**

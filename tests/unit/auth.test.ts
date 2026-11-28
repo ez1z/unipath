@@ -12,7 +12,7 @@ import {
   placeholderEmail,
   TELEGRAM_STATE_COOKIE,
 } from '../../src/lib/auth/telegram-plugin.ts';
-import { signLoginWidget } from '../../src/lib/auth/telegram.ts';
+import { signInitData, signLoginWidget } from '../../src/lib/auth/telegram.ts';
 import {
   deleteAccount,
   ensureProfile,
@@ -459,3 +459,87 @@ async function callback2(cookie: string) {
   const request = withState(params, cookie);
   await get(`/telegram/callback?${request.query}`, request.cookie);
 }
+
+describe('Telegram Mini App (initData)', () => {
+  const now = () => String(Math.floor(Date.now() / 1000));
+  const initData = (id: number, fields: Record<string, string> = {}, token = BOT_TOKEN) =>
+    signInitData(
+      {
+        user: JSON.stringify({ id, first_name: 'Real', language_code: 'ru' }),
+        auth_date: now(),
+        query_id: 'AAE',
+        ...fields,
+      },
+      token,
+    );
+  const webapp = async (data: string, cookie?: string) =>
+    post('/telegram/webapp', { initData: data }, cookie);
+  const sessionCookies = (response: Response) =>
+    response.headers.getSetCookie().filter((c) => c.startsWith('clavis.session_token='));
+
+  test('valid initData signs in silently; a new user keeps only the Telegram id', async () => {
+    const response = await webapp(await initData(800100));
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as { ok: boolean; created: boolean; languageCode: string };
+    expect(body).toMatchObject({ ok: true, created: true, languageCode: 'ru' });
+    const me = await session(cookieOf(response));
+    expect(me?.user.email).toBe(placeholderEmail('800100'));
+    const row = await t.d1
+      .prepare('select name, image from user where id = ?')
+      .bind(me?.user.id)
+      .first<{ name: string; image: string | null }>();
+    expect(row).toEqual({ name: '', image: null });
+  });
+
+  test('the Mini App and the Login Widget reach the same user', async () => {
+    const widget = withState(await signLoginWidget({ id: '800200', auth_date: now() }, BOT_TOKEN));
+    const fromWidget = await session(
+      cookieOf(await get(`/telegram/callback?${widget.query}`, widget.cookie)),
+    );
+    expect(fromWidget?.user.id).toBeDefined();
+
+    const fromApp = await webapp(await initData(800200));
+    expect(((await fromApp.json()) as { created: boolean }).created).toBe(false);
+    expect((await session(cookieOf(fromApp)))?.user.id).toBe(fromWidget?.user.id);
+  });
+
+  test('already signed in as that Telegram user: no new session', async () => {
+    const cookie = cookieOf(await webapp(await initData(800300)));
+    const again = await webapp(await initData(800300), cookie);
+    expect(again.status).toBe(200);
+    expect(sessionCookies(again)).toEqual([]);
+    expect(await countRows('session', 'user_id', (await session(cookie))?.user.id ?? '')).toBe(1);
+  });
+
+  test('signed in as someone else: the Telegram user replaces that session, nothing is linked', async () => {
+    const emailCookie = await signInWithEmail('mini-app@mail.test');
+    const emailUser = await session(emailCookie);
+    const response = await webapp(await initData(800400), emailCookie);
+    const me = await session(cookieOf(response));
+    expect(me?.user.email).toBe(placeholderEmail('800400'));
+    expect(me?.user.id).not.toBe(emailUser?.user.id);
+    expect(await countRows('account', 'user_id', emailUser?.user.id ?? '')).toBe(0);
+    expect(await session(emailCookie)).toBeNull();
+  });
+
+  test('tampered, expired, other bot or missing initData is refused without a session', async () => {
+    const good = new URLSearchParams(await initData(800500));
+    good.set('user', JSON.stringify({ id: 800501, language_code: 'ru' }));
+    const tampered = await webapp(good.toString());
+    expect(tampered.status).toBe(401);
+    expect(await tampered.json()).toEqual({ ok: false, error: 'failed' });
+    expect(sessionCookies(tampered)).toEqual([]);
+
+    const old = String(Math.floor(Date.now() / 1000) - 25 * 60 * 60);
+    const expired = await webapp(await initData(800502, { auth_date: old }));
+    expect(expired.status).toBe(401);
+    expect(await expired.json()).toEqual({ ok: false, error: 'expired' });
+
+    const otherBot = await webapp(await initData(800503, {}, '1:other'));
+    expect(otherBot.status).toBe(401);
+
+    const empty = await post('/telegram/webapp', { initData: '' });
+    expect(empty.status).toBe(400);
+    expect(await countRows('user', 'email', placeholderEmail('800501'))).toBe(0);
+  });
+});
