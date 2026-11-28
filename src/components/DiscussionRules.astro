@@ -1,0 +1,35 @@
+---
+/** SPEC: rules shown beside every Discussions form. */
+import { getTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const t = getTranslations(Astro.props.lang);
+---
+
+<aside class="card rules" aria-labelledby="rules-title">
+  <h2 id="rules-title" class="rules-title">
+    {t('discussions.rules.title')}
+  </h2>
+  <ul>
+    <li>{t('discussions.rules.ads')}</li>
+    <li>{t('discussions.rules.essays')}</li>
+    <li>{t('discussions.rules.contacts')}</li>
+  </ul>
+  <p class="muted-note">{t('discussions.rules.report')}</p>
+</aside>
+
+<style>
+  .rules-title {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    font-weight: var(--weight-semibold);
+  }
+  .rules ul {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding-inline-start: var(--space-5);
+  }
+</style>

@@ -1,0 +1,49 @@
+---
+/**
+ * A post's plain text: paragraphs, line breaks, and http(s) links with
+ * rel="nofollow ugc". Every piece goes through Astro's escaping; nothing is
+ * set as HTML.
+ */
+import type { Lang } from '../i18n';
+import { postParagraphs } from '../lib/discussions-view';
+
+interface Props {
+  body: string;
+  /** The post's own language, for screen readers. Replies don't record one. */
+  lang?: Lang | undefined;
+}
+const { body, lang } = Astro.props;
+const paragraphs = postParagraphs(body);
+---
+
+<div class="post-body" lang={lang}>
+  {paragraphs.map((lines) => (
+    <p>
+      {lines.map((line, i) => (
+        <>
+          {i > 0 && <br />}
+          {line.map((segment) =>
+            'href' in segment ? (
+              <a href={segment.href} rel="nofollow ugc noopener">
+                {segment.text}
+              </a>
+            ) : (
+              segment.text
+            ),
+          )}
+        </>
+      ))}
+    </p>
+  ))}
+</div>
+
+<style>
+  .post-body {
+    display: grid;
+    gap: var(--space-3);
+    overflow-wrap: anywhere;
+  }
+  .post-body a {
+    color: var(--brand);
+  }
+</style>

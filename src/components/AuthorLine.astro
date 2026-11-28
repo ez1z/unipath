@@ -1,0 +1,45 @@
+---
+/**
+ * "Nickname · Clavis team / Studies at X · date": who wrote a post. Without a
+ * nickname the author shows as a stable made-up "Student 4821".
+ */
+import { getTranslations, type Lang } from '../i18n';
+import { authorName, type PostAuthor } from '../lib/discussions';
+import { postDate, postIsoDate } from '../lib/discussions-view';
+
+interface Props {
+  lang: Lang;
+  author: PostAuthor;
+  at: Date;
+  /** e.g. "3 replies", shown after the date. */
+  extra?: string | undefined;
+}
+const { lang, author, at, extra } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<p class="author-line">
+  <span class="author-name">{authorName(t, author)}</span>
+  {author.team && <span class="badge">{t('discussions.team')}</span>}
+  {author.studiesAt.map((uni) => (
+    <span class="badge" lang={uni.name.fallback ? 'en' : undefined}>
+      {t('discussions.studiesAt', { name: uni.name.text })}
+    </span>
+  ))}
+  <span class="muted-note">
+    <time datetime={postIsoDate(at)}>{postDate(lang, at)}</time>
+    {extra && ` · ${extra}`}
+  </span>
+</p>
+
+<style>
+  .author-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+  .author-name {
+    font-weight: var(--weight-semibold);
+  }
+</style>

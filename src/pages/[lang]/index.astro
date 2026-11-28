@@ -1,4 +1,6 @@
 ---
+import ThreadList from '../../components/ThreadList.astro';
+import { latestThreads } from '../../lib/discussions';
 import ScholarshipCard from '../../components/ScholarshipCard.astro';
 import SearchBox from '../../components/SearchBox.astro';
 import Text from '../../components/Text.astro';
@@ -26,13 +28,14 @@ if (!isLang(lang)) {
 const t = getTranslations(lang);
 const db = getDb();
 
-const [countries, deadlines] = await Promise.all([
+const [countries, deadlines, threads] = await Promise.all([
   getCountries(db, lang),
   searchScholarships(db, parseScholarshipFilters(new URLSearchParams()), {
     lang,
     today: today(),
     pageSize: 4,
   }),
+  latestThreads(db, lang, 5),
 ]);
 const popular = countries.filter((c) => c.popularRank !== null).slice(0, 4);
 const quizCountries = countries
@@ -124,22 +127,37 @@ const quizCountries = countries
     </ul>
   </section>
 
-  {deadlines.items.length > 0 && (
-    <section class="block deadlines" aria-labelledby="deadlines-title">
-      <div class="block-head">
-        <h2 id="deadlines-title" class="section-title">
-          {t('home.deadlines')}
-        </h2>
-        <a href={`/${lang}/scholarships`}>{t('home.allScholarships')}</a>
-      </div>
-      <ul class="grid">
-        {deadlines.items.map((scholarship) => (
-          <li>
-            <ScholarshipCard lang={lang} scholarship={scholarship} />
-          </li>
-        ))}
-      </ul>
-    </section>
+  {(deadlines.items.length > 0 || threads.length > 0) && (
+    <div class="duo">
+      {deadlines.items.length > 0 && (
+        <section class="block deadlines" aria-labelledby="deadlines-title">
+          <div class="block-head">
+            <h2 id="deadlines-title" class="section-title">
+              {t('home.deadlines')}
+            </h2>
+            <a href={`/${lang}/scholarships`}>{t('home.allScholarships')}</a>
+          </div>
+          <ul class="grid">
+            {deadlines.items.map((scholarship) => (
+              <li>
+                <ScholarshipCard lang={lang} scholarship={scholarship} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {threads.length > 0 && (
+        <section class="block latest" aria-labelledby="latest-title">
+          <div class="block-head">
+            <h2 id="latest-title" class="section-title">
+              {t('discussions.latest')}
+            </h2>
+            <a href={`/${lang}/discussions`}>{t('discussions.all')}</a>
+          </div>
+          <ThreadList lang={lang} threads={threads} />
+        </section>
+      )}
+    </div>
   )}
 
   <p class="trust">{t('home.trust')}</p>
@@ -233,8 +251,8 @@ const quizCountries = countries
   .grid > li {
     display: grid;
   }
-  /* SPEC: deadlines sit beside the hero on desktop; phones keep a short Home. */
-  .deadlines {
+  /* SPEC: deadlines and New in Discussions sit side by side on desktop; phones keep a short Home. */
+  .duo {
     display: none;
   }
   .trust {
@@ -268,8 +286,14 @@ const quizCountries = countries
     .tiles {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-    .deadlines {
+    .duo {
       display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: var(--space-6);
+      align-items: start;
+    }
+    .duo > :only-child {
+      grid-column: 1 / -1;
     }
     .grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));

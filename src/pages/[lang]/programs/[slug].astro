@@ -1,4 +1,6 @@
 ---
+import ThreadList from '../../../components/ThreadList.astro';
+import { threadsTagged } from '../../../lib/discussions';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
 import CompareToggle from '../../../components/CompareToggle.astro';
 import DetailLayout from '../../../components/DetailLayout.astro';
@@ -34,6 +36,9 @@ const [page, rate] = await Promise.all([
   getUsdTmtRate(db),
 ]);
 if (!page) Astro.response.status = 404;
+const threads = page
+  ? await threadsTagged(db, lang, { type: 'program', id: page.program.id }, 5)
+  : [];
 
 const p = page?.program;
 const provider = p?.provider;
@@ -243,6 +248,21 @@ const pathLabel = (path: PathOption) => {
           />
         </div>
       </section>
+
+      <section aria-labelledby="questions-title">
+        <h2 id="questions-title" class="section-title">
+          {t('discussions.program.title')}
+        </h2>
+        <div class="section-body questions">
+          {threads.length > 0 && <ThreadList lang={lang} threads={threads} />}
+          <a
+            class="button button-secondary"
+            href={`/${lang}/discussions/ask?program=${page.program.id}`}
+          >
+            {t('discussions.ask')}
+          </a>
+        </div>
+      </section>
     </DetailLayout>
   </AppShell>
 )}
@@ -251,6 +271,14 @@ const pathLabel = (path: PathOption) => {
   .head {
     display: grid;
     gap: var(--space-2);
+  }
+  .questions {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+  .questions > :global(ul) {
+    justify-self: stretch;
   }
   .badges {
     display: flex;

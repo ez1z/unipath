@@ -1,0 +1,105 @@
+---
+/**
+ * A list of questions: title (in its own language, with a language label),
+ * Answered badge, topic or tag, replies and date. Used on boards, the
+ * Discussions start page, Home and a university's Discussion tab.
+ */
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import type { ThreadSummary } from '../lib/discussions';
+import { postDate, postIsoDate, threadPath } from '../lib/discussions-view';
+
+interface Props {
+  lang: Lang;
+  threads: ThreadSummary[];
+  /** Topic names by slug, to show which board a question is on. */
+  topicNames?: Map<string, string> | undefined;
+  /** Heading level of each title. */
+  level?: 2 | 3;
+}
+const { lang, threads, topicNames, level = 3 } = Astro.props;
+const t = getTranslations(lang);
+const Heading = level === 2 ? 'h2' : 'h3';
+---
+
+<ul class="thread-list">
+  {threads.map((thread) => (
+    <li class="thread-row">
+      <div class="thread-tags">
+        <span class="lang-tag">
+          <span aria-hidden="true">{thread.lang.toUpperCase()}</span>
+          <span class="visually-hidden">{t(`discussions.lang.${thread.lang}` as MessageKey)}</span>
+        </span>
+        {thread.answered && <span class="badge">{t('discussions.answered')}</span>}
+        {topicNames && <span class="muted-note">{topicNames.get(thread.topic)}</span>}
+        {thread.tag && (
+          <span class="muted-note">{t('discussions.about', { name: thread.tag.name.text })}</span>
+        )}
+      </div>
+      <Heading class="thread-title">
+        <a href={threadPath(lang, thread.topic, thread.id)} lang={thread.lang}>
+          {thread.title}
+        </a>
+      </Heading>
+      <p class="muted-note">
+        {t('discussions.replies', { n: thread.replyCount })} ·{' '}
+        <time datetime={postIsoDate(thread.lastActivityAt)}>
+          {postDate(lang, thread.lastActivityAt)}
+        </time>
+      </p>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .thread-list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .thread-row {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+  }
+  .thread-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .thread-title {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    font-weight: var(--weight-semibold);
+    overflow-wrap: anywhere;
+  }
+  .thread-title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .thread-title a:hover {
+    text-decoration: underline;
+  }
+  /* The whole card is the link's target area on touch screens. */
+  .thread-row {
+    position: relative;
+  }
+  .thread-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-card);
+  }
+  .thread-title a:focus-visible {
+    outline: none;
+  }
+  .thread-title a:focus-visible::after {
+    outline: var(--focus-ring-width) solid var(--brand);
+    outline-offset: 2px;
+  }
+</style>

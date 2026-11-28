@@ -1,0 +1,81 @@
+---
+/** The six boards and "Ask a question": the left column on desktop. */
+import { getTranslations, type Lang } from '../i18n';
+import type { TopicView } from '../lib/discussions';
+
+interface Props {
+  lang: Lang;
+  topics: TopicView[];
+  current?: string | undefined;
+  /** Where Ask a question starts (a board fills in its topic). */
+  askHref: string;
+}
+const { lang, topics, current, askHref } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<nav class="topics-nav" aria-labelledby="topics-nav-title">
+  <a class="button" href={askHref}>
+    {t('discussions.ask')}
+  </a>
+  <h2 id="topics-nav-title" class="topics-nav-title">
+    {t('discussions.topics')}
+  </h2>
+  <ul>
+    {topics.map((topic) => (
+      <li>
+        <a
+          href={`/${lang}/discussions/${topic.slug}`}
+          aria-current={topic.slug === current ? 'page' : undefined}
+        >
+          {topic.name.text}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .topics-nav {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+  .topics-nav-title {
+    font-size: var(--text-label);
+    line-height: var(--leading-label);
+    font-weight: var(--weight-semibold);
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .topics-nav ul {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .topics-nav li a {
+    display: flex;
+    align-items: center;
+    min-height: var(--touch-target);
+    padding-inline: var(--space-3);
+    border-radius: var(--radius-button);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .topics-nav li a:hover {
+    background: var(--surface-raised);
+  }
+  .topics-nav li a[aria-current='page'] {
+    background: var(--brand-soft);
+    font-weight: var(--weight-semibold);
+  }
+  /* On phones the start page lists the boards itself; boards show a back link. */
+  @media (max-width: 1023px) {
+    .topics-nav {
+      display: none;
+    }
+  }
+</style>

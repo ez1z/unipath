@@ -1,0 +1,104 @@
+---
+/**
+ * Discussions: the six boards with their question counts, the newest
+ * questions from every board, Ask a question and the rules. Cached 1 minute
+ * (lib/cache.ts); the same for every visitor.
+ */
+import DiscussionRules from '../../../components/DiscussionRules.astro';
+import EmptyState from '../../../components/EmptyState.astro';
+import ThreadList from '../../../components/ThreadList.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { latestThreads, listTopics, topicCounts } from '../../../lib/discussions';
+import { getDb } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+const db = getDb();
+const [topics, counts, latest] = await Promise.all([
+  listTopics(db, lang),
+  topicCounts(db),
+  latestThreads(db, lang, 10),
+]);
+const topicNames = new Map(topics.map((topic) => [topic.slug, topic.name.text]));
+---
+
+<AppShell lang={lang} title={t('discussions.metaTitle')} description={t('discussions.intro')}>
+  <div class="disc-head">
+    <div>
+      <h1 class="page-title">{t('discussions.title')}</h1>
+      <p class="text-muted">{t('discussions.intro')}</p>
+    </div>
+    <a class="button" href={`/${lang}/discussions/ask`}>
+      {t('discussions.ask')}
+    </a>
+  </div>
+
+  <div class="discussions-layout with-aside">
+    <div class="stack">
+      <section aria-labelledby="topics-title">
+        <h2 id="topics-title" class="section-title">
+          {t('discussions.topics')}
+        </h2>
+        <ul class="topic-tiles">
+          {topics.map((topic) => (
+            <li>
+              <a class="topic-tile" href={`/${lang}/discussions/${topic.slug}`}>
+                <span class="topic-name">{topic.name.text}</span>
+                <span class="muted-note">
+                  {t('discussions.threadCount', { n: counts.get(topic.slug) ?? 0 })}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="latest-title">
+        <h2 id="latest-title" class="section-title">
+          {t('discussions.latest')}
+        </h2>
+        {latest.length > 0 ? (
+          <ThreadList lang={lang} threads={latest} topicNames={topicNames} />
+        ) : (
+          <EmptyState title={t('discussions.empty.title')} body={t('discussions.empty.body')} />
+        )}
+      </section>
+    </div>
+    <div class="discussions-aside">
+      <p class="muted-note">{t('discussions.signInNote')}</p>
+      <DiscussionRules lang={lang} />
+    </div>
+  </div>
+</AppShell>
+
+<style>
+  .topic-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-3);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .topic-tile {
+    display: grid;
+    gap: var(--space-1);
+    min-height: var(--touch-target);
+    padding: var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .topic-tile:hover .topic-name {
+    text-decoration: underline;
+  }
+  .topic-name {
+    font-weight: var(--weight-semibold);
+  }
+</style>

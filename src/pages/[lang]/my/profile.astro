@@ -34,6 +34,8 @@ import {
 import { isPlaceholderEmail } from '../../../lib/auth/telegram-plugin';
 import { googlePath, myPath, signInPath, telegramPath } from '../../../lib/auth/urls';
 import { REMINDER_CHANNELS } from '../../../lib/db/values';
+import { BADGE_NOTE_MAX, listMyBadges, universityChoices } from '../../../lib/discussions';
+import { discussionError } from '../../../lib/discussions-view';
 import { getDb } from '../../../lib/server';
 
 export const prerender = false;
@@ -127,7 +129,13 @@ if (Astro.request.method === 'POST') {
   else if (emailError || deleteError) Astro.response.status = 400;
 }
 
-const profile = await ensureProfile(db, userId, lang);
+const [profile, badges, universityOptions] = await Promise.all([
+  ensureProfile(db, userId, lang),
+  listMyBadges(db, userId, lang),
+  universityChoices(db, lang),
+]);
+const badgeRequested = Astro.url.searchParams.get('badge') === 'requested';
+const badgeError = discussionError(t, Astro.url.searchParams.get('error'));
 const themeCookie = Astro.cookies.get(THEME_COOKIE)?.value;
 const theme: Theme = themeCookie === 'light' || themeCookie === 'dark' ? themeCookie : 'system';
 const updated = Astro.url.searchParams.get('updated') === '1';
@@ -343,6 +351,81 @@ const email = isPlaceholderEmail(signedIn.user.email) ? null : signedIn.user.ema
     </form>
   </section>
 
+  <section id="badge" class="card section" aria-labelledby="badge-title">
+    <h2 id="badge-title" class="text-title">
+      {t('badge.title')}
+    </h2>
+    <p>{t('badge.body')}</p>
+    {badgeRequested && (
+      <p class="notice notice-success" role="status">
+        {t('badge.requested')}
+      </p>
+    )}
+    {badgeError && (
+      <p class="notice" role="alert">
+        {badgeError}
+      </p>
+    )}
+    {badges.length > 0 && (
+      <div class="badge-list">
+        <h3 class="form-label">{t('badge.mine')}</h3>
+        <ul>
+          {badges.map((badge) => (
+            <li>
+              <span>{badge.type === 'team' ? t('discussions.team') : badge.university?.text}</span>
+              <span class={badge.verified ? 'badge' : 'badge badge-plain'}>
+                {badge.verified ? t('badge.verified') : t('badge.pending')}
+              </span>
+              {!badge.verified && (
+                <form method="post" action="/api/discussions/badge">
+                  <input type="hidden" name="lang" value={lang} />
+                  <input type="hidden" name="back" value={`${here}#badge`} />
+                  <input type="hidden" name="action" value="withdraw" />
+                  <input type="hidden" name="id" value={badge.id} />
+                  <button type="submit" class="button button-quiet">
+                    {t('badge.withdraw')}
+                  </button>
+                </form>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+    <form method="post" action="/api/discussions/badge" class="form">
+      <input type="hidden" name="lang" value={lang} />
+      <input type="hidden" name="back" value={here} />
+      <input type="hidden" name="action" value="request" />
+      <div class="field">
+        <label for="badge-university">{t('badge.university')}</label>
+        <select id="badge-university" name="universityId" class="input" required>
+          {universityOptions.map((option) => (
+            <option value={option.id}>{option.name}</option>
+          ))}
+        </select>
+      </div>
+      <div class="field">
+        <label for="badge-note">{t('badge.note')}</label>
+        <p id="badge-note-hint" class="muted-note">
+          {t('badge.noteHint')}
+        </p>
+        <textarea
+          id="badge-note"
+          name="note"
+          class="input"
+          rows={3}
+          required
+          minlength={5}
+          maxlength={BADGE_NOTE_MAX}
+          aria-describedby="badge-note-hint"
+        />
+      </div>
+      <button type="submit" class="button button-secondary">
+        {t('badge.request')}
+      </button>
+    </form>
+  </section>
+
   <section class="card section danger" aria-labelledby="delete-title">
     <h2 id="delete-title" class="text-title">
       {t('profile.delete.title')}
@@ -369,6 +452,19 @@ const email = isPlaceholderEmail(signedIn.user.email) ? null : signedIn.user.ema
 <style>
   .section {
     gap: var(--space-4);
+  }
+  .badge-list ul {
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .badge-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
   }
   .submit,
   .delete-button {

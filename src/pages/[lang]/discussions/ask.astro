@@ -1,0 +1,220 @@
+---
+/**
+ * Ask a question: topic, title (similar questions appear while typing),
+ * details, the question's language, an optional university, or the program
+ * the student came from. A nickname field while the student has none. A plain
+ * form to /api/discussions/thread; never cached.
+ */
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import DiscussionRules from '../../../components/DiscussionRules.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import { LANG_NAMES, LANGS } from '../../../i18n/config';
+import SimilarQuestions from '../../../islands/SimilarQuestions';
+import AppShell from '../../../layouts/AppShell.astro';
+import { ensureProfile } from '../../../lib/account';
+import { getSignedIn } from '../../../lib/auth/server';
+import { signInPath } from '../../../lib/auth/urls';
+import { loadTexts, mainVisible } from '../../../lib/db/queries';
+import { pathwayColleges, programs, universities } from '../../../lib/db/schema';
+import {
+  authorName,
+  BODY_MAX,
+  listTopics,
+  TITLE_MAX,
+  TITLE_MIN,
+  topicSchema,
+  universityChoices,
+} from '../../../lib/discussions';
+import { discussionError } from '../../../lib/discussions-view';
+import { getDb } from '../../../lib/server';
+import { and, eq } from 'drizzle-orm';
+
+export const prerender = false;
+
+const { lang } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const t = getTranslations(lang);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+const here = `${Astro.url.pathname}${Astro.url.search}`;
+const signedIn = await getSignedIn(Astro.request.headers, Astro.response.headers);
+if (!signedIn) return Astro.redirect(signInPath(lang, { next: here }), 303);
+const db = getDb();
+const userId = signedIn.user.id;
+const params = Astro.url.searchParams;
+
+const presetTopic = topicSchema.safeParse(params.get('topic'));
+const wantedProgram = Number(params.get('program'));
+const wantedUniversity = Number(params.get('university'));
+
+const [profile, topics, choices, programRow] = await Promise.all([
+  ensureProfile(db, userId, lang),
+  listTopics(db, lang),
+  universityChoices(db, lang),
+  Number.isSafeInteger(wantedProgram) && wantedProgram > 0
+    ? db
+        .select({ id: programs.id, name: programs.name, universityId: programs.universityId })
+        .from(programs)
+        .leftJoin(universities, eq(universities.id, programs.universityId))
+        .leftJoin(pathwayColleges, eq(pathwayColleges.id, programs.collegeId))
+        .where(and(eq(programs.id, wantedProgram), mainVisible))
+        .limit(1)
+        .then((rows) => rows[0] ?? null)
+    : null,
+]);
+const program = programRow
+  ? {
+      id: programRow.id,
+      name: (await loadTexts(db, lang, { program: [programRow.id] }, ['name'])).name(
+        'program',
+        programRow.id,
+        programRow.name,
+      ).text,
+    }
+  : null;
+const presetUniversity =
+  programRow?.universityId ??
+  (choices.some((c) => c.id === wantedUniversity) ? wantedUniversity : null);
+const error = discussionError(t, params.get('error'));
+const myAutoName = authorName(t, { id: userId, nickname: null });
+---
+
+<AppShell lang={lang} title={t('discussions.ask.metaTitle')} noindex signedIn>
+  <Breadcrumb
+    lang={lang}
+    items={[{ href: `/${lang}/discussions`, label: t('discussions.title') }]}
+    current={t('discussions.ask')}
+  />
+  <div class="discussions-layout with-aside">
+    <section aria-labelledby="ask-title" class="card ask">
+      <h1 id="ask-title" class="page-title">
+        {t('discussions.ask')}
+      </h1>
+      {error && (
+        <p class="notice" role="alert">
+          {error}
+        </p>
+      )}
+      <form method="post" action="/api/discussions/thread" class="form">
+        <input type="hidden" name="lang" value={lang} />
+        <input type="hidden" name="back" value={here} />
+
+        <div class="field">
+          <label for="ask-topic">{t('discussions.form.topic')}</label>
+          <select id="ask-topic" name="topic" class="input" required>
+            {topics.map((topic) => (
+              <option
+                value={topic.slug}
+                selected={presetTopic.success && presetTopic.data === topic.slug}
+              >
+                {topic.name.text}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="ask-title-input">{t('discussions.form.title')}</label>
+          <p id="ask-title-hint" class="muted-note">
+            {t('discussions.form.titleHint', { min: TITLE_MIN, max: TITLE_MAX })}
+          </p>
+          <input
+            id="ask-title-input"
+            name="title"
+            class="input"
+            required
+            minlength={TITLE_MIN}
+            maxlength={TITLE_MAX}
+            autocomplete="off"
+            aria-describedby="ask-title-hint"
+          />
+          <SimilarQuestions
+            client:idle
+            lang={lang}
+            inputId="ask-title-input"
+            labels={{
+              title: t('discussions.similar'),
+              hint: t('discussions.similarHint'),
+              answered: t('discussions.answered'),
+            }}
+          />
+        </div>
+
+        <div class="field">
+          <label for="ask-body">{t('discussions.form.body')}</label>
+          <p id="ask-body-hint" class="muted-note">
+            {t('discussions.form.bodyHint')}
+          </p>
+          <textarea
+            id="ask-body"
+            name="body"
+            class="input"
+            rows={6}
+            required
+            maxlength={BODY_MAX}
+            aria-describedby="ask-body-hint"
+          ></textarea>
+        </div>
+
+        <div class="field">
+          <label for="ask-lang">{t('discussions.form.lang')}</label>
+          <select id="ask-lang" name="postLang" class="input">
+            {LANGS.map((code) => (
+              <option value={code} selected={code === lang}>
+                {LANG_NAMES[code]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {program ? (
+          <label class="choice">
+            <input type="checkbox" name="programId" value={program.id} checked />
+            {t('discussions.form.tagProgram', { name: program.name })}
+          </label>
+        ) : (
+          <div class="field">
+            <label for="ask-university">{t('discussions.form.university')}</label>
+            <select id="ask-university" name="universityId" class="input">
+              <option value="">{t('discussions.form.noUniversity')}</option>
+              {choices.map((choice) => (
+                <option value={choice.id} selected={choice.id === presetUniversity}>
+                  {choice.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {!profile.displayName && (
+          <div class="field">
+            <label for="ask-nickname">{t('discussions.form.nickname')}</label>
+            <p id="ask-nickname-hint" class="muted-note">
+              {t('discussions.form.nicknameHint', { name: myAutoName })}
+            </p>
+            <input
+              id="ask-nickname"
+              name="nickname"
+              class="input"
+              maxlength={40}
+              autocomplete="nickname"
+              aria-describedby="ask-nickname-hint"
+            />
+          </div>
+        )}
+
+        <button type="submit" class="button">
+          {t('discussions.form.post')}
+        </button>
+      </form>
+    </section>
+    <div class="discussions-aside">
+      <DiscussionRules lang={lang} />
+    </div>
+  </div>
+</AppShell>
+
+<style>
+  .ask {
+    gap: var(--space-4);
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+/**
+ * "Report" on a post: a disclosure with the reasons and a submit button. Plain
+ * HTML (works without JavaScript). Signed out, sending goes to sign-in first.
+ */
+import { getTranslations, type Lang, type MessageKey } from '../i18n';
+import { REPORT_REASONS } from '../lib/discussions';
+
+interface Props {
+  lang: Lang;
+  targetType: 'thread' | 'reply';
+  targetId: number;
+  back: string;
+}
+const { lang, targetType, targetId, back } = Astro.props;
+const t = getTranslations(lang);
+const id = `report-${targetType}-${targetId}`;
+---
+
+<details class="report">
+  <summary class="button button-quiet">{t('discussions.report')}</summary>
+  <form method="post" action="/api/discussions/report" class="report-form card">
+    <input type="hidden" name="lang" value={lang} />
+    <input type="hidden" name="back" value={back} />
+    <input type="hidden" name="targetType" value={targetType} />
+    <input type="hidden" name="targetId" value={targetId} />
+    <fieldset class="field">
+      <legend>{t('discussions.reportLegend')}</legend>
+      {REPORT_REASONS.map((reason, i) => (
+        <label class="choice">
+          <input
+            type="radio"
+            name="reason"
+            value={reason}
+            required
+            checked={i === 0}
+            id={`${id}-${reason}`}
+          />
+          {t(`discussions.reason.${reason}` as MessageKey)}
+        </label>
+      ))}
+    </fieldset>
+    <button type="submit" class="button button-secondary">
+      {t('discussions.reportSend')}
+    </button>
+  </form>
+</details>
+
+<style>
+  .report summary {
+    list-style: none;
+    width: fit-content;
+  }
+  .report summary::-webkit-details-marker {
+    display: none;
+  }
+  .report-form {
+    margin-top: var(--space-2);
+  }
+</style>

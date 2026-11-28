@@ -1,0 +1,387 @@
+---
+/**
+ * A question and its replies (SPEC "Discussion thread"): question card, the
+ * pinned "Helped the asker" reply, the other replies with Helpful and Report,
+ * and the reply box at the bottom. Desktop: boards and Ask on the left,
+ * similar questions and the rules on the right.
+ *
+ * Signed-out visitors share a copy cached for a minute. A signed-in request
+ * skips that cache (lib/cache.ts, anonymousOnly) and is rendered privately
+ * with the viewer's own buttons: Helped me for the asker, their votes and
+ * reports. Every action is a plain form, so the page works without JavaScript.
+ */
+import AuthorLine from '../../../../components/AuthorLine.astro';
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
+import DiscussionRules from '../../../../components/DiscussionRules.astro';
+import EmptyState from '../../../../components/EmptyState.astro';
+import PostBody from '../../../../components/PostBody.astro';
+import ReportForm from '../../../../components/ReportForm.astro';
+import TopicsNav from '../../../../components/TopicsNav.astro';
+import { getTranslations, isLang, type MessageKey } from '../../../../i18n';
+import AppShell from '../../../../layouts/AppShell.astro';
+import { ensureProfile } from '../../../../lib/account';
+import { getSignedIn } from '../../../../lib/auth/server';
+import { signInPath } from '../../../../lib/auth/urls';
+import { hasSessionCookie } from '../../../../lib/cache';
+import {
+  authorName,
+  getThread,
+  listTopics,
+  REPLY_MAX,
+  reportedThread,
+  similarThreads,
+  topicSchema,
+} from '../../../../lib/discussions';
+import { discussionError, threadPath } from '../../../../lib/discussions-view';
+import { getDb } from '../../../../lib/server';
+
+export const prerender = false;
+
+const { lang, topic: rawTopic, thread: rawId } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const topic = topicSchema.safeParse(rawTopic);
+const id = Number(rawId);
+if (!topic.success || !Number.isSafeInteger(id) || id <= 0) {
+  return new Response(null, { status: 404 });
+}
+const t = getTranslations(lang);
+const db = getDb();
+
+const signedIn = hasSessionCookie(Astro.request)
+  ? await getSignedIn(Astro.request.headers, Astro.response.headers)
+  : null;
+const viewerId = signedIn?.user.id ?? null;
+if (signedIn) Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const [page, topics] = await Promise.all([getThread(db, lang, id, viewerId), listTopics(db, lang)]);
+if (page && page.thread.topic !== topic.data) {
+  return Astro.redirect(threadPath(lang, page.thread.topic, id), 301);
+}
+const topicName = topics.find((item) => item.slug === topic.data)?.name.text ?? topic.data;
+const boardHref = `/${lang}/discussions/${topic.data}`;
+const askHref = `/${lang}/discussions/ask?topic=${topic.data}`;
+const here = threadPath(lang, topic.data, id);
+const visible = page !== null && page.thread.status === 'open';
+if (!visible) Astro.response.status = 404;
+
+const thread = page?.thread;
+const isAsker = thread !== undefined && viewerId === thread.author.id;
+const [similar, reportedQuestion, profile] = await Promise.all([
+  visible && thread ? similarThreads(db, lang, thread.title, thread.id) : [],
+  viewerId && visible ? reportedThread(db, viewerId, id) : false,
+  viewerId ? ensureProfile(db, viewerId, lang) : null,
+]);
+// Only a private render reads ?error=: a cached copy must be the same for everyone.
+const error = signedIn ? discussionError(t, Astro.url.searchParams.get('error')) : null;
+const replyBack = `${here}#reply`;
+const myAutoName = viewerId ? authorName(t, { id: viewerId, nickname: null }) : '';
+---
+
+<AppShell
+  lang={lang}
+  title={visible && thread ? `${thread.title} – Clavis` : `${t('discussions.notFound')} – Clavis`}
+  noindex={!visible}
+  signedIn={signedIn !== null}
+>
+  <Breadcrumb
+    lang={lang}
+    items={[
+      { href: `/${lang}/discussions`, label: t('discussions.title') },
+      { href: boardHref, label: topicName },
+    ]}
+    current={visible && thread ? thread.title : t('discussions.notFound')}
+  />
+  <div class="discussions-layout with-nav with-aside">
+    <TopicsNav lang={lang} topics={topics} current={topic.data} askHref={askHref} />
+
+    {!visible || !page || !thread ? (
+      <section class="stack">
+        <h1 class="page-title">
+          {page ? t('discussions.hiddenThread') : t('discussions.notFound')}
+        </h1>
+        <EmptyState
+          title={page ? t('discussions.hiddenThreadBody') : t('discussions.notFoundBody')}
+          action={{ href: boardHref, label: topicName }}
+        />
+      </section>
+    ) : (
+      <div class="thread stack">
+        {error && (
+          <p class="notice" role="alert">
+            {error}
+          </p>
+        )}
+        <article class="card question" aria-labelledby="thread-title">
+          <div class="thread-tags">
+            <a class="badge badge-plain" href={boardHref}>
+              {topicName}
+            </a>
+            {thread.answered && <span class="badge">{t('discussions.answered')}</span>}
+            <span class="lang-tag">
+              <span aria-hidden="true">{thread.lang.toUpperCase()}</span>
+              <span class="visually-hidden">
+                {t(`discussions.lang.${thread.lang}` as MessageKey)}
+              </span>
+            </span>
+          </div>
+          <h1 id="thread-title" class="page-title" lang={thread.lang}>
+            {thread.title}
+          </h1>
+          {thread.tag && (
+            <p>
+              <a href={`/${lang}${thread.tag.path}`}>
+                {t('discussions.about', { name: thread.tag.name.text })}
+              </a>
+            </p>
+          )}
+          <PostBody body={thread.body} lang={thread.lang} />
+          <AuthorLine
+            lang={lang}
+            author={thread.author}
+            at={thread.createdAt}
+            extra={t('discussions.replies', { n: thread.replyCount })}
+          />
+          <div class="post-actions">
+            {reportedQuestion ? (
+              <p class="muted-note">{t('discussions.reported')}</p>
+            ) : (
+              !isAsker && (
+                <ReportForm lang={lang} targetType="thread" targetId={thread.id} back={here} />
+              )
+            )}
+          </div>
+        </article>
+
+        <section aria-labelledby="replies-title" class="stack">
+          <h2 id="replies-title" class="section-title">
+            {t('discussions.repliesTitle')}
+          </h2>
+          {page.replies.length === 0 && <p class="text-muted">{t('discussions.noReplies')}</p>}
+          <ol class="replies">
+            {page.replies.map((r) => {
+              const pinned = r.id === thread.helpedReplyId;
+              const own = viewerId === r.author.id;
+              const back = `${here}#reply-${r.id}`;
+              return (
+                <li id={`reply-${r.id}`} class:list={['card', 'reply', { pinned }]}>
+                  {r.status === 'hidden' ? (
+                    <p class="muted-note">{t('discussions.hiddenReply')}</p>
+                  ) : (
+                    <>
+                      {pinned && <p class="badge pinned-label">{t('discussions.helpedAsker')}</p>}
+                      <AuthorLine lang={lang} author={r.author} at={r.createdAt} />
+                      <PostBody body={r.body} />
+                      <div class="post-actions">
+                        {own ? (
+                          <span class="muted-note">
+                            {t('discussions.helpful')} ·{' '}
+                            {t('discussions.votes', { n: r.helpfulCount })}
+                          </span>
+                        ) : (
+                          <form method="post" action="/api/discussions/vote">
+                            <input type="hidden" name="lang" value={lang} />
+                            <input type="hidden" name="back" value={back} />
+                            <input type="hidden" name="replyId" value={r.id} />
+                            <input type="hidden" name="on" value={r.votedByViewer ? '0' : '1'} />
+                            <button
+                              type="submit"
+                              class="button button-secondary vote-button"
+                              aria-pressed={r.votedByViewer ? 'true' : 'false'}
+                              aria-label={`${t('discussions.helpful')}, ${t('discussions.votes', { n: r.helpfulCount })}`}
+                            >
+                              {t('discussions.helpful')} · {r.helpfulCount}
+                            </button>
+                          </form>
+                        )}
+                        {isAsker && (
+                          <form method="post" action="/api/discussions/helped">
+                            <input type="hidden" name="lang" value={lang} />
+                            <input type="hidden" name="back" value={back} />
+                            <input type="hidden" name="threadId" value={thread.id} />
+                            <input type="hidden" name="replyId" value={pinned ? '' : r.id} />
+                            <button type="submit" class="button button-quiet">
+                              {pinned ? t('discussions.unpin') : t('discussions.helpedMe')}
+                            </button>
+                          </form>
+                        )}
+                        {r.reportedByViewer ? (
+                          <p class="muted-note">{t('discussions.reported')}</p>
+                        ) : (
+                          !own && (
+                            <ReportForm
+                              lang={lang}
+                              targetType="reply"
+                              targetId={r.id}
+                              back={back}
+                            />
+                          )
+                        )}
+                      </div>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        <section id="reply" class="card reply-box" aria-labelledby="reply-title">
+          <h2 id="reply-title" class="visually-hidden">
+            {t('discussions.replyTitle')}
+          </h2>
+          {signedIn && profile ? (
+            <form method="post" action="/api/discussions/reply" class="reply-form">
+              <input type="hidden" name="lang" value={lang} />
+              <input type="hidden" name="back" value={replyBack} />
+              <input type="hidden" name="threadId" value={thread.id} />
+              <label for="reply-body" class="visually-hidden">
+                {t('discussions.replyLabel')}
+              </label>
+              <div class="reply-row">
+                <textarea
+                  id="reply-body"
+                  name="body"
+                  class="input reply-input"
+                  required
+                  minlength={2}
+                  maxlength={REPLY_MAX}
+                  rows={2}
+                  placeholder={t('discussions.replyLabel')}
+                />
+                <button type="submit" class="button">
+                  {t('discussions.replySend')}
+                </button>
+              </div>
+              {!profile.displayName && (
+                <details class="nickname">
+                  <summary class="muted-note">{t('discussions.form.nickname')}</summary>
+                  <div class="field">
+                    <label for="reply-nickname">{t('discussions.form.nickname')}</label>
+                    <p id="reply-nickname-hint" class="muted-note">
+                      {t('discussions.form.nicknameHint', { name: myAutoName })}
+                    </p>
+                    <input
+                      id="reply-nickname"
+                      name="nickname"
+                      class="input"
+                      maxlength={40}
+                      autocomplete="nickname"
+                      aria-describedby="reply-nickname-hint"
+                    />
+                  </div>
+                </details>
+              )}
+            </form>
+          ) : (
+            <a class="button" href={signInPath(lang, { next: replyBack })}>
+              {t('discussions.signInToReply')}
+            </a>
+          )}
+        </section>
+      </div>
+    )}
+
+    <div class="discussions-aside">
+      {similar.length > 0 && (
+        <section class="card" aria-labelledby="similar-title">
+          <h2 id="similar-title" class="rules-title">
+            {t('discussions.similar')}
+          </h2>
+          <ul class="similar-list">
+            {similar.map((item) => (
+              <li>
+                <a href={threadPath(lang, item.topic, item.id)} lang={item.lang}>
+                  {item.title}
+                </a>
+                {item.answered && <span class="muted-note"> · {t('discussions.answered')}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <DiscussionRules lang={lang} />
+    </div>
+  </div>
+</AppShell>
+
+<style>
+  .question .page-title {
+    overflow-wrap: anywhere;
+  }
+  /* A question can be long: on phones it reads as a heading, not a poster. */
+  @media (max-width: 1023px) {
+    .question .page-title {
+      font-size: var(--text-h2);
+      line-height: var(--leading-h2);
+    }
+  }
+  .replies {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .reply {
+    scroll-margin-top: var(--space-6);
+  }
+  .reply.pinned {
+    border: 2px solid var(--brand);
+  }
+  .pinned-label {
+    width: fit-content;
+  }
+  .post-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  .vote-button[aria-pressed='true'] {
+    background: var(--brand-soft);
+  }
+  .rules-title {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    font-weight: var(--weight-semibold);
+  }
+  .reply-form {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .reply-row {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+  .reply-input {
+    flex: 1;
+    min-width: 0;
+    resize: vertical;
+    field-sizing: content;
+    max-height: 40vh;
+  }
+  .nickname summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch-target);
+    cursor: pointer;
+  }
+  .nickname summary::before {
+    content: '+';
+    font-weight: var(--weight-semibold);
+  }
+  .nickname[open] summary::before {
+    content: '−';
+  }
+  /* SPEC: the reply box stays at the bottom of the screen on phones. */
+  @media (max-width: 1023px) {
+    .reply-box {
+      position: sticky;
+      bottom: calc(var(--bottom-bar-height) + var(--space-2));
+      z-index: 1;
+      box-shadow: var(--shadow-raised);
+    }
+  }
+</style>

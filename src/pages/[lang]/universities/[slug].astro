@@ -11,11 +11,13 @@ import SegmentedTabs from '../../../components/SegmentedTabs.astro';
 import SummaryBox from '../../../components/SummaryBox.astro';
 import Save from '../../../components/Save.astro';
 import Text from '../../../components/Text.astro';
+import ThreadList from '../../../components/ThreadList.astro';
 import { getTranslations, isLang, type MessageKey } from '../../../i18n';
 import AppShell from '../../../layouts/AppShell.astro';
 import { UNIVERSITY_TABS, universityTab } from '../../../lib/cache';
 import { getUniversityPage, getUsdTmtRate } from '../../../lib/db/catalog';
 import { daysBetween } from '../../../lib/dates';
+import { threadsTagged } from '../../../lib/discussions';
 import { formatNumber } from '../../../lib/format';
 import { deadlineText, moneyText, rateNote } from '../../../lib/view';
 import { getDb, today } from '../../../lib/server';
@@ -34,6 +36,10 @@ const [page, rate] = await Promise.all([
   getUsdTmtRate(db),
 ]);
 if (!page) Astro.response.status = 404;
+const threads =
+  page && tab === 'discussion'
+    ? await threadsTagged(db, lang, { type: 'university', id: page.university.id })
+    : [];
 
 const u = page?.university;
 const s = page?.summary;
@@ -278,6 +284,21 @@ const allPrograms = page ? [...page.bachelors, ...page.preYears] : [];
               empty={t('university.noScholarships')}
             />
           )}
+
+          {tab === 'discussion' && (
+            <div class="discussion-tab">
+              <a class="button" href={`/${lang}/discussions/ask?university=${page.university.id}`}>
+                {t('discussions.uni.ask', { name: page.university.name.text })}
+              </a>
+              {threads.length > 0 ? (
+                <ThreadList lang={lang} threads={threads} />
+              ) : (
+                <p class="text-muted">
+                  {t('discussions.uni.empty', { name: page.university.name.text })}
+                </p>
+              )}
+            </div>
+          )}
         </section>
       </div>
     </DetailLayout>
@@ -291,6 +312,14 @@ const allPrograms = page ? [...page.bachelors, ...page.preYears] : [];
   }
   .basis {
     margin-top: var(--space-2);
+  }
+  .discussion-tab {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+  .discussion-tab > :global(ul) {
+    justify-self: stretch;
   }
   .tabs-and-panel {
     display: grid;

@@ -1,0 +1,72 @@
+---
+/**
+ * A topic board: its open questions, most recent activity first, twenty at a
+ * time ("Show more" adds ?page=N). Cached 1 minute per page.
+ */
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import DiscussionRules from '../../../components/DiscussionRules.astro';
+import EmptyState from '../../../components/EmptyState.astro';
+import ThreadList from '../../../components/ThreadList.astro';
+import TopicsNav from '../../../components/TopicsNav.astro';
+import { getTranslations, isLang } from '../../../i18n';
+import AppShell from '../../../layouts/AppShell.astro';
+import { listThreads, listTopics, topicSchema } from '../../../lib/discussions';
+import { getDb } from '../../../lib/server';
+
+export const prerender = false;
+
+const { lang, topic: rawTopic } = Astro.params;
+if (!isLang(lang)) return new Response(null, { status: 404 });
+const parsed = topicSchema.safeParse(rawTopic);
+if (!parsed.success) return new Response(null, { status: 404 });
+const topic = parsed.data;
+const t = getTranslations(lang);
+const db = getDb();
+
+const page = Math.min(Math.max(Number(Astro.url.searchParams.get('page')) || 1, 1), 50);
+const [topics, list] = await Promise.all([
+  listTopics(db, lang),
+  listThreads(db, lang, topic, page),
+]);
+const name = topics.find((item) => item.slug === topic)?.name.text ?? topic;
+const askHref = `/${lang}/discussions/ask?topic=${topic}`;
+---
+
+<AppShell lang={lang} title={`${name} – ${t('discussions.metaTitle')}`}>
+  <Breadcrumb
+    lang={lang}
+    items={[{ href: `/${lang}/discussions`, label: t('discussions.title') }]}
+    current={name}
+  />
+  <div class="discussions-layout with-nav with-aside">
+    <TopicsNav lang={lang} topics={topics} current={topic} askHref={askHref} />
+    <section aria-labelledby="board-title" class="stack">
+      <div class="disc-head">
+        <h1 id="board-title" class="page-title">
+          {name}
+        </h1>
+        <a class="button phone-only" href={askHref}>
+          {t('discussions.ask')}
+        </a>
+      </div>
+      {list.items.length > 0 ? (
+        <ThreadList lang={lang} threads={list.items} level={2} />
+      ) : (
+        <EmptyState
+          title={t('discussions.empty.title')}
+          body={t('discussions.empty.body')}
+          action={{ href: askHref, label: t('discussions.ask') }}
+        />
+      )}
+      {list.hasMore && (
+        <a class="button button-secondary" href={`/${lang}/discussions/${topic}?page=${page + 1}`}>
+          {t('discussions.more')}
+        </a>
+      )}
+    </section>
+    <div class="discussions-aside">
+      <p class="muted-note">{t('discussions.signInNote')}</p>
+      <DiscussionRules lang={lang} />
+    </div>
+  </div>
+</AppShell>
