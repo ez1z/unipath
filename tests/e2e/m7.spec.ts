@@ -91,7 +91,13 @@ test('a record needs a source before it can be published', async ({ page }, info
   await page.getByLabel(msg('en', 'admin.field.country')).selectOption('GB');
   await page.getByLabel(msg('en', 'admin.field.published')).check();
   await page.getByRole('button', { name: msg('en', 'admin.create') }).click();
-  await expect(page.getByText(msg('en', 'admin.error.publishNeedsSource'))).toBeVisible();
+  // The message shows by the field, and the summary at the top links to that field.
+  await expect(
+    page.locator('form').getByText(msg('en', 'admin.error.publishNeedsSource')),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('alert').getByRole('link', { name: msg('en', 'admin.field.sourceUrl') }),
+  ).toHaveAttribute('href', '#f-source_url');
   await expect(page.getByLabel(msg('en', 'admin.field.sourceUrl'))).toHaveAttribute(
     'aria-invalid',
     'true',

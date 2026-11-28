@@ -98,6 +98,14 @@ const entityType = {
 }[type];
 const formError = errors['form'];
 const errorCount = Object.keys(errors).length;
+// Each problem links to its field: on a long form the field can be far below.
+const fieldByName = new Map(sections.flatMap((s) => s.fields).map((f) => [f.name, f]));
+const problems = Object.entries(errors).flatMap(([name, e]) => {
+  const field = fieldByName.get(name);
+  if (!field) return [];
+  const target = field.kind === 'translated' ? `f-${name}_en` : `f-${name}`;
+  return [{ href: `#${target}`, label: t(field.label), message: t(e.key, e.params) }];
+});
 ---
 
 <AdminLayout lang={lang} title={title} section={`/admin/${type}`}>
@@ -123,6 +131,15 @@ const errorCount = Object.keys(errors).length;
     <div class="notice" role="alert">
       <p class="form-error">{t('admin.error.summary', { n: errorCount })}</p>
       {formError && <p>{t(formError.key, formError.params)}</p>}
+      {problems.length > 0 && (
+        <ul class="problems">
+          {problems.map((p) => (
+            <li>
+              <a href={p.href}>{p.label}</a>: {p.message}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )}
 
@@ -167,6 +184,15 @@ const errorCount = Object.keys(errors).length;
 </AdminLayout>
 
 <style>
+  .notice[role='alert'] {
+    box-shadow: inset 0 0 0 2px var(--danger);
+  }
+  .problems {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-2) 0 0;
+    padding-inline-start: var(--space-5);
+  }
   .meta {
     display: flex;
     flex-wrap: wrap;

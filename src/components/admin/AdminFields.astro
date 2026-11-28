@@ -274,8 +274,18 @@ const imageLabels = {
     background: var(--surface-raised);
     min-width: 0;
   }
+  /* A floated legend is laid out like any grid item: the title sits inside the
+     card instead of cutting a notch in its border. */
   .admin-section > legend {
-    padding-inline: var(--space-2);
+    float: left;
+    width: 100%;
+    padding: 0 0 var(--space-3);
+    border-bottom: 1px solid var(--border);
+  }
+  @media (min-width: 64rem) {
+    .admin-section {
+      padding: var(--space-5);
+    }
   }
   .langs {
     display: grid;
