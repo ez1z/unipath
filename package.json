@@ -24,6 +24,7 @@
     "cf-typegen": "wrangler types",
     "db:generate": "drizzle-kit generate",
     "db:seed": "node scripts/seed.ts",
+    "db:backup": "node scripts/backup-now.ts",
     "lighthouse": "node scripts/lighthouse.ts"
   },
   "devDependencies": {

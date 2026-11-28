@@ -53,8 +53,9 @@
     "EMAIL_FROM": "no-reply@clavis.example",
     "DEV_MAILBOX": "1",
   },
-  // 04:00 UTC = 09:00 Asia/Ashgabat: deadline reminders (src/lib/scheduled.ts).
-  "triggers": { "crons": ["0 4 * * *"] },
+  // UTC. 04:00 = 09:00 Ashgabat: deadline reminders. 23:00 = 04:00 Ashgabat: D1 backup to R2.
+  // Both in src/lib/scheduled.ts.
+  "triggers": { "crons": ["0 4 * * *", "0 23 * * *"] },
   "kv_namespaces": [
     {
       "binding": "KV",

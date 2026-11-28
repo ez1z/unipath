@@ -1,6 +1,6 @@
 /**
  * The Worker: Astro answers every request; the daily cron (wrangler.jsonc
- * `triggers.crons`) sends deadline reminders. M7 adds the nightly backup.
+ * `triggers.crons`) sends deadline reminders and makes the nightly backup.
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import { runScheduled } from './lib/scheduled.ts';

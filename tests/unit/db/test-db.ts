@@ -18,6 +18,9 @@ export const TODAY = '2026-12-01';
 export interface TestDb {
   d1: D1Database;
   db: Db;
+  /** The local (in-memory) R2 bucket and KV namespace of the same proxy. */
+  files: R2Bucket;
+  kv: KVNamespace;
   dispose: () => Promise<void>;
 }
 
@@ -44,5 +47,5 @@ export async function createTestDb({ seed = true } = {}): Promise<TestDb> {
   await d1.batch(migrationStatements().map((statement) => d1.prepare(statement)));
   const db = createDb(d1);
   if (seed) await loadDemoData(db, buildDemoData(TODAY));
-  return { d1, db, dispose: () => proxy.dispose() };
+  return { d1, db, files: proxy.env.FILES, kv: proxy.env.KV, dispose: () => proxy.dispose() };
 }
