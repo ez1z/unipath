@@ -7,6 +7,7 @@
  * to the profile when signed in) and the matches load in place from the
  * /[lang]/matches fragment, so Home itself stays the same for everyone.
  */
+import '../styles/quick-questions.css';
 import { useEffect, useRef, useState } from 'react';
 import { readQuiz, writeQuiz, type Quiz } from './account-client';
 

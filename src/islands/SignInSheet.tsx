@@ -8,6 +8,7 @@
  * the page and come back through /auth/continue, which finishes it there.
  * Loaded on demand, so pages don't pay for it until someone needs it.
  */
+import '../styles/save.css';
 import { useEffect, useRef, useState } from 'react';
 
 export interface SignInSheetProps {

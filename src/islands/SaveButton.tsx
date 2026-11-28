@@ -6,6 +6,7 @@
  * JavaScript it asks /api/save whether this is saved, toggles in place, and
  * when signed out opens the sign-in sheet (loaded only then), saving right after.
  */
+import '../styles/save.css';
 import { lazy, Suspense } from 'preact/compat';
 import { useEffect, useState } from 'react';
 import { copyQuizToProfile } from './account-client';

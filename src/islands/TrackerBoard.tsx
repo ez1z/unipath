@@ -8,6 +8,7 @@
  * Decision column then offers Accepted / Waitlisted / Rejected / Enrolled).
  * The menu stays the keyboard way to move a card.
  */
+import '../styles/tracker.css';
 import { useState } from 'react';
 import { useHydrated } from './hydrated';
 

@@ -1,0 +1,98 @@
+/* Tracker board island (TrackerBoard.tsx) and the tracker item page.
+   Imported only where it is used, so other pages stay small (SPEC budget). */
+
+/* ---------------------------------------------------------------------------
+   Tracker board (island on My Clav › Tracker).
+   --------------------------------------------------------------------------- */
+
+.tracker-board {
+  display: grid;
+  gap: var(--space-5);
+}
+.board-column {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.board-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+}
+.board-count {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-badge);
+  background: var(--brand-soft);
+  font-size: var(--text-small);
+}
+.board-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.board-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+.board-card[draggable='true'] {
+  cursor: grab;
+}
+.board-name {
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+}
+.board-empty {
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--ink-muted);
+}
+.board-progress {
+  display: grid;
+  gap: var(--space-1);
+}
+.stage-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.stage-select {
+  flex: 1 1 10rem;
+  width: auto;
+}
+.drop-zones {
+  display: grid;
+  gap: var(--space-2);
+}
+.drop-zone {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 2px var(--brand);
+  background: var(--brand-soft);
+  font-weight: var(--weight-semibold);
+}
+.tracker-board[data-dragging] .board-column {
+  border-radius: var(--radius-card);
+  outline: 2px dashed var(--border);
+  outline-offset: var(--space-1);
+}
+@media (min-width: 1024px) {
+  .tracker-board {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}

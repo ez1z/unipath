@@ -4,6 +4,7 @@
  * Share button that uses Telegram's share sheet inside the Mini App, else the
  * phone's own share sheet where there is one.
  */
+import '../styles/share.css';
 import { useState } from 'react';
 import { inTelegramApp, shareInTelegram } from '../lib/telegram-app';
 import { useHydrated } from './hydrated';

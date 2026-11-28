@@ -1,0 +1,30 @@
+/* Home's quick questions island (QuickQuestions.tsx).
+   Imported only where it is used, so other pages stay small (SPEC budget). */
+
+/* Quick questions on Home (island). */
+.quick-questions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+.quiz-details > summary {
+  list-style: none;
+  width: fit-content;
+}
+.quiz-details > summary::-webkit-details-marker {
+  display: none;
+}
+.quiz-form {
+  max-width: 36rem;
+  margin-top: var(--space-4);
+}
+.quiz-countries {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0 var(--space-3);
+}
+.quiz-english {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--space-3);
+}

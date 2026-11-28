@@ -3,6 +3,7 @@
  * Watches the plain title field by id; the form works the same without
  * JavaScript, just without suggestions.
  */
+import '../styles/discussions.css';
 import { useEffect, useRef, useState } from 'react';
 
 export interface SimilarQuestionsProps {

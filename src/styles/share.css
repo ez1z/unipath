@@ -1,0 +1,14 @@
+/* Share-with-parents island (ShareWithParents.tsx).
+   Imported only where it is used, so other pages stay small (SPEC budget). */
+
+/* Share link (ShareWithParents island). */
+.share-link {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
