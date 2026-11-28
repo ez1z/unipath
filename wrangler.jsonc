@@ -1,6 +1,7 @@
 // Cloudflare Worker config for Clavis.
-// Local dev only for now: `astro dev` / `wrangler` use local D1, R2 and KV (state in .wrangler/).
-// The IDs below are placeholders; real ones are created in M8 (see DEPLOY.md, written then).
+// Top level: local dev and tests (`astro dev`, `astro preview`, local D1, R2 and KV in .wrangler/).
+// `env.production`: the live site. Built with CLOUDFLARE_ENV=production (see DEPLOY.md);
+// its IDs, domain and bot name are placeholders until Eziz creates the resources.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "clavis",
@@ -62,4 +63,49 @@
       "id": "00000000000000000000000000000000",
     },
   ],
+  // The live site. Bindings and vars are not inherited from the top level, so each is
+  // repeated here. Every REPLACE_… value comes from DEPLOY.md step by step.
+  "env": {
+    "production": {
+      "name": "clavis",
+      "routes": [{ "pattern": "clavis.example", "custom_domain": true }],
+      // Preview URLs for uploaded versions (`wrangler versions upload`), before they go live.
+      "preview_urls": true,
+      "workers_dev": false,
+      // Worker logs in the Cloudflare dashboard (no third-party service).
+      "observability": { "enabled": true },
+      "vars": {
+        "SITE_URL": "https://clavis.example",
+        "TELEGRAM_BOT_USERNAME": "clavis_bot",
+        "EMAIL_FROM": "no-reply@clavis.example",
+        // Off: the local test mailbox ("1") never exists in production.
+        "DEV_MAILBOX": "",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "clavis-production",
+          "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "r2_buckets": [{ "binding": "FILES", "bucket_name": "clavis-files-production" }],
+      "kv_namespaces": [{ "binding": "KV", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }],
+      // Sign-in codes and deadline reminders (Cloudflare Email Service).
+      "send_email": [{ "name": "EMAIL" }],
+      "ratelimits": [
+        {
+          "name": "REPORT_LIMITER",
+          "namespace_id": "2001",
+          "simple": { "limit": 5, "period": 60 },
+        },
+        { "name": "AUTH_LIMITER", "namespace_id": "2002", "simple": { "limit": 10, "period": 60 } },
+        {
+          "name": "WRITE_LIMITER",
+          "namespace_id": "2003",
+          "simple": { "limit": 60, "period": 60 },
+        },
+      ],
+    },
+  },
 }

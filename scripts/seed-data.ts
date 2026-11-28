@@ -14,6 +14,7 @@
  * - 5 scholarships: open, rolling, closed, unpublished; linked to programs or whole universities.
  */
 import { addDays } from '../src/lib/dates.ts';
+import { COUNTRIES, TOPIC_NAMES } from '../src/lib/reference-data.ts';
 import type {
   countries,
   pathwayColleges,
@@ -107,18 +108,11 @@ export function buildDemoData(today: string): DemoData {
   const checked = addDays(today, -14);
   const day = (offset: number) => addDays(today, offset);
 
-  const countryRows: Row<typeof countries>[] = [
-    { code: 'TR', popularRank: 1 },
-    { code: 'RU', popularRank: 2 },
-    { code: 'HU', popularRank: 3 },
-    { code: 'GB', popularRank: 4 },
-  ];
-  const countryNames: Record<string, { tk: string; ru: string; en: string }> = {
-    TR: { tk: 'Türkiýe', ru: 'Турция', en: 'Türkiye' },
-    RU: { tk: 'Russiýa', ru: 'Россия', en: 'Russia' },
-    HU: { tk: 'Wengriýa', ru: 'Венгрия', en: 'Hungary' },
-    GB: { tk: 'Beýik Britaniýa', ru: 'Великобритания', en: 'United Kingdom' },
-  };
+  const countryRows: Row<typeof countries>[] = COUNTRIES.map(({ code, popularRank }) => ({
+    code,
+    popularRank,
+  }));
+  const countryNames = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]));
 
   const uni = (
     n: number,
@@ -743,18 +737,7 @@ export function buildDemoData(today: string): DemoData {
     ]),
   });
 
-  const topicNames: Record<(typeof TOPIC_SLUGS)[number], { tk: string; ru: string; en: string }> = {
-    'choosing-a-country': { tk: 'Ýurt saýlamak', ru: 'Выбор страны', en: 'Choosing a country' },
-    scholarships: { tk: 'Stipendiýalar', ru: 'Стипендии', en: 'Scholarships' },
-    'documents-and-visas': {
-      tk: 'Resminamalar we wizalar',
-      ru: 'Документы и визы',
-      en: 'Documents and visas',
-    },
-    tests: { tk: 'Synaglar (IELTS, SAT)', ru: 'Экзамены (IELTS, SAT)', en: 'Tests (IELTS, SAT)' },
-    'life-abroad': { tk: 'Daşary ýurtda durmuş', ru: 'Жизнь за рубежом', en: 'Life abroad' },
-    'for-parents': { tk: 'Ene-atalar üçin', ru: 'Для родителей', en: 'For parents' },
-  };
+  const topicNames = TOPIC_NAMES;
   const topicRows = TOPIC_SLUGS.map((slug, index) => ({ slug, sort: index + 1 }));
   for (const slug of TOPIC_SLUGS) add('topic', slug, 'name', topicNames[slug]);
 

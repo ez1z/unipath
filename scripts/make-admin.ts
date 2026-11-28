@@ -2,8 +2,9 @@
  * `pnpm make-admin <email>`: give an account the admin role in the LOCAL D1
  * (the account must have signed in once). `--revoke` makes it a student again.
  *
- * In production, run the same UPDATE with Wrangler yourself (DEPLOY.md):
- *   wrangler d1 execute clavis --remote --command "UPDATE user SET role = 'admin' WHERE email = '…'"
+ * In production, run the same UPDATE with Wrangler yourself (DEPLOY.md, step 8):
+ *   wrangler d1 execute DB --remote --env production --config wrangler.jsonc
+ *     --command "UPDATE user SET role = 'admin' WHERE email = '…'"
  */
 import { getPlatformProxy } from 'wrangler';
 
