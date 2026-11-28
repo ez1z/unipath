@@ -175,7 +175,8 @@ describe('daily limits', () => {
     expect(await createReply(t.db, me, id, 'One more', now)).toEqual({ ok: false, error: 'daily' });
     // Someone else can still reply.
     expect((await createReply(t.db, asker, id, 'Thanks all', now)).ok).toBe(true);
-  });
+    // 32 writes through the local D1 proxy: over 5 s when the whole suite runs at once.
+  }, 20_000);
 });
 
 describe('Helped me and Helpful', () => {
