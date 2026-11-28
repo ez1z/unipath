@@ -131,11 +131,17 @@ test.describe('Security headers', () => {
     }
   });
 
-  test("server pages carry Astro's script hashes and no unsafe-inline", async ({ request }) => {
-    const csp = (await request.get('/en/search')).headers()['content-security-policy'] ?? '';
-    expect(csp).toMatch(/script-src 'self' 'sha256-/);
-    expect(csp).not.toContain('unsafe-inline');
-    expect(csp).not.toContain('unsafe-eval');
+  test("scripts only by hash, never inline or eval'd", async ({ request }) => {
+    for (const path of ['/en/search', '/en/universities/demo-university-1']) {
+      const csp = (await request.get(path)).headers()['content-security-policy'] ?? '';
+      const scriptSrc = /script-src ([^;]*)/.exec(csp)?.[1] ?? '';
+      expect(scriptSrc).toMatch(/^'self' 'sha256-/);
+      expect(scriptSrc).not.toContain('unsafe-inline');
+      expect(scriptSrc).not.toContain('unsafe-eval');
+      expect(csp).toContain("default-src 'self'");
+      // Inline <style> is allowed (astro.config.mjs explains why); styles from elsewhere are not.
+      expect(/style-src ([^;]*)/.exec(csp)?.[1]?.trim()).toBe("'self' 'unsafe-inline'");
+    }
   });
 
   test('the Telegram Login Widget script is allowed on its page only', async ({ request }) => {
@@ -148,6 +154,12 @@ test.describe('Security headers', () => {
     expect(widget).toContain("'self'");
     expect(await scriptSrc('/en/sign-in')).not.toContain('telegram.org');
     expect(await scriptSrc('/en/search')).not.toContain('telegram.org');
+    const frameSrc = async (path: string) =>
+      (await request.get(path)).headers()['content-security-policy'] ?? '';
+    expect(await frameSrc('/en/sign-in/telegram')).toContain(
+      'frame-src https://oauth.telegram.org',
+    );
+    expect(await frameSrc('/en/search')).not.toContain('frame-src');
   });
 
   test('prerendered pages carry the policy as a meta tag', async ({ page }) => {

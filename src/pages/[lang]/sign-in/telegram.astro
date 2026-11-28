@@ -20,6 +20,7 @@ import {
   TELEGRAM_STATE_SECONDS,
 } from '../../../lib/auth/telegram-plugin';
 import { continuePath, signInPath } from '../../../lib/auth/urls';
+import { TELEGRAM_WIDGET_FRAME } from '../../../lib/security';
 
 export const prerender = false;
 
@@ -39,6 +40,7 @@ const bot = telegramBotUsername();
 if (bot) {
   Astro.csp?.insertScriptResource("'self'");
   Astro.csp?.insertScriptResource('https://telegram.org');
+  Astro.csp?.insertDirective(TELEGRAM_WIDGET_FRAME);
 }
 const callback = new URL('/api/auth/telegram/callback', siteUrl());
 callback.searchParams.set('next', continuePath(lang, to));

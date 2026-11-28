@@ -4,9 +4,10 @@
  *
  * The policy comes in two parts:
  *
- * - A `<meta http-equiv="content-security-policy">` that Astro writes into
- *   every page (astro.config.mjs `security.csp`), with hashes of the scripts
- *   and styles it renders, the inline theme script's hash, and META_DIRECTIVES.
+ * - Astro's policy (astro.config.mjs `security.csp`): a header on server
+ *   pages, a `<meta http-equiv>` on prerendered ones. Scripts only by hash
+ *   (Astro's own and the inline theme script); inline `<style>` allowed, see
+ *   astro.config.mjs for why; META_DIRECTIVES for everything else.
  * - Response headers (SECURITY_HEADERS): the directives a `<meta>` policy
  *   can't carry (frame-ancestors) and the other security headers. The
  *   middleware adds them to pages rendered by the Worker; public/_headers
@@ -18,17 +19,15 @@
  */
 import { THEME_SCRIPT } from './theme.ts';
 
-/** Directives for Astro's `<meta>` policy (script-src and style-src are Astro's). */
-export const META_DIRECTIVES = [
-  "default-src 'self'",
-  "img-src 'self' data:",
-  "font-src 'self'",
-  "connect-src 'self'",
-  "media-src 'none'",
-  "worker-src 'none'",
-  "manifest-src 'self'",
-  'frame-src https://oauth.telegram.org',
-] as const;
+/**
+ * Directives for Astro's policy (script-src and style-src are Astro's). Images,
+ * fonts, fetches and the manifest all fall back to default-src: same origin only.
+ * Kept short on purpose: the policy travels with every page (see astro.config.mjs).
+ */
+export const META_DIRECTIVES = ["default-src 'self'"] as const;
+
+/** Only on the Telegram Login Widget page: the widget opens Telegram in a frame. */
+export const TELEGRAM_WIDGET_FRAME = 'frame-src https://oauth.telegram.org';
 
 /**
  * Header-only directives. The Mini App runs in a frame on Telegram Web, so

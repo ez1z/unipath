@@ -31,11 +31,15 @@ export default defineConfig({
   security: {
     // CSRF: cross-site form posts to server pages are refused (Astro's default, kept explicit).
     checkOrigin: true,
-    // A <meta> CSP on every page with hashes of Astro's scripts and styles; the
-    // header half (frame-ancestors and friends) is in src/lib/security.ts.
+    // CSP on every page: scripts only by hash (Astro's own and the theme script);
+    // the header half (frame-ancestors and friends) is in src/lib/security.ts.
     csp: {
       directives: [...META_DIRECTIVES],
       scriptDirective: { hashes: [await themeScriptHash()] },
+      // Inline <style> is allowed rather than hashed: Astro would list the hash of
+      // every stylesheet in the build (~70) on every page, about 4 KB, which cost
+      // 0.4 s of first paint on Slow 3G (SPEC budget: under 2 s). Scripts stay strict.
+      styleDirective: { resources: ["'self'", "'unsafe-inline'"] },
     },
   },
   devToolbar: { enabled: false },
