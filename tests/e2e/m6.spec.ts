@@ -104,6 +104,7 @@ async function fromTelegram(page: Page, type: string, data?: unknown) {
 }
 
 test('opening from the bot signs in silently, in Telegram’s language', async ({ page }, info) => {
+  await fakeTelegram(page);
   await page.goto(await launchUrl(telegramId(info), { lang: 'ru' }));
   await expect(page).toHaveURL(/\/ru$/);
 
@@ -117,6 +118,7 @@ test('opening from the bot signs in silently, in Telegram’s language', async (
 
 test('a returning student keeps their Profile language', async ({ page, browser }, info) => {
   const id = telegramId(info);
+  await fakeTelegram(page);
   await page.goto(await launchUrl(id, { lang: 'ru' }));
   await expect(page).toHaveURL(/\/ru$/);
   await page.goto('/ru/my/profile');
@@ -126,18 +128,35 @@ test('a returning student keeps their Profile language', async ({ page, browser 
   // Next time Telegram still says Russian, but the student chose English.
   const later = await browser.newContext();
   const again = await later.newPage();
+  await fakeTelegram(again);
   await again.goto(await launchUrl(id, { lang: 'ru' }));
   await expect(again).toHaveURL(/\/en$/);
   await later.close();
 });
 
 test('tampered launch data is refused', async ({ page }, info) => {
+  await fakeTelegram(page);
   await page.goto(await launchUrl(telegramId(info), { tamper: true }));
   await expect(page).toHaveURL(/\/tk\/sign-in\?error=telegram-app$/);
   await expect(page.getByText(msg('tk', 'signIn.error.telegram-app'))).toBeVisible();
   expect(
     (await page.context().cookies()).find((c) => c.name === 'clavis.session_token'),
   ).toBeUndefined();
+});
+
+test('a link with someone’s launch data signs no one in outside Telegram', async ({
+  page,
+}, info) => {
+  // Valid, signed data, but a plain browser (no Telegram bridge): a login CSRF attempt.
+  await page.goto(await launchUrl(telegramId(info), { lang: 'ru' }));
+  await expect(page.getByText(msg('tk', 'tg.outside'))).toBeVisible();
+  await expect(page).toHaveURL(/\/tg#/);
+  expect(
+    (await page.context().cookies()).find((c) => c.name === 'clavis.session_token'),
+  ).toBeUndefined();
+  // And a hash on any other page is ignored.
+  await page.goto(`/en${(await launchUrl(telegramId(info))).slice(3)}`);
+  expect(await page.evaluate(() => sessionStorage.getItem('clavis_tg'))).toBeNull();
 });
 
 test('opened outside Telegram, /tg says so and links to the website', async ({ page }) => {

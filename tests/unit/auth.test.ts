@@ -4,6 +4,7 @@
  * Google is checked; the real round trip is in the manual steps for Eziz).
  */
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { isAPIError } from 'better-auth/api';
 import { createAuth, type Auth } from '../../src/lib/auth/auth.ts';
 import { safeNextPath } from '../../src/lib/auth/next.ts';
 import {
@@ -472,8 +473,19 @@ describe('Telegram Mini App (initData)', () => {
       },
       token,
     );
-  const webapp = async (data: string, cookie?: string) =>
-    post('/telegram/webapp', { initData: data }, cookie);
+  /** The server-side call /tg makes, answered as an HTTP-like Response. */
+  const webapp = async (data: string, cookie?: string) => {
+    try {
+      return await auth.api.telegramWebApp({
+        body: { initData: data },
+        headers: new Headers(cookie ? { Cookie: cookie } : {}),
+        asResponse: true,
+      });
+    } catch (error) {
+      if (isAPIError(error)) return new Response(null, { status: error.statusCode });
+      throw error;
+    }
+  };
   const sessionCookies = (response: Response) =>
     response.headers.getSetCookie().filter((c) => c.startsWith('clavis.session_token='));
 
@@ -538,8 +550,14 @@ describe('Telegram Mini App (initData)', () => {
     const otherBot = await webapp(await initData(800503, {}, '1:other'));
     expect(otherBot.status).toBe(401);
 
-    const empty = await post('/telegram/webapp', { initData: '' });
+    const empty = await webapp('');
     expect(empty.status).toBe(400);
     expect(await countRows('user', 'email', placeholderEmail('800501'))).toBe(0);
+  });
+
+  test('there is no HTTP endpoint for it: only /tg (origin-checked, limited) can call it', async () => {
+    const direct = await post('/telegram/webapp', { initData: await initData(800600) });
+    expect(direct.status).toBe(404);
+    expect(sessionCookies(direct)).toEqual([]);
   });
 });

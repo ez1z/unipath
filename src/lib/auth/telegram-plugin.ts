@@ -5,8 +5,8 @@
  *   `GET /api/auth/telegram/callback?state=…&next=…&id=…&auth_date=…&hash=…`;
  *   this checks the one-time state, the signature and its age, then signs in or
  *   links Telegram to the signed-in user.
- * - Mini App: `POST /api/auth/telegram/webapp` with the Mini App's `initData`
- *   (called by `/tg`), a silent sign-in.
+ * - Mini App: `auth.api.telegramWebApp` with the Mini App's `initData`, a
+ *   silent sign-in. Server-only (no URL): `/tg` calls it.
  *
  * Telegram users get a placeholder address on the reserved `.invalid` domain,
  * because Better Auth needs a unique email. Nothing is ever sent to it.
@@ -164,7 +164,7 @@ export const telegramPlugin = ({
       ),
 
       /**
-       * Silent sign-in inside the Mini App (`/tg` posts here). The data is
+       * Silent sign-in inside the Mini App (called by `/tg`). The data is
        * `Telegram.WebApp.initData`, checked with the bot token and refused
        * after 24 hours (SPEC). Inside Telegram, the Telegram account is who
        * the student is: a session for anyone else is replaced, and nothing is
@@ -176,6 +176,9 @@ export const telegramPlugin = ({
         {
           method: 'POST',
           body: z.object({ initData: z.string().min(1).max(INIT_DATA_MAX_LENGTH) }),
+          // Not on /api/auth: the only way in is /tg, which checks the origin and
+          // limits per Telegram user before calling this.
+          metadata: { SERVER_ONLY: true },
         },
         async (ctx) => {
           const result = await verifyInitData(ctx.body.initData, botToken);

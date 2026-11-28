@@ -109,11 +109,47 @@ function save(key: string, value: string) {
 
 let launch: LaunchData | null | undefined;
 
-/** This visit's launch data: from the hash on the first page, then from sessionStorage. */
+/** The platform name scripts/dev-telegram-webapp.ts uses; honoured on localhost only. */
+export const DEV_PLATFORM = 'dev';
+
+/**
+ * Is this page really running inside a Telegram client? Launch data in a
+ * hash alone proves nothing: anyone can send a link like
+ * `/tg#tgWebAppData=<their own signed data>`, and signing a visitor into
+ * someone else's account that way is a login CSRF. So the hash is only taken
+ * when Telegram's bridge is there: the apps inject `TelegramWebviewProxy`, old
+ * Windows clients `external.notify`, and Telegram Web frames the page from
+ * web.telegram.org (M8's CSP allows no other frame parent).
+ */
+export function telegramClientPresent(platform: string): boolean {
+  const w = window as TelegramWindow;
+  if (w.TelegramWebviewProxy) return true;
+  const external = (w as unknown as { external?: { notify?: unknown } }).external;
+  if (external && typeof external.notify === 'function') return true;
+  if (w.parent !== w) {
+    let parentOrigin = location.ancestorOrigins?.[0];
+    if (parentOrigin === undefined) {
+      try {
+        parentOrigin = document.referrer ? new URL(document.referrer).origin : undefined;
+      } catch {
+        parentOrigin = undefined;
+      }
+    }
+    if (parentOrigin === TELEGRAM_WEB_ORIGIN) return true;
+  }
+  // The local stand-in, in a plain browser.
+  return platform === DEV_PLATFORM && ['localhost', '127.0.0.1'].includes(location.hostname);
+}
+
+/**
+ * This visit's launch data. Telegram opens the Mini App at `/tg` with the data
+ * in the hash; it is taken there (inside a real Telegram client only) and kept
+ * in sessionStorage for the rest of the visit.
+ */
 export function launchData(): LaunchData | null {
   if (launch !== undefined) return launch;
-  const fromHash = parseLaunchHash(location.hash);
-  if (fromHash) {
+  const fromHash = location.pathname === '/tg' ? parseLaunchHash(location.hash) : null;
+  if (fromHash && telegramClientPresent(fromHash.platform)) {
     save(LAUNCH_KEY, JSON.stringify(fromHash));
     launch = fromHash;
     return launch;

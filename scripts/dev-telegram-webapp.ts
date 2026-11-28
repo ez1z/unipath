@@ -40,7 +40,8 @@ const initData = await signInitData(
 const hash = new URLSearchParams({
   tgWebAppData: initData,
   tgWebAppVersion: '8.0',
-  tgWebAppPlatform: 'tdesktop',
+  // 'dev' lets a plain browser on localhost act as the Telegram app (lib/telegram-app.ts).
+  tgWebAppPlatform: 'dev',
   tgWebAppThemeParams: JSON.stringify(theme),
 });
 console.log(`http://localhost:4321/tg#${hash.toString()}`);
