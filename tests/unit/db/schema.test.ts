@@ -63,9 +63,10 @@ describe('migrations', () => {
         'mistake_reports',
         'settings',
         'audit_log',
-        // FTS5 search indexes (migration 0002); their shadow tables are filtered out above.
+        // FTS5 search indexes (migrations 0002, 0006); their shadow tables are filtered out above.
         'program_search',
         'university_search',
+        'thread_search',
       ].sort(),
     );
   });

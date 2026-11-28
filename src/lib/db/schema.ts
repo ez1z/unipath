@@ -590,6 +590,8 @@ export const threads = sqliteTable(
     index('threads_university_idx').on(t.universityId),
     index('threads_program_idx').on(t.programId),
     index('threads_author_idx').on(t.authorId, t.createdAt),
+    // "New in Discussions" across all boards.
+    index('threads_status_activity_idx').on(t.status, t.lastActivityAt),
     check('threads_status', oneOf(t.status, POST_STATUSES)),
     check('threads_lang', oneOf(t.lang, ['tk', 'ru', 'en'])),
   ],
@@ -668,6 +670,9 @@ export const userBadges = sqliteTable(
     }),
     verifiedBy: text('verified_by').references(() => user.id, { onDelete: 'set null' }),
     verifiedAt: integer('verified_at', { mode: 'timestamp_ms' }),
+    /** The student's short note with a "Studies here" request, for the admin who checks it. */
+    note: text('note'),
+    createdAt: createdAt(),
   },
   (t) => [
     index('user_badges_user_idx').on(t.userId),

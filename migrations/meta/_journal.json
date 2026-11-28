@@ -36,6 +36,20 @@
       "when": 1795850441342,
       "tag": "0004_tracker",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1795851366025,
+      "tag": "0005_discussions",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1795851368249,
+      "tag": "0006_thread_search",
+      "breakpoints": true
     }
   ]
 }
