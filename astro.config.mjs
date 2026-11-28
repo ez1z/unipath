@@ -2,6 +2,7 @@
 import cloudflare from '@astrojs/cloudflare';
 import preact from '@astrojs/preact';
 import { defineConfig } from 'astro/config';
+import { META_DIRECTIVES, themeScriptHash } from './src/lib/security.ts';
 
 // A new id per build, so cached HTML from an older deploy (with older CSS and asset
 // names) is never served after a deploy. See cacheKey in src/lib/cache.ts.
@@ -27,6 +28,18 @@ export default defineConfig({
   integrations: [preact({ compat: true })],
   // Better Auth owns sessions (M3); Astro's own KV-backed sessions stay off.
   session: false,
+  security: {
+    // CSRF: cross-site form posts to server pages are refused (Astro's default, kept explicit).
+    checkOrigin: true,
+    // A <meta> CSP on every page with hashes of Astro's scripts and styles; the
+    // header half (frame-ancestors and friends) is in src/lib/security.ts.
+    csp: {
+      directives: [...META_DIRECTIVES],
+      scriptDirective: { hashes: [await themeScriptHash()] },
+    },
+  },
   devToolbar: { enabled: false },
+  // No Markdown code blocks; Shiki's inline styles wouldn't pass the CSP anyway.
+  markdown: { syntaxHighlight: false },
   vite: { define: { __BUILD_ID__: JSON.stringify(BUILD_ID) } },
 });

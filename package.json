@@ -28,10 +28,12 @@
     "db:import": "node scripts/import-records.ts",
     "db:import-moe": "node scripts/import-moe-list.ts",
     "make-admin": "node scripts/make-admin.ts",
-    "lighthouse": "node scripts/lighthouse.ts"
+    "lighthouse": "node scripts/lighthouse.ts",
+    "security:headers": "node scripts/write-headers.ts"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
+    "@axe-core/playwright": "4.14.1",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.65.1",
     "@types/node": "^24.19.4",

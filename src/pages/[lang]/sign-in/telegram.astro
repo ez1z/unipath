@@ -34,6 +34,12 @@ const action = parsePendingAction(rawAction) ? rawAction : null;
 const to = { next, action };
 
 const bot = telegramBotUsername();
+// The Login Widget is the one third-party script on the site, on this page only
+// (lib/security.ts). Adding a source replaces Astro's default, so 'self' goes back in.
+if (bot) {
+  Astro.csp?.insertScriptResource("'self'");
+  Astro.csp?.insertScriptResource('https://telegram.org');
+}
 const callback = new URL('/api/auth/telegram/callback', siteUrl());
 callback.searchParams.set('next', continuePath(lang, to));
 callback.searchParams.set('fail', signInPath(lang, to));

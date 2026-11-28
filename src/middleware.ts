@@ -1,9 +1,12 @@
 import { defineMiddleware } from 'astro:middleware';
 import { cachePolicy, withPageCache, type CacheContext } from './lib/cache';
+import { applySecurityHeaders } from './lib/security';
 
 /**
  * Public server pages go through the page cache (lib/cache.ts). In `astro dev`
- * the cache is off, so edits show at once.
+ * the cache is off, so edits show at once. Every Worker response gets the
+ * security headers (lib/security.ts); prerendered pages get them from
+ * public/_headers.
  */
 export const onRequest = defineMiddleware(async (context, next) => {
   if (context.isPrerendered) return next();
@@ -23,15 +26,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
       waitUntil: (promise) => cf.waitUntil(promise),
     };
   }
-  const response = await withPageCache(context.request, () => next(), cacheContext);
+  let response = await withPageCache(context.request, () => next(), cacheContext);
+  try {
+    response.headers.set('X-Clavis-Probe', '1');
+    response.headers.delete('X-Clavis-Probe');
+  } catch {
+    // Immutable headers (a response from the cache or a fetch): copy it.
+    response = new Response(response.body, response);
+  }
   // Everything rendered per request that isn't a cached public page (account,
   // sign-in, share, admin, API) is private unless it says otherwise.
   if (!policy && !response.headers.has('Cache-Control')) {
-    try {
-      response.headers.set('Cache-Control', 'private, no-store');
-    } catch {
-      // Immutable headers (a fetched response passed through): leave as is.
-    }
+    response.headers.set('Cache-Control', 'private, no-store');
   }
+  applySecurityHeaders(response.headers, context.url);
   return response;
 });
