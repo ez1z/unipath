@@ -68,15 +68,17 @@
   "env": {
     "production": {
       "name": "clavis",
-      "routes": [{ "pattern": "clavis.example", "custom_domain": true }],
+      // No domain yet (2026-11-29): the site runs on the account's workers.dev address.
+      // With a domain, add `"routes": [{ "pattern": "the-domain", "custom_domain": true }]`,
+      // set SITE_URL to it and workers_dev to false (DEPLOY.md, "Moving to a domain").
       // Preview URLs for uploaded versions (`wrangler versions upload`), before they go live.
       "preview_urls": true,
-      "workers_dev": false,
+      "workers_dev": true,
       // Worker logs in the Cloudflare dashboard (no third-party service).
       "observability": { "enabled": true },
       "vars": {
-        "SITE_URL": "https://clavis.example",
-        "TELEGRAM_BOT_USERNAME": "clavis_bot",
+        "SITE_URL": "https://clavis.clavis-548.workers.dev",
+        "TELEGRAM_BOT_USERNAME": "myclavisbot",
         // Email is off in production (Eziz, 2026-11-28): sign-in with Telegram or Google,
         // reminders by Telegram. To turn it on, set an address here and add the
         // send_email binding below (DEPLOY.md, "Turning email on").
@@ -88,12 +90,15 @@
         {
           "binding": "DB",
           "database_name": "clavis-production",
-          "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+          "database_id": "a6ef7f8a-bd14-43ca-90a7-f6cfe4a85727",
           "migrations_dir": "migrations",
         },
       ],
-      "r2_buckets": [{ "binding": "FILES", "bucket_name": "clavis-files-production" }],
-      "kv_namespaces": [{ "binding": "KV", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }],
+      // File storage (R2) is off for now (Eziz, 2026-11-29: R2 asks for a card): no
+      // logo/photo uploads, no nightly backup (src/lib/server.ts filesBucket). To turn it
+      // on, add `"r2_buckets": [{ "binding": "FILES", "bucket_name": "clavis-files-production" }]`
+      // (DEPLOY.md, "Turning file storage on").
+      "kv_namespaces": [{ "binding": "KV", "id": "f753ac86aa5945b5b2d13d883872e9c7" }],
       "ratelimits": [
         {
           "name": "REPORT_LIMITER",
