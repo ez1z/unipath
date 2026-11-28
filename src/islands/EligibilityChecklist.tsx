@@ -3,6 +3,7 @@
  * list of conditions; once hydrated, ticks produce "Looks like a fit" or
  * "Missing: …". Nothing is stored or sent.
  */
+import { tkList } from '../lib/tk-intl';
 import { useState } from 'react';
 
 export interface EligibilityChecklistProps {
@@ -28,7 +29,9 @@ export default function EligibilityChecklist(props: EligibilityChecklistProps) {
       ? fitLabel
       : missingLabel.replace(
           '{items}',
-          new Intl.ListFormat(lang, { style: 'long', type: 'conjunction' }).format(missing),
+          lang === 'tk'
+            ? tkList(missing)
+            : new Intl.ListFormat(lang, { style: 'long', type: 'conjunction' }).format(missing),
         );
 
   return (

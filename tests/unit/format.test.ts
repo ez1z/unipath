@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest';
+import { listText } from '../../src/lib/view.ts';
 import {
   formatDate,
+  formatMonth,
+  formatNumber,
   formatTmt,
   formatUsd,
   languageName,
@@ -44,5 +47,20 @@ describe('languageName', () => {
     expect(languageName('en', 'tr')).toBe('Turkish');
     expect(languageName('ru', 'en')).toBe('английский');
     expect(languageName('en', '!!')).toBe('!!');
+  });
+});
+
+describe('Turkmen without Intl locale data (the Workers runtime has none)', () => {
+  test('formats dates, months, numbers, money, languages and lists itself', () => {
+    const nbsp = String.fromCharCode(0xa0);
+    expect(formatDate('tk', '2027-01-27')).toBe('27 ýan 2027');
+    expect(formatMonth('tk', 9)).toBe('Sentýabr');
+    expect(formatNumber('tk', 3.5)).toBe('3,5');
+    expect(formatNumber('tk', 12000)).toBe(`12${nbsp}000`);
+    expect(formatUsd('tk', 6000)).toBe(`6${nbsp}000${nbsp}US$`);
+    expect(formatTmt('tk', 21000)).toBe(`21${nbsp}000${nbsp}TMT`);
+    expect(languageName('tk', 'en')).toBe('iňlis dili');
+    expect(languageName('tk', 'tr')).toBe('türk dili');
+    expect(listText('tk', ['a', 'b', 'c'])).toBe('a, b we c');
   });
 });

@@ -3,6 +3,7 @@
  * Costs show USD with TMT beside it, using the rate and its date from `settings`.
  */
 import type { Lang } from '../i18n/config.ts';
+import { tkCurrency, tkDate, tkLanguage, tkMonth, tkNumber } from './tk-intl.ts';
 
 export interface UsdTmtRate {
   /** TMT for 1 USD. */
@@ -12,10 +13,12 @@ export interface UsdTmtRate {
 }
 
 export function formatNumber(lang: Lang, value: number): string {
+  if (lang === 'tk') return tkNumber(value);
   return new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }).format(value);
 }
 
 export function formatUsd(lang: Lang, usd: number): string {
+  if (lang === 'tk') return tkCurrency(usd, 'USD');
   return new Intl.NumberFormat(lang, {
     style: 'currency',
     currency: 'USD',
@@ -30,6 +33,7 @@ export function usdToTmt(usd: number, rate: UsdTmtRate | null): number | null {
 }
 
 export function formatTmt(lang: Lang, tmt: number): string {
+  if (lang === 'tk') return tkCurrency(tmt, 'TMT');
   return new Intl.NumberFormat(lang, {
     style: 'currency',
     currency: 'TMT',
@@ -39,6 +43,7 @@ export function formatTmt(lang: Lang, tmt: number): string {
 
 /** `YYYY-MM-DD` as a date in the page language, e.g. "20 dek 2026". */
 export function formatDate(lang: Lang, iso: string): string {
+  if (lang === 'tk') return tkDate(iso);
   // Noon UTC keeps the calendar day the same in every time zone.
   return new Intl.DateTimeFormat(lang, {
     day: 'numeric',
@@ -50,6 +55,7 @@ export function formatDate(lang: Lang, iso: string): string {
 
 /** Month name (1–12) in the page language, for intakes. */
 export function formatMonth(lang: Lang, month: number): string {
+  if (lang === 'tk') return tkMonth(month);
   return new Intl.DateTimeFormat(lang, { month: 'long', timeZone: 'UTC' }).format(
     new Date(Date.UTC(2000, month - 1, 15)),
   );
@@ -57,6 +63,10 @@ export function formatMonth(lang: Lang, month: number): string {
 
 /** A teaching language code ("en") as a name in the page language ("iňlis dili"). */
 export function languageName(lang: Lang, code: string): string {
+  if (lang === 'tk') {
+    const name = tkLanguage(code);
+    if (name) return name;
+  }
   try {
     return new Intl.DisplayNames(lang, { type: 'language' }).of(code) ?? code;
   } catch {

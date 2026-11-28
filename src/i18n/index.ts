@@ -1,3 +1,4 @@
+import { tkNumber } from '../lib/tk-intl';
 import type { Lang } from './config';
 import en from './en.json';
 import ru from './ru.json';
@@ -23,7 +24,11 @@ export type Translate = (key: MessageKey, params?: MessageParams) => string;
  */
 export function formatMessage(lang: Lang, message: string, params: MessageParams = {}): string {
   const number = (value: string | number) =>
-    typeof value === 'number' ? new Intl.NumberFormat(lang).format(value) : value;
+    typeof value === 'number'
+      ? lang === 'tk'
+        ? tkNumber(value)
+        : new Intl.NumberFormat(lang).format(value)
+      : value;
 
   const withPlurals = message.replace(
     /\{(\w+), plural,((?:\s*\w+\s*\{[^{}]*\})+)\s*\}/g,
@@ -34,7 +39,8 @@ export function formatMessage(lang: Lang, message: string, params: MessageParams
       for (const [, form, text] of body.matchAll(/(\w+)\s*\{([^{}]*)\}/g)) {
         if (form !== undefined && text !== undefined) forms.set(form, text);
       }
-      const rule = new Intl.PluralRules(lang).select(Number(value));
+      // Turkmen has no plural forms for counted nouns ("5 ýyl"); workerd lacks its rules anyway.
+      const rule = lang === 'tk' ? 'other' : new Intl.PluralRules(lang).select(Number(value));
       const chosen = forms.get(rule) ?? forms.get('other') ?? '';
       return chosen.replaceAll('#', number(value));
     },

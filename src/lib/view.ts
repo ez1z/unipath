@@ -12,6 +12,7 @@ import {
   usdToTmt,
   type UsdTmtRate,
 } from './format.ts';
+import { tkList } from './tk-intl.ts';
 
 export function levelLabel(t: Translate, level: ProgramLevel): string {
   return t(`level.${level}` as MessageKey);
@@ -82,5 +83,6 @@ export function triStateKey(prefix: 'scholarship.preYear' | 'scholarship.turkmen
 
 /** Joins a list the way the language does: "a, b and c". */
 export function listText(lang: Lang, items: string[]): string {
+  if (lang === 'tk') return tkList(items);
   return new Intl.ListFormat(lang, { style: 'long', type: 'conjunction' }).format(items);
 }
