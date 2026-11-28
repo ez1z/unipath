@@ -471,6 +471,13 @@ export const trackerItems = sqliteTable(
   },
   (t) => [
     index('tracker_items_user_idx').on(t.userId),
+    // One item per record per student, even if "Track this" is tapped twice at once.
+    // (SQLite lets many rows share a NULL, so each index only bites on its own kind.)
+    uniqueIndex('tracker_items_user_program_unique').on(t.userId, t.programId),
+    uniqueIndex('tracker_items_user_pathway_unique').on(t.userId, t.pathwayId),
+    uniqueIndex('tracker_items_user_scholarship_unique').on(t.userId, t.scholarshipId),
+    // The daily reminder run reads only items still before submission.
+    index('tracker_items_stage_idx').on(t.stage),
     check('tracker_items_stage', oneOf(t.stage, TRACKER_STAGES)),
     check(
       'tracker_items_target',
@@ -486,7 +493,13 @@ export const trackerTasks = sqliteTable(
     itemId: integer('item_id')
       .notNull()
       .references(() => trackerItems.id, { onDelete: 'cascade' }),
+    /** The student's own words, or English for a pre-filled task (see `code`). */
     title: text('title').notNull(),
+    /**
+     * Pre-filled tasks carry a code (e.g. `doc:passport`, `ielts:6.5`), so they show
+     * in the reader's language; null for tasks the student added.
+     */
+    code: text('code'),
     done: integer('done', { mode: 'boolean' }).notNull().default(false),
     dueDate: text('due_date'),
     sort: integer('sort').notNull().default(0),

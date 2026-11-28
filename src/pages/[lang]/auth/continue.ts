@@ -33,7 +33,7 @@ export const GET: APIRoute = async ({ params, request, url }) => {
   const db = getDb();
   await ensureProfile(db, signedIn.user.id, lang);
   const fresh = Date.now() - new Date(signedIn.session.createdAt).getTime() < FRESH_SESSION_MS;
-  if (action && fresh) await runPendingAction(db, signedIn.user.id, action);
+  const goTo = action && fresh ? await runPendingAction(db, signedIn.user.id, lang, action) : null;
 
-  return redirectWithCookies(next ?? myPath(lang), cookies.getSetCookie());
+  return redirectWithCookies(goTo ?? next ?? myPath(lang), cookies.getSetCookie());
 };

@@ -10,6 +10,7 @@ import { findReportTarget, type ReportTarget } from './db/catalog.ts';
 import type { Db } from './db/client.ts';
 import { profiles, savedItems, user, verification, type QuizAnswers } from './db/schema.ts';
 import { REMINDER_CHANNELS, SAVED_ITEM_TYPES, type SavedItemType } from './db/values.ts';
+import { trackTarget, trackTargetSchema, type TrackTarget } from './tracker.ts';
 
 export type Profile = typeof profiles.$inferSelect;
 
@@ -175,30 +176,44 @@ export async function listSaved(db: Db, userId: string, lang: Lang): Promise<Sav
 // Pending action: what the student tried before signing in
 // ---------------------------------------------------------------------------
 
-/** `save:program:101`. M4 adds `track:…`. */
-export interface PendingAction {
-  kind: 'save';
-  item: SavedItemRef;
-}
+/** `save:program:101` or `track:pathway:3`. */
+export type PendingAction =
+  { kind: 'save'; item: SavedItemRef } | { kind: 'track'; target: TrackTarget };
 
 export function parsePendingAction(value: unknown): PendingAction | null {
   if (typeof value !== 'string') return null;
-  const [kind, type, id] = value.split(':');
-  if (kind !== 'save') return null;
-  const item = savedItemSchema.safeParse({ type, id });
-  return item.success ? { kind: 'save', item: item.data } : null;
+  const [kind, type, id, ...rest] = value.split(':');
+  if (rest.length > 0) return null;
+  if (kind === 'save') {
+    const item = savedItemSchema.safeParse({ type, id });
+    return item.success ? { kind: 'save', item: item.data } : null;
+  }
+  if (kind === 'track') {
+    const target = trackTargetSchema.safeParse({ type, id });
+    return target.success ? { kind: 'track', target: target.data } : null;
+  }
+  return null;
 }
 
 export function serializePendingAction(action: PendingAction): string {
-  return `${action.kind}:${action.item.type}:${action.item.id}`;
+  return action.kind === 'save'
+    ? `save:${action.item.type}:${action.item.id}`
+    : `track:${action.target.type}:${action.target.id}`;
 }
 
+/** Finishes the action; a path to go to instead of `next` (the new tracker item), or null. */
 export async function runPendingAction(
   db: Db,
   userId: string,
+  lang: Lang,
   action: PendingAction,
-): Promise<void> {
-  await setSaved(db, userId, action.item, true);
+): Promise<string | null> {
+  if (action.kind === 'save') {
+    await setSaved(db, userId, action.item, true);
+    return null;
+  }
+  const result = await trackTarget(db, userId, action.target);
+  return result.ok ? `/${lang}/my/tracker/${result.id}` : null;
 }
 
 // ---------------------------------------------------------------------------

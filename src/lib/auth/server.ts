@@ -29,7 +29,8 @@ export function devMailboxEnabled(): boolean {
   return vars['DEV_MAILBOX'] === '1' && isLocalSite() && !vars.EMAIL;
 }
 
-function mailer(): Mailer {
+/** Cloudflare Email in production; the console (and dev mailbox) on a local site. */
+export function getMailer(): Mailer {
   if (vars.EMAIL && vars['EMAIL_FROM']) return cloudflareMailer(vars.EMAIL, vars['EMAIL_FROM']);
   if (isLocalSite()) return consoleMailer(devMailboxEnabled() ? env.KV : null);
   // On a real domain without the email binding, codes must not end up in the logs.
@@ -63,7 +64,7 @@ export function getAuth(): Auth {
     db: getDb(),
     siteUrl: siteUrl(),
     secret,
-    mailer: mailer(),
+    mailer: getMailer(),
     telegramBotToken: vars['TELEGRAM_BOT_TOKEN'],
     telegramMarkUsed: markUsedInKv,
     google: googleEnabled()

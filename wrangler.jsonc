@@ -4,6 +4,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "clavis",
+  // Astro's handler plus the cron (src/worker.ts).
+  "main": "./src/worker.ts",
   "compatibility_date": "2026-11-23",
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [
@@ -49,6 +51,8 @@
     "EMAIL_FROM": "no-reply@clavis.example",
     "DEV_MAILBOX": "1",
   },
+  // 04:00 UTC = 09:00 Asia/Ashgabat: deadline reminders (src/lib/scheduled.ts).
+  "triggers": { "crons": ["0 4 * * *"] },
   "kv_namespaces": [
     {
       "binding": "KV",
