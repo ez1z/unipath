@@ -1,0 +1,191 @@
+---
+/**
+ * /admin/badges: "Studies here" requests from students (approve or reject),
+ * the badges already given (remove), and the "Clavis team" badge by email.
+ */
+import { env } from 'cloudflare:workers';
+import { getTranslations, type MessageKey } from '../../i18n';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { afterAdminWrite } from '../../lib/admin/after-save';
+import { text } from '../../lib/admin/form';
+import { requireAdmin } from '../../lib/admin/guard';
+import { decideBadge, grantTeamBadge, pendingBadges, verifiedBadges } from '../../lib/admin/queues';
+import { postDate } from '../../lib/discussions-view';
+import { getDb } from '../../lib/server';
+
+export const prerender = false;
+
+const admin = await requireAdmin(Astro.request, Astro.response.headers);
+if (admin instanceof Response) return admin;
+const { lang, adminId } = admin;
+const t = getTranslations(lang);
+const db = getDb();
+let message: { key: MessageKey; ok: boolean } | null = null;
+let email = '';
+
+if (Astro.request.method === 'POST') {
+  const limit = await env.WRITE_LIMITER.limit({ key: `write:${adminId}` });
+  const form = await Astro.request.formData();
+  const decision = text(form, 'decision');
+  if (!limit.success) {
+    message = { key: 'admin.error.rate', ok: false };
+  } else if (decision === 'team') {
+    email = text(form, 'email').slice(0, 254);
+    const result = /^[^\s@]+@[^\s@]+$/.test(email)
+      ? await grantTeamBadge(db, adminId, email)
+      : 'noUser';
+    if (result === 'ok') {
+      await afterAdminWrite(db, env.KV, { catalogue: false });
+      return Astro.redirect('/admin/badges?done=1', 303);
+    }
+    message = {
+      key: result === 'already' ? 'admin.badge.already' : 'admin.badge.noUser',
+      ok: false,
+    };
+  } else {
+    const id = Number(text(form, 'id'));
+    if (
+      Number.isInteger(id) &&
+      (decision === 'approve' || decision === 'reject' || decision === 'revoke') &&
+      (await decideBadge(db, adminId, id, decision))
+    ) {
+      await afterAdminWrite(db, env.KV, { catalogue: false });
+      return Astro.redirect('/admin/badges?done=1', 303);
+    }
+    message = { key: 'admin.error.action', ok: false };
+  }
+}
+const [pending, verified] = await Promise.all([pendingBadges(db, t), verifiedBadges(db, t)]);
+const done = Astro.url.searchParams.get('done') === '1' && !message;
+---
+
+<AdminLayout lang={lang} title={t('admin.queue.badges')} section="/admin/badges">
+  <h1 class="page-title">{t('admin.queue.badges')}</h1>
+  {done && (
+    <p class="notice notice-success" role="status">
+      {t('admin.done')}
+    </p>
+  )}
+  {message && (
+    <p class="form-error" role="alert">
+      {t(message.key)}
+    </p>
+  )}
+
+  <section class="stack" aria-labelledby="pending">
+    <h2 id="pending" class="section-title">
+      {t('admin.badge.pending')}
+    </h2>
+    {pending.length === 0 ? (
+      <p class="text-muted">{t('admin.queue.empty')}</p>
+    ) : (
+      <ul class="queue">
+        {pending.map((b) => (
+          <li class="card">
+            <p class="card-title">
+              {b.who} · {b.university}
+            </p>
+            <p class="muted-note">
+              {b.email} · {postDate(lang, b.createdAt)}
+            </p>
+            {b.note && <blockquote class="message">{b.note}</blockquote>}
+            <form method="post" class="decide">
+              <input type="hidden" name="id" value={b.id} />
+              <button class="button" name="decision" value="approve">
+                {t('admin.badge.approve')}
+              </button>
+              <button class="button button-secondary" name="decision" value="reject">
+                {t('admin.badge.reject')}
+              </button>
+            </form>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <section class="stack" aria-labelledby="team">
+    <h2 id="team" class="section-title">
+      {t('admin.badge.teamTitle')}
+    </h2>
+    <form method="post" class="team">
+      <input type="hidden" name="decision" value="team" />
+      <div class="field">
+        <label for="team-email">{t('admin.badge.email')}</label>
+        <input
+          id="team-email"
+          class="input"
+          type="email"
+          name="email"
+          value={email}
+          required
+          autocomplete="off"
+        />
+      </div>
+      <button class="button" type="submit">
+        {t('admin.badge.grantTeam')}
+      </button>
+    </form>
+  </section>
+
+  <section class="stack" aria-labelledby="given">
+    <h2 id="given" class="section-title">
+      {t('admin.badge.given')}
+    </h2>
+    {verified.length === 0 ? (
+      <p class="text-muted">{t('admin.none')}</p>
+    ) : (
+      <ul class="queue">
+        {verified.map((b) => (
+          <li class="row">
+            <span>
+              {b.who} · {b.type === 'team' ? t('admin.badge.team') : b.university}
+              <span class="muted-note"> {b.email}</span>
+            </span>
+            <form method="post">
+              <input type="hidden" name="id" value={b.id} />
+              <button class="button button-quiet" name="decision" value="revoke">
+                {t('admin.badge.revoke')}
+              </button>
+            </form>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</AdminLayout>
+
+<style>
+  .queue {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .message {
+    margin: 0;
+    padding-inline-start: var(--space-3);
+    border-inline-start: 3px solid var(--border);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .decide,
+  .team {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-2);
+  }
+  .team .field {
+    min-width: 16rem;
+  }
+</style>

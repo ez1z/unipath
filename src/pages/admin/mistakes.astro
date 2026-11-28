@@ -1,0 +1,105 @@
+---
+/** /admin/mistakes: "Report a mistake" messages, oldest first. */
+import { env } from 'cloudflare:workers';
+import { getTranslations } from '../../i18n';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { text } from '../../lib/admin/form';
+import { requireAdmin } from '../../lib/admin/guard';
+import { closeMistake, openMistakes } from '../../lib/admin/queues';
+import { postDate } from '../../lib/discussions-view';
+import { getDb } from '../../lib/server';
+
+export const prerender = false;
+
+const admin = await requireAdmin(Astro.request, Astro.response.headers);
+if (admin instanceof Response) return admin;
+const { lang, adminId } = admin;
+const t = getTranslations(lang);
+const db = getDb();
+let error = false;
+
+if (Astro.request.method === 'POST') {
+  const limit = await env.WRITE_LIMITER.limit({ key: `write:${adminId}` });
+  const form = await Astro.request.formData();
+  const id = Number(text(form, 'id'));
+  const decision = text(form, 'decision');
+  if (
+    limit.success &&
+    Number.isInteger(id) &&
+    (decision === 'resolved' || decision === 'dismissed')
+  ) {
+    if (await closeMistake(db, adminId, id, decision))
+      return Astro.redirect('/admin/mistakes?done=1', 303);
+  }
+  error = true;
+}
+const items = await openMistakes(db, lang);
+const done = Astro.url.searchParams.get('done') === '1' && !error;
+---
+
+<AdminLayout lang={lang} title={t('admin.queue.mistakes')} section="/admin/mistakes">
+  <h1 class="page-title">{t('admin.queue.mistakes')}</h1>
+  {done && (
+    <p class="notice notice-success" role="status">
+      {t('admin.done')}
+    </p>
+  )}
+  {error && (
+    <p class="form-error" role="alert">
+      {t('admin.error.action')}
+    </p>
+  )}
+  {items.length === 0 ? (
+    <p class="text-muted">{t('admin.queue.empty')}</p>
+  ) : (
+    <ul class="queue">
+      {items.map((m) => (
+        <li class="card">
+          <p class="muted-note">
+            {t(`admin.entity.${m.entityType}`)} · {postDate(lang, m.createdAt)}
+          </p>
+          <p class="card-title">
+            {m.adminPath ? (
+              <a href={m.adminPath}>{m.name}</a>
+            ) : (
+              (m.name ?? t('admin.recordGone', { id: m.entityId }))
+            )}
+          </p>
+          {m.publicPath && <a href={m.publicPath}>{t('admin.viewOnSite')}</a>}
+          <blockquote class="message">{m.message}</blockquote>
+          <form method="post" class="decide">
+            <input type="hidden" name="id" value={m.id} />
+            <button class="button" name="decision" value="resolved">
+              {t('admin.mistake.resolve')}
+            </button>
+            <button class="button button-secondary" name="decision" value="dismissed">
+              {t('admin.mistake.dismiss')}
+            </button>
+          </form>
+        </li>
+      ))}
+    </ul>
+  )}
+</AdminLayout>
+
+<style>
+  .queue {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .message {
+    margin: 0;
+    padding-inline-start: var(--space-3);
+    border-inline-start: 3px solid var(--border);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .decide {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+/**
+ * /admin/reports: reported posts and hidden posts. Keep (shows it again;
+ * those reports no longer count), hide, or delete for good.
+ */
+import { env } from 'cloudflare:workers';
+import { getTranslations } from '../../i18n';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { afterAdminWrite } from '../../lib/admin/after-save';
+import { text } from '../../lib/admin/form';
+import { requireAdmin } from '../../lib/admin/guard';
+import { decidePost, reportedPosts, type PostDecision } from '../../lib/admin/queues';
+import { getDb } from '../../lib/server';
+
+export const prerender = false;
+
+const admin = await requireAdmin(Astro.request, Astro.response.headers);
+if (admin instanceof Response) return admin;
+const { lang, adminId } = admin;
+const t = getTranslations(lang);
+const db = getDb();
+let error = false;
+const DECISIONS: PostDecision[] = ['restore', 'hide', 'delete'];
+
+if (Astro.request.method === 'POST') {
+  const limit = await env.WRITE_LIMITER.limit({ key: `write:${adminId}` });
+  const form = await Astro.request.formData();
+  const id = Number(text(form, 'id'));
+  const target = text(form, 'target');
+  const decision = text(form, 'decision') as PostDecision;
+  if (
+    limit.success &&
+    Number.isInteger(id) &&
+    (target === 'thread' || target === 'reply') &&
+    DECISIONS.includes(decision) &&
+    (await decidePost(db, adminId, target, id, decision))
+  ) {
+    // Cached discussion pages pick up the change at once.
+    await afterAdminWrite(db, env.KV, { catalogue: false });
+    return Astro.redirect('/admin/reports?done=1', 303);
+  }
+  error = true;
+}
+const posts = await reportedPosts(db, lang, t);
+const done = Astro.url.searchParams.get('done') === '1' && !error;
+---
+
+<AdminLayout lang={lang} title={t('admin.queue.reports')} section="/admin/reports">
+  <h1 class="page-title">{t('admin.queue.reports')}</h1>
+  {done && (
+    <p class="notice notice-success" role="status">
+      {t('admin.done')}
+    </p>
+  )}
+  {error && (
+    <p class="form-error" role="alert">
+      {t('admin.error.action')}
+    </p>
+  )}
+  {posts.length === 0 ? (
+    <p class="text-muted">{t('admin.queue.empty')}</p>
+  ) : (
+    <ul class="queue">
+      {posts.map((p) => (
+        <li class="card">
+          <p class="muted-note">
+            {t(p.targetType === 'thread' ? 'admin.post.thread' : 'admin.post.reply')} · {p.author}
+            {' · '}
+            {t('admin.post.reports', { n: p.reports })}
+            {p.hidden && <span class="badge badge-plain">{t('admin.post.hidden')}</span>}
+          </p>
+          <p class="card-title">
+            <a href={p.threadPath}>{p.threadTitle}</a>
+          </p>
+          <blockquote class="message">{p.body}</blockquote>
+          {p.reasons.length > 0 && (
+            <details>
+              <summary>{t('admin.post.reasons')}</summary>
+              <ul>
+                {p.reasons.map((r) => (
+                  <li>{r}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <form method="post" class="decide">
+            <input type="hidden" name="id" value={p.targetId} />
+            <input type="hidden" name="target" value={p.targetType} />
+            <button class="button" name="decision" value="restore">
+              {t('admin.post.restore')}
+            </button>
+            {!p.hidden && (
+              <button class="button button-secondary" name="decision" value="hide">
+                {t('admin.post.hide')}
+              </button>
+            )}
+            <button class="button button-quiet" name="decision" value="delete">
+              {t('admin.post.delete')}
+            </button>
+          </form>
+        </li>
+      ))}
+    </ul>
+  )}
+</AdminLayout>
+
+<style>
+  .queue {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .message {
+    margin: 0;
+    padding-inline-start: var(--space-3);
+    border-inline-start: 3px solid var(--border);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .decide {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>
