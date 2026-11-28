@@ -1,7 +1,17 @@
 ---
-/** Line icons for navigation. Decorative: the visible label carries the meaning. */
+/** Line icons for navigation and trust notes. Decorative: the visible label carries the meaning. */
 interface Props {
-  name: 'home' | 'universities' | 'scholarships' | 'discussions' | 'my';
+  name:
+    | 'home'
+    | 'universities'
+    | 'scholarships'
+    | 'discussions'
+    | 'my'
+    | 'shield'
+    | 'no-ads'
+    | 'gift'
+    | 'send'
+    | 'arrow';
 }
 const { name } = Astro.props;
 ---
@@ -52,6 +62,26 @@ const { name } = Astro.props;
       <path d="M4.5 20.5c0-3.9 3.4-6.5 7.5-6.5s7.5 2.6 7.5 6.5" />
     </>
   )}
+  {name === 'shield' && (
+    <>
+      <path d="M12 3.5 5 6v5.5c0 4.3 3 7.6 7 9 4-1.4 7-4.7 7-9V6z" />
+      <path d="m9 12 2.2 2.2L15.5 10" />
+    </>
+  )}
+  {name === 'no-ads' && (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m6 6 12 12" />
+    </>
+  )}
+  {name === 'gift' && (
+    <>
+      <path d="M4.5 10.5h15v10h-15zM3.5 7.5h17v3h-17zM12 7.5v13" />
+      <path d="M12 7.5C10.5 4 7 4 7 6s3 1.5 5 1.5c2 0 5 .5 5-1.5s-3.5-2-5 1.5" />
+    </>
+  )}
+  {name === 'send' && <path d="M21 4 3.5 11l6.5 2.5L12.5 20zM10 13.5 21 4" />}
+  {name === 'arrow' && <path d="M5 12h14M13 6l6 6-6 6" />}
 </svg>
 
 <style>

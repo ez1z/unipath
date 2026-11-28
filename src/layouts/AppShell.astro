@@ -6,6 +6,7 @@ import Logo from '../components/Logo.astro';
 import MinistryExplainers from '../components/MinistryExplainers.astro';
 import { getTranslations, type Lang } from '../i18n';
 import { activeSection, navItems } from '../lib/nav';
+import { telegramBotLink } from '../lib/site';
 import BaseLayout from './BaseLayout.astro';
 
 /**
@@ -39,6 +40,8 @@ const t = getTranslations(lang);
 const items = navItems(lang);
 const current = activeSection(Astro.url.pathname);
 const ariaCurrent = (section: string) => (section === current ? 'page' : undefined);
+const botLink = telegramBotLink();
+const year = new Date().getFullYear();
 ---
 
 <BaseLayout lang={lang} title={title} description={description} noindex={noindex}>
@@ -66,7 +69,7 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
 
       <div class="header-actions">
         <LanguageSwitch lang={lang} />
-        <a class="sign-in" href={`/${lang}/my`}>
+        <a class="sign-in" href={`/${lang}/my`} data-my-label={t('nav.my')}>
           {signedIn ? t('nav.my') : t('auth.signIn')}
         </a>
       </div>
@@ -78,8 +81,39 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-inner">
-      <nav aria-label={t('footer.label')}>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <p class="footer-logo">
+          <Logo size="large" />
+          <span class="visually-hidden">Clavis</span>
+        </p>
+        <p class="tagline">{t('footer.tagline')}</p>
+        {botLink && (
+          <a class="tg-link" href={botLink} rel="noopener">
+            <Icon name="send" />
+            <span>{t('footer.telegram')}</span>
+          </a>
+        )}
+      </div>
+      <nav class="footer-col" aria-labelledby="footer-explore">
+        <h2 id="footer-explore" class="footer-heading">
+          {t('footer.explore')}
+        </h2>
+        <ul>
+          {items.slice(1).map((item) => (
+            <li>
+              <a href={item.href}>{t(item.labelKey)}</a>
+            </li>
+          ))}
+          <li>
+            <a href={`/${lang}/compare`}>{t('compare.title')}</a>
+          </li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-labelledby="footer-about">
+        <h2 id="footer-about" class="footer-heading">
+          {t('footer.clavis')}
+        </h2>
         <ul>
           <li>
             <a href={`/${lang}/about`}>{t('footer.about')}</a>
@@ -92,6 +126,12 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
           </li>
         </ul>
       </nav>
+    </div>
+    <div class="container footer-bottom">
+      <p>{t('home.trust')}</p>
+      <p>
+        © {year} Clavis · {t('footer.made')}
+      </p>
     </div>
   </footer>
 
@@ -115,6 +155,15 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
     </ul>
   </nav>
 </BaseLayout>
+
+<script>
+  // Cached pages always say "Sign in"; with the signed-in hint (middleware.ts) say "My Clav".
+  if (/(?:^|;\s*)clavis_in=1/.test(document.cookie)) {
+    for (const link of document.querySelectorAll<HTMLElement>('[data-my-label]')) {
+      link.textContent = link.dataset['myLabel'] ?? link.textContent;
+    }
+  }
+</script>
 
 <style>
   .skip-link {
@@ -172,33 +221,100 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
     padding-block: var(--space-5) var(--space-6);
   }
 
-  /* Footer; its bottom padding keeps it clear of the fixed bottom bar. */
+  /* Footer: a deep-green band (cream text and logo, like the app icon). Its
+     bottom padding keeps it clear of the fixed bottom bar on phones. */
   .site-footer {
-    border-top: 1px solid var(--border);
-    padding-top: var(--space-5);
+    --logo-ink: var(--footer-ink);
+    background: var(--footer-bg);
+    color: var(--footer-ink);
+    padding-top: var(--space-6);
     padding-bottom: calc(
-      var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px) + var(--space-6)
+      var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px) + var(--space-5)
     );
   }
-  .footer-inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
+  .site-footer a {
+    color: var(--footer-ink);
+  }
+  .site-footer :focus-visible {
+    outline-color: var(--footer-ink);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5) var(--space-4);
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+    display: grid;
+    align-content: start;
+    justify-items: start;
     gap: var(--space-3);
   }
-  .site-footer ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1) var(--space-4);
+  /* Branding only: the header logo is the link home. */
+  .footer-logo {
+    display: inline-flex;
+  }
+  .tagline {
+    color: var(--footer-muted);
+    font-weight: var(--weight-medium);
+  }
+  .tg-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch-target);
+    padding-inline: var(--space-4);
+    border: 2px solid var(--footer-line);
+    border-radius: var(--radius-button);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+  }
+  .tg-link:hover {
+    border-color: var(--footer-ink);
+  }
+  .footer-heading {
+    margin-bottom: var(--space-2);
+    color: var(--footer-muted);
+    font-size: var(--text-label);
+    line-height: var(--leading-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .footer-col ul {
+    display: grid;
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .site-footer a {
+  .footer-col a {
     display: inline-flex;
     align-items: center;
     min-height: var(--touch-target);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+  .footer-col a:hover {
+    text-decoration: underline;
+  }
+  /* The rule is a full-width flex item, so it lines up with the content, not the padding. */
+  .footer-bottom::before {
+    content: '';
+    flex-basis: 100%;
+    height: 1px;
+    margin-bottom: var(--space-2);
+    background: var(--footer-line);
+  }
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-5);
+    color: var(--footer-muted);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
   }
   main:focus {
     outline: none;
@@ -323,7 +439,14 @@ const ariaCurrent = (section: string) => (section === current ? 'page' : undefin
       padding-block: var(--space-6);
     }
     .site-footer {
-      padding-bottom: var(--space-6);
+      padding-bottom: var(--space-5);
+    }
+    .footer-grid {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+    .footer-brand {
+      grid-column: auto;
     }
     .bottom-bar {
       display: none;

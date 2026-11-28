@@ -1,12 +1,16 @@
 import { defineMiddleware } from 'astro:middleware';
 import { cachePolicy, withPageCache, type CacheContext } from './lib/cache';
 import { applySecurityHeaders } from './lib/security';
+import { hintCookie } from './lib/signed-in-hint';
 
 /**
  * Public server pages go through the page cache (lib/cache.ts). In `astro dev`
  * the cache is off, so edits show at once. Every Worker response gets the
  * security headers (lib/security.ts); prerendered pages get them from
  * public/_headers.
+ *
+ * Uncached responses also keep the signed-in hint cookie in line with the
+ * session (lib/signed-in-hint.ts), so cached pages can say "My Clav".
  */
 export const onRequest = defineMiddleware(async (context, next) => {
   if (context.isPrerendered) return next();
@@ -38,6 +42,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // sign-in, share, admin, API) is private unless it says otherwise.
   if (!policy && !response.headers.has('Cache-Control')) {
     response.headers.set('Cache-Control', 'private, no-store');
+  }
+  if (!policy) {
+    const hint = hintCookie(
+      context.request.headers.get('Cookie') ?? '',
+      response.headers.getSetCookie(),
+      context.url.protocol === 'https:',
+    );
+    if (hint) response.headers.append('Set-Cookie', hint);
   }
   applySecurityHeaders(response.headers, context.url);
   return response;
